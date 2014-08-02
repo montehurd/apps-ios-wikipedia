@@ -109,6 +109,9 @@ typedef enum {
 @property (strong, nonatomic) NSString *currentTitle;
 @property (strong, nonatomic) NSString *currentDomain;
 
+@property (strong, nonatomic) NSLayoutConstraint *leadGalleryTopConstraint;
+@property (strong, nonatomic) UIImageView *leadGalleryView;
+
 @end
 
 #pragma mark Internal variables
@@ -226,11 +229,7 @@ typedef enum {
 
     self.view.backgroundColor = CHROME_COLOR;
     
-
-
-
-
-
+    [self setupLeadGalleryView];
 
 // Uncomment these lines only if testing onboarding!
 // These lines allow the onboarding to run on every app cold start.
@@ -461,6 +460,10 @@ typedef enum {
                          self.referencesContainerView.transform = CGAffineTransformIdentity;
 
                          self.bottomBarView.transform = CGAffineTransformIdentity;
+
+                         self.leadGalleryView.transform = CGAffineTransformIdentity;
+                         [self scrollLeadGalleryView];
+
                          self.webViewRightConstraint.constant = 0;
 
                          [self.view layoutIfNeeded];
@@ -515,6 +518,10 @@ typedef enum {
                          self.webView.transform = xf;
                          self.referencesContainerView.transform = xf;
                          self.bottomBarView.transform = xf;
+
+                         self.leadGalleryView.transform = xf;
+                         [self scrollLeadGalleryView];
+
                          self.webViewRightConstraint.constant = [self tocGetWidthForWebViewScale:webViewScale];
                          [self.view layoutIfNeeded];
                      }completion: ^(BOOL done){
@@ -1073,6 +1080,10 @@ typedef enum {
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    if (scrollView == self.webView.scrollView) {
+        [self scrollLeadGalleryView];
+    }
+
     // Hide the keyboard if it was visible when the results are scrolled, but only if
     // the results have been scrolled in excess of some small distance threshold first.
     // This prevents tiny scroll adjustments, which seem to occur occasionally for some
@@ -2184,6 +2195,81 @@ typedef enum {
                          [self.referencesVC removeFromParentViewController];
                          self.referencesVC = nil;
                      }];
+}
+
+#pragma mark Lead gallery
+
+-(void)scrollLeadGalleryView
+{
+    CGFloat leadGalleryScroll = -self.webView.scrollView.contentOffset.y;
+    CGPoint p = CGPointMake(0, leadGalleryScroll);
+    p = CGPointApplyAffineTransform(p, self.leadGalleryView.transform);
+    self.leadGalleryTopConstraint.constant = p.y;
+}
+
+-(void)setupLeadGalleryView
+{
+    CGFloat leadGalleryHeight = 68;
+    self.leadGalleryView = [[UIImageView alloc] init];
+
+//Note: using UIImageView here, but this should be a UIView which contains other views (image
+//views or a collectionview or whatever) Just made UIImageView for now as quick hack to see an
+//image.
+self.leadGalleryView.contentMode = UIViewContentModeScaleAspectFill;
+self.leadGalleryView.clipsToBounds = YES;
+
+    self.leadGalleryView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.leadGalleryView.backgroundColor = [UIColor redColor];
+    [self.view addSubview:self.leadGalleryView];
+    
+    self.leadGalleryTopConstraint =
+    [NSLayoutConstraint constraintWithItem: self.leadGalleryView
+                                 attribute: NSLayoutAttributeTop
+                                 relatedBy: NSLayoutRelationEqual
+                                    toItem: self.view
+                                 attribute: NSLayoutAttributeTop
+                                multiplier: 1.0
+                                  constant: 0];
+    
+    NSDictionary *views = @{@"view": self.leadGalleryView, @"web": self.webView.scrollView};
+    NSDictionary *metrics = @{@"leadGalleryHeight": @(leadGalleryHeight)};
+    NSArray *viewConstraintArrays = @
+    [
+     [NSLayoutConstraint constraintsWithVisualFormat: @"H:|[view]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views],
+     [NSLayoutConstraint constraintsWithVisualFormat: @"V:[view(leadGalleryHeight)]"
+                                             options: 0
+                                             metrics: metrics
+                                               views: views],
+     @[self.leadGalleryTopConstraint]
+     ];
+    [self.view addConstraints:[viewConstraintArrays valueForKeyPath:@"@unionOfArrays.self"]];
+    
+// Note: will need the notification code which the toc used to use to set its images
+// as they were retrieved. Would need to show more than one image too. Presently this
+// is not using notification code so it will only work if the image is already in core data.
+// Presently this will also only show the image of the first article displayed. Will
+// need to update when article changes obviously.
+[self setLeadImage];
+    
+}
+
+-(void)setLeadImage
+{
+    NSManagedObjectContext *ctx = articleDataContext_.mainContext;
+    [ctx performBlockAndWait:^(){
+        NSManagedObjectID *articleID =
+        [ctx getArticleIDForTitle: [SessionSingleton sharedInstance].currentArticleTitle
+                           domain: [SessionSingleton sharedInstance].currentArticleDomain];
+        Article *article = (Article *)[ctx objectWithID:articleID];
+        NSArray *sectionImages = [article getSectionImagesUsingContext:ctx];
+        if (sectionImages.count > 0) {
+            SectionImage *sectionImage = sectionImages[0];
+            self.leadGalleryView.image = [[UIImage alloc] initWithData:sectionImage.image.imageData.data];
+        }
+    }];
 }
 
 @end

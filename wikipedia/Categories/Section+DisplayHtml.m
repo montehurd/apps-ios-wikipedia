@@ -37,13 +37,20 @@
     
     NSInteger headingTagSize = [self getHeadingTagSize];
 
+    NSString *leadImagePlaceHolder =
+        [self.sectionId isEqualToNumber:@(0)]
+        ? @"<div style='height:55px;background-color:red;'><!-- PLACEHOLDER FOR TOP IMAGE VIEW --></div>"
+        : @"";
+
     return
         [NSString stringWithFormat:@"\
+%@\
 <h%ld class=\"section_heading\" data-id=\"%ld\" id=\"%@\">\
 %@\
 %@\
 </h%ld>\
             ",
+            leadImagePlaceHolder,
             (long)headingTagSize,
             (long)self.sectionId.integerValue,
             self.anchor,
