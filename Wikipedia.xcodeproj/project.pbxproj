@@ -144,6 +144,7 @@
 		04C757671A1A9E1B0084AC39 /* RecentSearchesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C757651A1A9E1B0084AC39 /* RecentSearchesViewController.m */; };
 		04C7576E1A1AA2D00084AC39 /* RecentSearchCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C7576C1A1AA2D00084AC39 /* RecentSearchCell.m */; };
 		04C7576F1A1AA2D00084AC39 /* RecentSearchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04C7576D1A1AA2D00084AC39 /* RecentSearchCell.xib */; };
+		04C7577F1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C7577E1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.m */; };
 		04C91CEB195517250035ED1B /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04C91CEA195517250035ED1B /* OnboardingViewController.m */; };
 		04C91CEE195520990035ED1B /* logo-onboarding-subtitle.png in Resources */ = {isa = PBXBuildFile; fileRef = 04C91CEC195520990035ED1B /* logo-onboarding-subtitle.png */; };
 		04C91CEF195520990035ED1B /* logo-onboarding-subtitle@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 04C91CED195520990035ED1B /* logo-onboarding-subtitle@2x.png */; };
@@ -512,6 +513,8 @@
 		04C7576B1A1AA2D00084AC39 /* RecentSearchCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentSearchCell.h; sourceTree = "<group>"; };
 		04C7576C1A1AA2D00084AC39 /* RecentSearchCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentSearchCell.m; sourceTree = "<group>"; };
 		04C7576D1A1AA2D00084AC39 /* RecentSearchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecentSearchCell.xib; sourceTree = "<group>"; };
+		04C7577D1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TopMenuTextFieldLangButton.h; sourceTree = "<group>"; };
+		04C7577E1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TopMenuTextFieldLangButton.m; sourceTree = "<group>"; };
 		04C91CE9195517250035ED1B /* OnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingViewController.h; sourceTree = "<group>"; };
 		04C91CEA195517250035ED1B /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
 		04C91CEC195520990035ED1B /* logo-onboarding-subtitle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-onboarding-subtitle.png"; sourceTree = "<group>"; };
@@ -983,6 +986,8 @@
 				042A5B31192591520095E172 /* TopMenuTextField.m */,
 				04CFA11E194900D50088269A /* TopMenuTextFieldContainer.h */,
 				04CFA11F194900D50088269A /* TopMenuTextFieldContainer.m */,
+				04C7577D1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.h */,
+				04C7577E1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.m */,
 			);
 			path = Top;
 			sourceTree = "<group>";
@@ -1966,7 +1971,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/make-css-assets.bash";
+			shellScript = "#scripts/make-css-assets.bash";
 		};
 		04272E7619404CDF00CC682F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1979,7 +1984,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/run-grunt.sh";
+			shellScript = "#scripts/run-grunt.sh";
 		};
 		046F268119C387BD00D7ACB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1996,7 +2001,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/icon-svgs-to-pngs.sh";
+			shellScript = "#scripts/icon-svgs-to-pngs.sh";
 		};
 		048702AE19F75B0800B7D307 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2024,7 +2029,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-storyboard-strings.php";
+			shellScript = "#scripts/update-storyboard-strings.php";
 		};
 		D4C16A631970949A00CD91AD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2040,7 +2045,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-qqq.php";
+			shellScript = "#scripts/update-qqq.php";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2089,6 +2094,7 @@
 				04FD6C7A184EBFCD002CA02F /* ArticleData.xcdatamodeld in Sources */,
 				048A26771906268100395F53 /* PaddedLabel.m in Sources */,
 				04B91AAB18E3D9E200FFAA1C /* NSString+FormattedAttributedString.m in Sources */,
+				04C7577F1A1C1A8A0084AC39 /* TopMenuTextFieldLangButton.m in Sources */,
 				043F18E518D9691D00D8489A /* UINavigationController+TopActionSheet.m in Sources */,
 				04414DDF1A1420EB00A41B4E /* WikiDataShortDescriptionFetcher.m in Sources */,
 				D4EE00B9182443FC0090790F /* MWPageTitle.m in Sources */,

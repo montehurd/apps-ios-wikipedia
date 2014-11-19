@@ -3,6 +3,7 @@
 
 #import "TopMenuTextField.h"
 #import "TopMenuTextFieldContainer.h"
+#import "LanguagesViewController.h"
 #import "WikipediaAppUtils.h"
 #import "TopMenuViewController.h"
 #import "Defines.h"
@@ -31,8 +32,12 @@
 #import "AccountCreationViewController.h"
 #import "WMF_Colors.h"
 #import "UIView+ConstraintsScale.h"
+#import "UIViewController+ModalPresent.h"
+#import "LanguagesViewController.h"
+#import "UIViewController+Alert.h"
+#import "UIViewController+ModalPop.h"
 
-@interface TopMenuViewController (){
+@interface TopMenuViewController () <LanguageSelectionDelegate, TopMenuTextFieldClearTappedDelegate>{
 
 }
 
@@ -199,6 +204,50 @@
 
 #pragma mark Setup
 
+- (void)clearTapped: (TopMenuTextField *)sender
+{
+    if (self.navBarMode == NAVBAR_MODE_SEARCH) {
+        switch (sender.clearButtonType) {
+            case TOP_TEXT_FIELD_CLEAR_BUTTON_X:
+                [self clearTextFieldText];
+                break;
+            case TOP_TEXT_FIELD_CLEAR_BUTTON_LANGS:
+                [self showLangSwitcher];
+                break;
+                
+            default:
+                break;
+        }
+    }
+}
+
+-(void)showLangSwitcher
+{
+    if (self.navBarMode == NAVBAR_MODE_SEARCH) {
+        [self performModalSequeWithID: @"modal_segue_show_languages"
+                      transitionStyle: UIModalTransitionStyleCoverVertical
+                                block: ^(LanguagesViewController *languagesVC){
+                                    languagesVC.invokingVC = self;
+                                    languagesVC.languageSelectionDelegate = self;
+                                }];
+    }
+}
+
+- (void)languageSelected:(NSDictionary *)langData sender:(LanguagesViewController *)sender
+{
+    [self showAlert:MWLocalizedString(@"main-menu-language-selection-saved", nil) type:ALERT_TYPE_TOP duration:1];
+    
+    [NAV switchPreferredLanguageToId:langData[@"code"] name:langData[@"name"]];
+
+    [self.textFieldContainer.textField refreshClearButton];
+    
+    // Hide the lang picker.
+    [self popModalToRoot];
+    
+    // Hide the recent searches interface.
+    [ROOT popToRootViewControllerAnimated:NO];
+}
+
 -(void)setupNavbarContainerSubviews
 {
     UIEdgeInsets textFieldContainerMargin = UIEdgeInsetsMake(8, 0, 7, 0);
@@ -209,8 +258,9 @@
     self.textFieldContainer.textField.autocorrectionType = UITextAutocorrectionTypeNo;
     self.textFieldContainer.textField.font = SEARCH_TEXT_FIELD_FONT;
     self.textFieldContainer.textField.textColor = SEARCH_TEXT_FIELD_HIGHLIGHTED_COLOR;
+    self.textFieldContainer.textField.clearTappedDelegate = self;
     self.textFieldContainer.tag = NAVBAR_TEXT_FIELD;
-    self.textFieldContainer.textField.clearButtonMode = UITextFieldViewModeNever;
+    self.textFieldContainer.textField.clearButtonType = TOP_TEXT_FIELD_CLEAR_BUTTON_LANGS;
     self.textFieldContainer.textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     [self.textFieldContainer.textField addTarget:self action:@selector(postNavItemTappedNotification:) forControlEvents:UIControlEventTouchUpInside];
     self.textFieldContainer.textField.placeholder = MWLocalizedString(@"search-field-placeholder-text", nil);
@@ -220,12 +270,6 @@
     
     [self.navBarContainer addSubview:self.textFieldContainer];
  
-    UIButton *clearButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 30, 25)];
-    clearButton.backgroundColor = [UIColor clearColor];
-    [clearButton setImage:[UIImage imageNamed:@"text_field_x_circle_gray.png"] forState:UIControlStateNormal];
-    [clearButton addTarget:self action:@selector(clearTextFieldText) forControlEvents:UIControlEventTouchUpInside];
-    
-    self.textFieldContainer.textField.rightView = clearButton;
     [self updateClearButtonVisibility];
 
     WikiGlyphButton *(^getWikiGlyphButton)(NSString *, NSString *accessLabel, NavBarItemTag, CGFloat) =
@@ -685,8 +729,10 @@
 
 -(void)updateClearButtonVisibility
 {
-    self.textFieldContainer.textField.rightViewMode =
-        (self.textFieldContainer.textField.text.length == 0) ? UITextFieldViewModeNever : UITextFieldViewModeAlways;
+    if (self.navBarMode == NAVBAR_MODE_SEARCH) {
+        self.textFieldContainer.textField.clearButtonType = (self.textFieldContainer.textField.text.length == 0) ? TOP_TEXT_FIELD_CLEAR_BUTTON_LANGS : TOP_TEXT_FIELD_CLEAR_BUTTON_X;
+        
+    }
 }
 
 #pragma mark Memory

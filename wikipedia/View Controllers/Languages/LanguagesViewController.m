@@ -12,6 +12,8 @@
 #import "UIViewController+Alert.h"
 #import "UIViewController+ModalPop.h"
 #import "UIView+ConstraintsScale.h"
+#import "TopMenuTextFieldContainer.h"
+#import "TopMenuTextField.h"
 
 #pragma mark - Defines
 
@@ -71,6 +73,11 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
+    TopMenuTextFieldContainer *textFieldContainer =
+    [self.topMenuViewController getNavBarItem:NAVBAR_TEXT_FIELD];
+    textFieldContainer.textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+    textFieldContainer.textField.rightViewMode = UITextFieldViewModeNever;
 
     if(self.downloadLanguagesForCurrentArticle){
         [self downloadLangLinkData];
@@ -259,10 +266,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary *selectedLangInfo = self.filteredLanguagesData[indexPath.row];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"LanguageItemSelected"
-                                                        object: self
-                                                      userInfo: selectedLangInfo];
+    [self.languageSelectionDelegate languageSelected:selectedLangInfo sender:self];
 }
 
 #pragma mark - Memory
