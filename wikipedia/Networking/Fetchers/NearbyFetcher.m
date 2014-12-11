@@ -109,13 +109,13 @@
              @"action": @"query",
              @"prop": @"coordinates|pageimages|pageprops",
              @"ppprop": @"wikibase_item",
-             @"colimit": @"50",
+             @"colimit": @"1",
              @"pithumbsize" : @(SEARCH_THUMBNAIL_WIDTH),
-             @"pilimit": @"50",
+             @"pilimit": @"1",
              @"generator": @"geosearch",
              @"ggscoord": [NSString stringWithFormat:@"%f|%f", self.latitude, self.longitude],
              @"ggsradius": @"10000",
-             @"ggslimit": @"50",
+             @"ggslimit": @"1",
              @"format": @"json"
              };
 }

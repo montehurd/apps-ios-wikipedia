@@ -33,6 +33,8 @@
 @property (strong, nonatomic) NSDictionary *attributesTitle;
 @property (strong, nonatomic) NSDictionary *attributesDescription;
 
+@property (strong, nonatomic) UIView *testView;
+
 @end
 
 @implementation NearbyResultCell
@@ -112,8 +114,32 @@
     
     [self setupStringAttributes];
 
+
+
+self.layer.borderWidth = 1;
+self.testView = [[UIView alloc] init];
+self.testView.backgroundColor = [UIColor redColor];
+
+self.testView.layer.borderColor = [UIColor blueColor].CGColor;
+self.testView.layer.borderWidth = 3.0;
+
+[self addSubview:self.testView];
+
+self.testView.frame = CGRectMake(0, 0, 250, 25);
+
+
+
     //[self randomlyColorSubviews];
 }
+
+//-(void)setFrame:(CGRect)frame
+//{
+//    [super setFrame:frame];
+//    
+//    self.testView.frame = self.bounds;
+//
+//    
+//}
 
 -(void)setDistance:(NSNumber *)distance
 {
@@ -228,6 +254,13 @@
     */
 
     angleRadians = DEGREES_TO_RADIANS(angleDegrees);
+
+
+NSLog(@"angleRadians = %f", angleRadians);
+self.testView.layer.transform = CATransform3DMakeRotation(angleRadians, 0.0, 0.0, 1.0);
+[self.testView setNeedsDisplay];
+
+
 
     [self.thumbView drawTickAtHeading:angleRadians];    
 }
