@@ -33,7 +33,7 @@
 @property (strong, nonatomic) NSDictionary *attributesTitle;
 @property (strong, nonatomic) NSDictionary *attributesDescription;
 
-@property (strong, nonatomic) UIView *testView;
+@property (strong, nonatomic) UILabel *cardView;
 
 @end
 
@@ -114,32 +114,31 @@
     
     [self setupStringAttributes];
 
+    self.layer.borderWidth = 1;
+    self.cardView = [[UILabel alloc] init];
+    self.cardView.text = @"Really long sentence yo";
+    self.cardView.backgroundColor = [UIColor redColor];
+
+//    if some unexpected weirdness, try uncommenting:
+//    self.cardView.translatesAutoresizingMaskIntoConstraints = NO;
 
 
-self.layer.borderWidth = 1;
-self.testView = [[UIView alloc] init];
-self.testView.backgroundColor = [UIColor redColor];
+    [self addSubview:self.cardView];
 
-self.testView.layer.borderColor = [UIColor blueColor].CGColor;
-self.testView.layer.borderWidth = 3.0;
-
-[self addSubview:self.testView];
-
-self.testView.frame = CGRectMake(0, 0, 250, 25);
+    self.cardView.frame = CGRectMake(0, 0, 250, 25);
 
 
-
-    //[self randomlyColorSubviews];
+//    [self randomlyColorSubviews];
 }
 
-//-(void)setFrame:(CGRect)frame
-//{
-//    [super setFrame:frame];
-//    
-//    self.testView.frame = self.bounds;
-//
-//    
-//}
+-(void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    
+    self.cardView.frame = self.bounds;
+
+    
+}
 
 -(void)setDistance:(NSNumber *)distance
 {
@@ -256,11 +255,29 @@ self.testView.frame = CGRectMake(0, 0, 250, 25);
     angleRadians = DEGREES_TO_RADIANS(angleDegrees);
 
 
-NSLog(@"angleRadians = %f", angleRadians);
-self.testView.layer.transform = CATransform3DMakeRotation(angleRadians, 0.0, 0.0, 1.0);
-[self.testView setNeedsDisplay];
+    NSLog(@"angleRadians = %f", angleRadians);
+    
+    float distance = self.distance.floatValue;
+    // Account for 90º (π/2) offset and get opposite/adjacent vectors
+    float depth = sin(angleRadians - M_PI_2) * distance;
+    float side = cos(angleRadians - M_PI_2) * distance;
+    
+    NSLog(@"depth = %f & side = %f", depth, side);
+    
+    CATransform3D transform = CATransform3DIdentity;
+    
+    self.cardView.layer.anchorPoint = CGPointMake(0.5, 0.5);
+    
+    transform.m34 = 1.0 / -500;
+    transform = CATransform3DScale(transform, 0.75, 0.75, 0.75);
+    // -200 is the initial depth, then moves back given the distance
+    transform = CATransform3DTranslate(transform, side * 10, 60.0, -200 + (depth * 10));
+    // Reverse rotation about the y-axis
+    transform = CATransform3DRotate(transform, angleRadians, 0.0, -1.0, 0.0);
 
-
+    self.cardView.font = [UIFont systemFontOfSize:36.0];
+    self.cardView.layer.transform = transform;
+    [self.cardView setNeedsDisplay];
 
     [self.thumbView drawTickAtHeading:angleRadians];    
 }
