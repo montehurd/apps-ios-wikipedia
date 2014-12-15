@@ -110,7 +110,8 @@
         [NSString stringWithFormat:@"%f|%f", self.latitude, self.longitude];
     return @{
              @"action": @"query",
-             @"prop": @"coordinates|pageimages|pageterms",
+             @"prop": @"coordinates|pageimages|pageterms|pageprops",
+             @"ppprop": @"wikibase_item",
              @"colimit": @"50",
              @"pithumbsize" : @(SEARCH_THUMBNAIL_WIDTH),
              @"pilimit": @"50",
@@ -183,6 +184,13 @@ if ([title isEqualToString:@"Wikimedia Foundation"]) {
                     }
                 }
                 d[@"description"] = description;
+
+                id pageprops = page[@"pageprops"];
+                if (pageprops && [pageprops isKindOfClass:[NSDictionary class]]){
+                    if (pageprops[@"wikibase_item"]){
+                        d[@"wikibase_item"] = pageprops[@"wikibase_item"];
+                    }
+                }
 
                 [nearbyResults addObject:d];
             }

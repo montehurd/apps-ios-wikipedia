@@ -58,6 +58,7 @@
 #import "SearchResultsController.h"
 #import "ArticleFetcher.h"
 #import "AssetsFileFetcher.h"
+#import "WikidataDescriptionUploader.h"
 
 //#import "UIView+Debugging.h"
 
@@ -1318,6 +1319,15 @@
     //[self presentViewController:referencesVC animated:YES completion:^{}];
 
     //NSLog(@"articleFetchManager.operationCount = %lu", (unsigned long)[QueuesSingleton sharedInstance].articleFetchManager.operationQueue.operationCount);
+
+
+    /*
+    (void)[[WikidataDescriptionUploader alloc] initAndUploadWikidataDescription: @"Town in Aitkin County, Minnesota, USA"
+                                                                   forPageTitle: self.currentTitle
+                                                                          token: nil
+                                                                    withManager: [QueuesSingleton sharedInstance].articleFetchManager
+                                                             thenNotifyDelegate: self];
+    */
 }
 
 -(void)toggleImageSheet

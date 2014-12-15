@@ -58,6 +58,7 @@
 		0443961B1A3C11A30081557D /* NearbyResultCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0443961A1A3C11A30081557D /* NearbyResultCollectionCell.m */; };
 		0443961D1A3C134F0081557D /* NearbyResultCollectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0443961C1A3C134F0081557D /* NearbyResultCollectionCell.xib */; };
 		044396231A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 044396221A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.m */; };
+		0443962C1A3F00EC0081557D /* WikidataDescriptionUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 0443962B1A3F00EC0081557D /* WikidataDescriptionUploader.m */; };
 		0447862F185145090050563B /* HistoryResultCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 04478621185145090050563B /* HistoryResultCell.m */; };
 		04478631185145090050563B /* HistoryResultPrototypeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04478622185145090050563B /* HistoryResultPrototypeView.xib */; };
 		04478633185145090050563B /* HistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04478624185145090050563B /* HistoryViewController.m */; };
@@ -371,6 +372,8 @@
 		0443961C1A3C134F0081557D /* NearbyResultCollectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NearbyResultCollectionCell.xib; sourceTree = "<group>"; };
 		044396211A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionViewCell+DynamicCellHeight.h"; sourceTree = "<group>"; };
 		044396221A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionViewCell+DynamicCellHeight.m"; sourceTree = "<group>"; };
+		0443962A1A3F00EB0081557D /* WikidataDescriptionUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WikidataDescriptionUploader.h; sourceTree = "<group>"; };
+		0443962B1A3F00EC0081557D /* WikidataDescriptionUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WikidataDescriptionUploader.m; sourceTree = "<group>"; };
 		04478620185145090050563B /* HistoryResultCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistoryResultCell.h; sourceTree = "<group>"; };
 		04478621185145090050563B /* HistoryResultCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistoryResultCell.m; sourceTree = "<group>"; };
 		04478622185145090050563B /* HistoryResultPrototypeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HistoryResultPrototypeView.xib; sourceTree = "<group>"; };
@@ -1232,6 +1235,8 @@
 				0487047B19F8262600B7D307 /* WikiTextSectionFetcher.m */,
 				0487047C19F8262600B7D307 /* WikiTextSectionUploader.h */,
 				0487047D19F8262600B7D307 /* WikiTextSectionUploader.m */,
+				0443962A1A3F00EB0081557D /* WikidataDescriptionUploader.h */,
+				0443962B1A3F00EC0081557D /* WikidataDescriptionUploader.m */,
 			);
 			path = Fetchers;
 			sourceTree = "<group>";
@@ -2107,6 +2112,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0443962C1A3F00EC0081557D /* WikidataDescriptionUploader.m in Sources */,
 				D49B2ED2196C687C002F035D /* PullToRefreshViewController.m in Sources */,
 				0449E63518A9845C00D51524 /* LoginViewController.m in Sources */,
 				04DB0BEA18BD37F900B4BCF3 /* UIScrollView+ScrollSubviewToLocation.m in Sources */,
