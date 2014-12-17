@@ -59,6 +59,8 @@
 #import "ArticleFetcher.h"
 #import "AssetsFileFetcher.h"
 
+#import "NearbyImmersionViewController.h"
+
 //#import "UIView+Debugging.h"
 
 #define TOC_TOGGLE_ANIMATION_DURATION @0.225f
@@ -325,6 +327,14 @@
     [self downloadAssetsFilesIfNecessary];
 
     [self performHousekeepingIfNecessary];
+
+
+
+
+NearbyImmersionViewController *immersionVC = [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"NearbyImmersionViewController"];
+[self presentViewController:immersionVC animated:YES completion:^{}];
+
+
 
     //[self.view randomlyColorSubviews];
 }

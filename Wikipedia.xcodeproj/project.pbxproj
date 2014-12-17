@@ -83,6 +83,7 @@
 		0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */ = {isa = PBXBuildFile; fileRef = 0472BC17193AD88C00C40BDA /* MWKSection+DisplayHtml.m */; };
 		047528AF19107DAA00F2CDA8 /* Section.m in Sources */ = {isa = PBXBuildFile; fileRef = 047528AE19107DAA00F2CDA8 /* Section.m */; };
 		047528B5191465C400F2CDA8 /* Article.m in Sources */ = {isa = PBXBuildFile; fileRef = 047528B4191465C400F2CDA8 /* Article.m */; };
+		047627AB1A41FD260097C43B /* NearbyImmersionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 047627AA1A41FD260097C43B /* NearbyImmersionViewController.m */; };
 		047801BE18AE987900DBB747 /* UIButton+ColorMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 047801BD18AE987900DBB747 /* UIButton+ColorMask.m */; };
 		047E74141860509000916964 /* SavedPagesResultPrototypeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */; };
 		047E95511996DD030046A122 /* NearbyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 047E954E1996DD030046A122 /* NearbyViewController.m */; };
@@ -420,6 +421,8 @@
 		047528AE19107DAA00F2CDA8 /* Section.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Section.m; sourceTree = "<group>"; };
 		047528B3191465C400F2CDA8 /* Article.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Article.h; sourceTree = "<group>"; };
 		047528B4191465C400F2CDA8 /* Article.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Article.m; sourceTree = "<group>"; };
+		047627A91A41FD260097C43B /* NearbyImmersionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NearbyImmersionViewController.h; sourceTree = "<group>"; };
+		047627AA1A41FD260097C43B /* NearbyImmersionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NearbyImmersionViewController.m; sourceTree = "<group>"; };
 		047801BC18AE987900DBB747 /* UIButton+ColorMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+ColorMask.h"; sourceTree = "<group>"; };
 		047801BD18AE987900DBB747 /* UIButton+ColorMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+ColorMask.m"; sourceTree = "<group>"; };
 		047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SavedPagesResultPrototypeView.xib; sourceTree = "<group>"; };
@@ -1158,6 +1161,15 @@
 			path = Images;
 			sourceTree = "<group>";
 		};
+		047627A81A41FD260097C43B /* NearbyImmersion */ = {
+			isa = PBXGroup;
+			children = (
+				047627A91A41FD260097C43B /* NearbyImmersionViewController.h */,
+				047627AA1A41FD260097C43B /* NearbyImmersionViewController.m */,
+			);
+			path = NearbyImmersion;
+			sourceTree = "<group>";
+		};
 		0485FEC71994CF8800141361 /* Nearby */ = {
 			isa = PBXGroup;
 			children = (
@@ -1372,6 +1384,7 @@
 				04530AF21935BF2900022512 /* ModalOverlay */,
 				042A5B1419253D2A0095E172 /* Navigation */,
 				0485FEC71994CF8800141361 /* Nearby */,
+				047627A81A41FD260097C43B /* NearbyImmersion */,
 				04C91CE8195517030035ED1B /* Onboarding */,
 				04F27B6D18FE0F2E00EDD838 /* PageHistory */,
 				04DD89AE18BFE63A00DD5DAD /* Preview */,
@@ -1819,7 +1832,7 @@
 				ORGANIZATIONNAME = "Wikimedia Foundation";
 				TargetAttributes = {
 					D4991434181D51DE00E6073C = {
-						DevelopmentTeam = AKK7J2GV64;
+						DevelopmentTeam = D5RR3ZF62D;
 					};
 				};
 			};
@@ -2024,7 +2037,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/make-css-assets.bash";
+			shellScript = "#scripts/make-css-assets.bash";
 		};
 		04272E7619404CDF00CC682F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2037,7 +2050,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/run-grunt.sh";
+			shellScript = "#scripts/run-grunt.sh";
 		};
 		046F268119C387BD00D7ACB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2054,7 +2067,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/icon-svgs-to-pngs.sh";
+			shellScript = "#scripts/icon-svgs-to-pngs.sh";
 		};
 		048702AE19F75B0800B7D307 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2082,7 +2095,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-storyboard-strings.php";
+			shellScript = "#scripts/update-storyboard-strings.php";
 		};
 		D4C16A631970949A00CD91AD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2098,7 +2111,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-qqq.php";
+			shellScript = "#scripts/update-qqq.php";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2194,6 +2207,7 @@
 				0429300A18604898002A13FC /* SavedPagesResultCell.m in Sources */,
 				0487048419F8262600B7D307 /* CaptchaResetter.m in Sources */,
 				04D34DC11863F6B200610A87 /* History.m in Sources */,
+				047627AB1A41FD260097C43B /* NearbyImmersionViewController.m in Sources */,
 				04821CD119895EDC007558F6 /* ReferenceGradientView.m in Sources */,
 				0460F8DC19B0F932001BC59B /* CenteredPathView.m in Sources */,
 				0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */,
