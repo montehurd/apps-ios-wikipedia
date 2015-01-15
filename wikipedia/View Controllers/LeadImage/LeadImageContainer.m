@@ -13,6 +13,7 @@
 #import "FocalImage.h"
 #import "MWKArticle+isMain.h"
 #import "UIView+Debugging.h"
+#import "WikidataDescriptionEditorView.h"
 
 #define PLACEHOLDER_IMAGE_ALPHA 0.3f
 
@@ -34,6 +35,8 @@ Do *not* leave this set to YES for release.
 @property (nonatomic) BOOL isPlaceholder;
 @property(strong, nonatomic)id rotationObserver;
 
+@property(strong, nonatomic)WikidataDescriptionEditorView *descriptionEditor;
+
 @end
 
 @implementation LeadImageContainer
@@ -44,6 +47,38 @@ Do *not* leave this set to YES for release.
     self.clipsToBounds = YES;
     self.backgroundColor = [UIColor clearColor];
     [self adjustConstraintsScaleForViews:@[self.titleLabel]];
+
+    UILongPressGestureRecognizer *longPress =
+    [[UILongPressGestureRecognizer alloc] initWithTarget: self
+                                                  action: @selector(titleLabelLongPressed:)];
+    longPress.minimumPressDuration = 0.5f;
+    [self.titleLabel addGestureRecognizer:longPress];
+
+    self.descriptionEditor = [[[NSBundle mainBundle] loadNibNamed: @"WikidataDescriptionEditorView"
+                                                             owner: nil
+                                                           options: nil] firstObject];
+self.descriptionEditor.alpha = 0.5;
+[self addSubview:self.descriptionEditor];
+NSDictionary *views = @{@"view": self.descriptionEditor};
+//self.descriptionEditor.titleLabel.text = @"asdfas";
+//self.descriptionEditor.descriptionTextField.text = @"bla bla";
+NSArray *constraintArrays = @
+    [
+
+     [NSLayoutConstraint constraintsWithVisualFormat: @"H:|[view]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views],
+
+     [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[view]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views]
+ ];
+[self addConstraints:[constraintArrays valueForKeyPath:@"@unionOfArrays.self"]];
+
+
+
 
     self.rotationObserver =
     [[NSNotificationCenter defaultCenter] addObserverForName: UIDeviceOrientationDidChangeNotification
@@ -73,7 +108,24 @@ Do *not* leave this set to YES for release.
     // Important! "clipsToBounds" must be "NO" so super long titles lay out properly!
     self.clipsToBounds = NO;
 
-    //[self randomlyColorSubviews];
+    [self randomlyColorSubviews];
+}
+
+-(void)titleLabelLongPressed:(UILongPressGestureRecognizer *)recognizer
+{
+/*
+    Short description of <i>Barack Obama</i>
+    ---------------------------------------
+    | 44th President of the United States |
+    ---------------------------------------
+
+
+*/
+
+    if (recognizer.state == UIGestureRecognizerStateBegan){
+        NSLog(@"LONG PRESSED");
+
+    }
 }
 
 -(void)dealloc
@@ -239,9 +291,18 @@ Do *not* leave this set to YES for release.
     
     if (self.article.isMain) {
         [self.titleLabel setTitle:@"" description:@""];
+
+self.descriptionEditor.titleLabel.text = @"";
+self.descriptionEditor.descriptionTextField.text = @"";
+
     }else{
         NSString *title = [self.article.displaytitle getStringWithoutHTML];
         [self.titleLabel setTitle:title description:[self getCurrentArticleDescription]];
+
+self.descriptionEditor.titleLabel.text = title;
+self.descriptionEditor.descriptionTextField.text = [self getCurrentArticleDescription];
+
+
     }
 
     if (!self.article.image.asUIImage && [self imageExists]) {

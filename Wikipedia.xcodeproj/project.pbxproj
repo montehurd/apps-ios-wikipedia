@@ -82,6 +82,8 @@
 		0462A6D11A1FE016009412D4 /* SearchResultAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 0462A6D01A1FE016009412D4 /* SearchResultAttributedString.m */; };
 		0463639818A844570049EE4F /* KeychainCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 0463639718A844570049EE4F /* KeychainCredentials.m */; };
 		0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */ = {isa = PBXBuildFile; fileRef = 0472BC17193AD88C00C40BDA /* MWKSection+DisplayHtml.m */; };
+		0477E9D11A6851AF00029334 /* WikidataDescriptionEditorView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0477E9D01A6851AF00029334 /* WikidataDescriptionEditorView.xib */; };
+		0477E9D41A68527C00029334 /* WikidataDescriptionEditorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0477E9D31A68527C00029334 /* WikidataDescriptionEditorView.m */; };
 		047801BE18AE987900DBB747 /* UIButton+ColorMask.m in Sources */ = {isa = PBXBuildFile; fileRef = 047801BD18AE987900DBB747 /* UIButton+ColorMask.m */; };
 		047E74141860509000916964 /* SavedPagesResultPrototypeView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */; };
 		047E95511996DD030046A122 /* NearbyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 047E954E1996DD030046A122 /* NearbyViewController.m */; };
@@ -434,6 +436,9 @@
 		0472BC16193AD88C00C40BDA /* MWKSection+DisplayHtml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MWKSection+DisplayHtml.h"; sourceTree = "<group>"; };
 		0472BC17193AD88C00C40BDA /* MWKSection+DisplayHtml.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MWKSection+DisplayHtml.m"; sourceTree = "<group>"; };
 		047528A3190F0C2900F2CDA8 /* WikiGlyph_Chars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WikiGlyph_Chars.h; sourceTree = "<group>"; };
+		0477E9D01A6851AF00029334 /* WikidataDescriptionEditorView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WikidataDescriptionEditorView.xib; sourceTree = "<group>"; };
+		0477E9D21A68527C00029334 /* WikidataDescriptionEditorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WikidataDescriptionEditorView.h; sourceTree = "<group>"; };
+		0477E9D31A68527C00029334 /* WikidataDescriptionEditorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WikidataDescriptionEditorView.m; sourceTree = "<group>"; };
 		047801BC18AE987900DBB747 /* UIButton+ColorMask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+ColorMask.h"; sourceTree = "<group>"; };
 		047801BD18AE987900DBB747 /* UIButton+ColorMask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+ColorMask.m"; sourceTree = "<group>"; };
 		047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SavedPagesResultPrototypeView.xib; sourceTree = "<group>"; };
@@ -1570,6 +1575,9 @@
 				04E106371A3560A90046DC27 /* LeadImageTitleLabel.m */,
 				045374861A35834D00CE1A56 /* LeadImageTitleAttributedString.h */,
 				045374871A35834D00CE1A56 /* LeadImageTitleAttributedString.m */,
+				0477E9D01A6851AF00029334 /* WikidataDescriptionEditorView.xib */,
+				0477E9D21A68527C00029334 /* WikidataDescriptionEditorView.h */,
+				0477E9D31A68527C00029334 /* WikidataDescriptionEditorView.m */,
 			);
 			path = LeadImage;
 			sourceTree = "<group>";
@@ -2010,6 +2018,7 @@
 				04D3082B19991CB60034F106 /* logo-placeholder-nearby.png in Resources */,
 				04E106351A3560030046DC27 /* LeadImageContainer.xib in Resources */,
 				D4C16A6819709CDF00CD91AD /* (null) in Resources */,
+				0477E9D11A6851AF00029334 /* WikidataDescriptionEditorView.xib in Resources */,
 				047E74141860509000916964 /* SavedPagesResultPrototypeView.xib in Resources */,
 				04123630189C29EA00E0CF8E /* abuse-filter-disallowed@2x.png in Resources */,
 				D4BC22B4181E9E6300CAC673 /* empty.png in Resources */,
@@ -2049,7 +2058,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/make-css-assets.bash";
+			shellScript = "#scripts/make-css-assets.bash";
 		};
 		04272E7619404CDF00CC682F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2062,7 +2071,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/run-grunt.sh";
+			shellScript = "#scripts/run-grunt.sh";
 		};
 		046F268119C387BD00D7ACB3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2079,7 +2088,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/icon-svgs-to-pngs.sh";
+			shellScript = "#scripts/icon-svgs-to-pngs.sh";
 		};
 		048702AE19F75B0800B7D307 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2107,7 +2116,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-storyboard-strings.php";
+			shellScript = "#scripts/update-storyboard-strings.php";
 		};
 		D4C16A631970949A00CD91AD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2123,7 +2132,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "scripts/update-qqq.php";
+			shellScript = "#scripts/update-qqq.php";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2164,6 +2173,7 @@
 				04414DDB1A140FAF00A41B4E /* SearchDidYouMeanButton.m in Sources */,
 				04530AFB1935C2B500022512 /* EmptySegue.m in Sources */,
 				044BD6B618849AD000FFE4BE /* SectionEditorViewController.m in Sources */,
+				0477E9D41A68527C00029334 /* WikidataDescriptionEditorView.m in Sources */,
 				042B3996192EAEEA0066B270 /* ShareMenuSavePageActivity.m in Sources */,
 				0429301018604898002A13FC /* SavedPagesViewController.m in Sources */,
 				04D149DF18877343006B4104 /* UIViewController+Alert.m in Sources */,
