@@ -8,7 +8,7 @@
 #import "TopMenuViewController.h"
 #import "UIViewController+ModalPop.h"
 #import "TabularScrollView.h"
-#import "WikiGlyph_Chars_iOS.h"
+#import "WikiGlyph_Chars.h"
 #import "Defines.h"
 #import "PaddedLabel.h"
 #import "SecondaryMenuRowView.h"
@@ -163,7 +163,7 @@ typedef enum {
 
         NSDictionary *attributes =
             @{
-              NSFontAttributeName: [UIFont fontWithName:@"WikiFontGlyphs-iOS" size:MENU_ICON_FONT_SIZE],
+              NSFontAttributeName: [UIFont fontWithName:@"WikiFont-Glyphs" size:MENU_ICON_FONT_SIZE],
               NSForegroundColorAttributeName : MENU_ICON_COLOR,
               NSBaselineOffsetAttributeName: @0
               };
@@ -204,7 +204,7 @@ typedef enum {
 
 -(void)setRowData
 {
-    NSString *ltrSafeCaretCharacter = @""; //[WikipediaAppUtils isDeviceLanguageRTL] ? IOS_WIKIGLYPH_BACKWARD : IOS_WIKIGLYPH_FORWARD;
+    NSString *ltrSafeCaretCharacter = @""; //[WikipediaAppUtils isDeviceLanguageRTL] ? WIKIGLYPH_BACKWARD : WIKIGLYPH_FORWARD;
     
     NSMutableArray *rowData =
     @[

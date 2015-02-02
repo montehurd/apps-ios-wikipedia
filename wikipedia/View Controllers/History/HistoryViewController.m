@@ -496,7 +496,7 @@
             wikiFontCharacter = WIKIGLYPH_LINK;
             break;
         default:
-            wikiFontCharacter = WIKIGLYPH_MAGNIFYING_GLASS;
+            wikiFontCharacter = WIKIGLYPH_MAGNIFY_BOLD;
             break;
     }
     

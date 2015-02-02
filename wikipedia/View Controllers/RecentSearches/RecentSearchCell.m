@@ -10,7 +10,7 @@
 #define FONT_SIZE (16.0f * MENUS_SCALE_MULTIPLIER)
 #define FONT_COLOR [UIColor grayColor]
 #define ICON_SIZE (20.0f * MENUS_SCALE_MULTIPLIER)
-#define ICON_GLYPH WIKIGLYPH_MAGNIFYING_GLASS
+#define ICON_GLYPH WIKIGLYPH_MAGNIFY_BOLD
 #define BORDER_COLOR [UIColor colorWithWhite:0.9 alpha:1.0]
 #define MAGNIFY_ICON_COLOR [UIColor colorWithWhite:0.8 alpha:1.0]
 
