@@ -18,6 +18,8 @@
 #import "SavedPagesFunnel.h"
 #import "NSObject+ConstraintsScale.h"
 #import "PaddedLabel.h"
+#import "ProgressLine.h"
+#import "WMF_Colors.h"
 
 #define SAVED_PAGES_TITLE_TEXT_COLOR [UIColor colorWithWhite:0.0f alpha:0.7f]
 #define SAVED_PAGES_TEXT_COLOR [UIColor colorWithWhite:0.0f alpha:1.0f]
@@ -40,6 +42,8 @@
 
 @property (strong, nonatomic) IBOutlet UIView *emptyContainerView;
 
+@property (strong, nonatomic) ProgressLine *progressLine;
+
 @end
 
 @implementation SavedPagesViewController
@@ -60,6 +64,10 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+
+    self.progressLine.progress += 0.1;
+    [self.progressLine drawWithDuration: 0.5
+                                  delay: 0.0];
 }
 
 #pragma mark - Top menu
@@ -112,10 +120,21 @@
                                                object: nil];
 }
 
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    [self.progressLine drawWithDuration: 0.0
+                                  delay: 0.0];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
+    self.progressLine = [[ProgressLine alloc] initWithView: self.view
+                                                     color: WMF_COLOR_GREEN
+                                                lineHeight: 4.0f];
+    self.progressLine.progress = 0.0;
+    
     userDataStore = [SessionSingleton sharedInstance].userDataStore;
     savedPageList = userDataStore.savedPageList;
     
@@ -326,6 +345,18 @@
 - (UIScrollView *)refreshScrollView
 {
     return self.tableView;
+}
+
+-(void)refreshWasPulled
+{
+    [self.progressLine clear];
+
+    self.progressLine.progress = 0.67f;
+
+    [self.progressLine drawWithDuration: 0.25
+                                  delay: 1.0];
+
+
 }
 
 @end

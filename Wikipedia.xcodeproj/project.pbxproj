@@ -39,6 +39,7 @@
 		04292FF8185FBB0B002A13FC /* SearchResultsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 04292FF7185FBB0B002A13FC /* SearchResultsController.m */; };
 		0429300A18604898002A13FC /* SavedPagesResultCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0429300418604898002A13FC /* SavedPagesResultCell.m */; };
 		0429301018604898002A13FC /* SavedPagesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0429300918604898002A13FC /* SavedPagesViewController.m */; };
+		04293AB61A85243E007DABCC /* ProgressLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 04293AB51A85243E007DABCC /* ProgressLine.m */; };
 		042A5B2619253D2A0095E172 /* CenterNavController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042A5B2019253D2A0095E172 /* CenterNavController.m */; };
 		042A5B2919253E570095E172 /* TopMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042A5B2819253E570095E172 /* TopMenuViewController.m */; };
 		042A5B2C19253E690095E172 /* BottomMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042A5B2B19253E690095E172 /* BottomMenuViewController.m */; };
@@ -318,6 +319,8 @@
 		0429300418604898002A13FC /* SavedPagesResultCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SavedPagesResultCell.m; sourceTree = "<group>"; };
 		0429300818604898002A13FC /* SavedPagesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SavedPagesViewController.h; sourceTree = "<group>"; };
 		0429300918604898002A13FC /* SavedPagesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = SavedPagesViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		04293AB41A85243E007DABCC /* ProgressLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressLine.h; sourceTree = "<group>"; };
+		04293AB51A85243E007DABCC /* ProgressLine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgressLine.m; sourceTree = "<group>"; };
 		042A5B1F19253D2A0095E172 /* CenterNavController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CenterNavController.h; sourceTree = "<group>"; };
 		042A5B2019253D2A0095E172 /* CenterNavController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CenterNavController.m; sourceTree = "<group>"; };
 		042A5B2719253E570095E172 /* TopMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TopMenuViewController.h; sourceTree = "<group>"; };
@@ -943,6 +946,8 @@
 			children = (
 				0429300818604898002A13FC /* SavedPagesViewController.h */,
 				0429300918604898002A13FC /* SavedPagesViewController.m */,
+				04293AB41A85243E007DABCC /* ProgressLine.h */,
+				04293AB51A85243E007DABCC /* ProgressLine.m */,
 				0429300318604898002A13FC /* SavedPagesResultCell.h */,
 				0429300418604898002A13FC /* SavedPagesResultCell.m */,
 				047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */,
@@ -2336,6 +2341,7 @@
 				D4E8A8A719084F1300DA4765 /* SQLiteHelper.m in Sources */,
 				04F39590186CF80100B0D6FC /* TOCViewController.m in Sources */,
 				0439317619FB092600386E8F /* UIWebView+LoadAssetsHtml.m in Sources */,
+				04293AB61A85243E007DABCC /* ProgressLine.m in Sources */,
 				04B91AA718E34BBC00FFAA1C /* UIView+TemporaryAnimatedXF.m in Sources */,
 				04224500197F5E09005DD0BF /* AbuseFilterAlert.m in Sources */,
 				D4B0AE0819366A0A00F0AC90 /* CreateAccountFunnel.m in Sources */,
