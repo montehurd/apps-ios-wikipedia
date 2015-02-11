@@ -13,6 +13,21 @@
     </head>
     <body class="stable">
         <div class="content" id="content">
+
+
+<!-- 
+Reminder - Don't create issues_container in js as they do on Android.
+Since we are doing headless transforms (document dom already created)
+and issues_container needs to be first child of content, doing so 
+would cause layout to be "reflowed".
+//-->
+<div class="issues_container" id="issues_container">
+TEST
+</div>
+
+
+
+
             #INJECTION_POINT#
         </div>
     </body>

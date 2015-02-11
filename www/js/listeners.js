@@ -10,8 +10,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
     transformer.transform( "hideRedlinks", document );
     transformer.transform( "disableFilePageEdit", document );
 
+
+//var issuesContainer = document.createElement( "div" );
+//issuesContainer.setAttribute( "dir", window.directionality );
+//issuesContainer.id = "issues_container";
+//issuesContainer.className = "issues_container";
+//document.getElementById( "content" ).appendChild( issuesContainer );
+
+    transformer.transform( "displayDisambigLink", document);
+    transformer.transform( "displayIssuesLink", document);
+
     bridge.sendMessage( "DOMContentLoaded", {} );
 });
+
+bridge.registerListener( "setInnerHTML", function( payload ){
+    document.getElementById( payload.id ).innerHTML = payload.innerHTML;
+} );
 
 bridge.registerListener( "setLanguage", function( payload ){
     var html = document.querySelector( "html" );

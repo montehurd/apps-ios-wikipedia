@@ -45,6 +45,8 @@ Do *not* leave this set to YES for release.
     self.backgroundColor = [UIColor clearColor];
     [self adjustConstraintsScaleForViews:@[self.titleLabel]];
 
+self.alpha = 0.2;
+
     self.rotationObserver =
     [[NSNotificationCenter defaultCenter] addObserverForName: UIDeviceOrientationDidChangeNotification
                                                       object: nil

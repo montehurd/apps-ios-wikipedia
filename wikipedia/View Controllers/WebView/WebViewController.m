@@ -197,6 +197,15 @@
 
         // Show lead image!
         [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].article];
+
+
+// Now that dom is ready set translations for button text
+// (Quick hack example - note these are not the proper MWLocalizedStrings!)
+//[weakSelf setInnerHTML:MWLocalizedString(@"zero-interstitial-continue", nil) ofButton:@"disambig_button" ];
+//[weakSelf setInnerHTML:MWLocalizedString(@"zero-interstitial-cancel", nil) ofButton:@"issues_button"];
+
+
+
     }];
     
     self.unsafeToScroll = NO;
@@ -268,6 +277,16 @@
     [self tocUpdateViewLayout];
     
     [self loadingIndicatorAdd];
+}
+
+-(void)setInnerHTML:(NSString *)innerHTML ofButton:(NSString *)buttonId
+{
+    [self.bridge sendMessage: @"setInnerHTML"
+                 withPayload: @{
+                                @"id": buttonId,
+                                @"innerHTML": innerHTML
+                                }
+     ];
 }
 
 -(void)jumpToFragmentIfNecessary
