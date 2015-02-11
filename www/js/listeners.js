@@ -13,6 +13,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
     bridge.sendMessage( "DOMContentLoaded", {} );
 });
 
+bridge.registerListener( "kickOffTableTransforms", function( payload ){
+    alert(payload.string1);
+    //kickoff transform here - modify it to accept the string parameters
+} );
+
 bridge.registerListener( "setLanguage", function( payload ){
     var html = document.querySelector( "html" );
     html.lang = payload.lang;

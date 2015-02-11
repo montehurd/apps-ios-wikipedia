@@ -195,6 +195,8 @@
         [weakSelf jumpToFragmentIfNecessary];
         [weakSelf performSelector:@selector(autoScrollToLastScrollOffsetIfNecessary) withObject:nil afterDelay:0.5f];
 
+[weakSelf kickOffTableTransformStuffWithString:@"blaaaa" andString:@"haaaa"];
+
         // Show lead image!
         [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].article];
     }];
@@ -268,6 +270,16 @@
     [self tocUpdateViewLayout];
     
     [self loadingIndicatorAdd];
+}
+
+-(void) kickOffTableTransformStuffWithString:(NSString *)string1 andString:(NSString *)string2
+{
+    [self.bridge sendMessage: @"kickOffTableTransforms"
+                 withPayload: @{
+                                @"string1": string1,
+                                @"string2": string2
+                                }
+     ];
 }
 
 -(void)jumpToFragmentIfNecessary
