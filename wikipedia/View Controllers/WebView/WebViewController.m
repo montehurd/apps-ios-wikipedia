@@ -40,6 +40,8 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
     [super viewDidLoad];
 
     [self setupLeadImageContainer];
+    [self setupFooterContainer];
+    [self setupFooterSubContainers];
 
     session = [SessionSingleton sharedInstance];
     
@@ -346,7 +348,7 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
 
 -(void)scrollIndicatorMove
 {
-    CGFloat f = self.webView.scrollView.contentSize.height - BOTTOM_SCROLL_LIMIT_HEIGHT;
+    CGFloat f = self.webView.scrollView.contentSize.height - kBottomScrollSpacerHeight;
     if (f == 0) f = 0.00001f;
     //self.scrollIndicatorView.alpha = [self tocDrawerIsOpen] ? 0.0f : 1.0f;
     CGFloat percent = self.webView.scrollView.contentOffset.y / f;
@@ -1093,9 +1095,9 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
     // When trying to scroll the bottom of the web view article all the way to
     // the top, this is the minimum amount that will be allowed to be onscreen
     // before we limit scrolling.
-    CGFloat onscreenMinHeight = 210;
+    CGFloat onscreenMinHeight = -380.0f;
     
-    CGFloat offsetMaxY = BOTTOM_SCROLL_LIMIT_HEIGHT + onscreenMinHeight;
+    CGFloat offsetMaxY = kBottomScrollSpacerHeight + onscreenMinHeight;
     
     if ((webScrollView.contentSize.height - webScrollView.contentOffset.y) < offsetMaxY){
         CGPoint p = CGPointMake(webScrollView.contentOffset.x,
@@ -1579,6 +1581,11 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
         [sectionTextArray addObject: [self renderLastModified:lastModified by:lastModifiedBy]];
         [sectionTextArray addObject: [self renderLanguageButtonForCount: langCount]];
         [sectionTextArray addObject: [self renderLicenseFooter]];
+
+        NSString *lastModifiedByUserName =
+        (lastModifiedBy && !lastModifiedBy.anonymous) ? lastModifiedBy.name : nil;
+        [self.footerOptionsController updateLanguageCount:langCount];
+        [self.footerOptionsController updateLastModifiedDate:lastModified userName:lastModifiedByUserName];
     }
     
     // This is important! Ensures bottom of web view article can be scrolled closer to the top of
@@ -1586,7 +1593,7 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
     // Note: had to add "px" to the height because we added "<!DOCTYPE html>" to the top
     // of the index.html - it won't actually give the div height w/o this now (no longer
     // using quirks mode now that doctype specified).
-    [sectionTextArray addObject: [NSString stringWithFormat:@"<div style='height:%dpx;background-color:white;'></div>", BOTTOM_SCROLL_LIMIT_HEIGHT]];
+    [sectionTextArray addObject: [NSString stringWithFormat:@"<div style='height:%dpx;background-color:white;'></div>", (int)kBottomScrollSpacerHeight]];
     
     // Join article sections text
     NSString *joint = @""; //@"<div style=\"height:20px;\"></div>";
@@ -2151,22 +2158,16 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
                                 action:@selector(didTouchLeadImage:)
                       forControlEvents:UIControlEventTouchUpInside];
 
-    // Because of autolayout weirdness with adding subview's to UIWebView's
-    // scrollview (which is done so we'll get scroll tracking and scaling
-    // when TOC appears for free), autoresizingMask is used - this also means
-    // we need to manually update leadImageContainer's frame on rotate - which
-    // is presently done in its "updateNonImageElements" method.
-    self.leadImageContainer.autoresizingMask =
-        (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleWidth);
-    
-    [self.webView.scrollView addSubview:self.leadImageContainer];
-    
-    self.leadImageContainer.frame =
-        (CGRect){{0, 0}, {self.webView.scrollView.frame.size.width, LEAD_IMAGE_CONTAINER_HEIGHT}};
+    self.leadImageContainerHeightConstraint =
+    [self.webView wmf_addTrackingView: self.leadImageContainer
+                             ofHeight: LEAD_IMAGE_CONTAINER_HEIGHT
+                           atLocation: WMFTrackingViewLocationTop];
 }
 
 - (void)leadImageHeightChangedTo: (NSNumber *)height
 {
+    self.leadImageContainerHeightConstraint.constant = height.floatValue;
+
     // Let the html spacer div adjust to the new height of the lead image container.
     [self.bridge sendMessage: @"setLeadImageDivHeight"
                  withPayload: @{@"height": height}];
@@ -2203,6 +2204,91 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
 - (void)didTouchLeadImage:(id)sender
 {
     [self presentGalleryForArticle:session.article showingImage:session.article.image];
+}
+
+#pragma mark Footer container
+
+-(void)setupFooterContainer
+{
+    if (!self.footerContainer) {
+        self.footerContainer = [[UIView alloc] init];
+        self.footerContainer.backgroundColor = [UIColor lightGrayColor];
+        
+        [self.webView wmf_addTrackingView: self.footerContainer
+                                 ofHeight: kBottomScrollSpacerHeight
+                               atLocation: WMFTrackingViewLocationBottom];
+    }
+}
+
+-(void)setupFooterSubContainers
+{
+    if (self.footerContainer.subviews.count == 0) {
+        
+        UIView*(^addSubContainer)() = ^UIView*() {
+            UIView *subContainer = [[UIView alloc] init];
+            subContainer.layer.borderWidth = 1.0f;
+            subContainer.layer.borderColor = [UIColor greenColor].CGColor;
+            subContainer.translatesAutoresizingMaskIntoConstraints = NO;
+            [self.footerContainer addSubview:subContainer];
+            [self.footerContainer addConstraints:
+             [NSLayoutConstraint constraintsWithVisualFormat: @"H:|[subContainer]|"
+                                                     options: 0
+                                                     metrics: nil
+                                                       views: @{@"subContainer": subContainer}]];
+            return subContainer;
+        };
+        
+        UIView *suggestionsContainer = addSubContainer();
+        UIView *optionsContainer = addSubContainer();
+        UIView *legalContainer = addSubContainer();
+        
+        NSDictionary *views =
+        @{
+          @"suggestionsContainer": suggestionsContainer,
+          @"optionsContainer": optionsContainer,
+          @"legalContainer": legalContainer
+          };
+        
+        [self.footerContainer addConstraints:
+         [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[suggestionsContainer(240)][optionsContainer(140)][legalContainer(130)]"
+                                                 options: 0
+                                                 metrics: nil
+                                                   views: views]];
+        
+        SuggestionsFooterViewController *suggestionsController = [[SuggestionsFooterViewController alloc] init];
+        [self addChildController:suggestionsController toContainerView:suggestionsContainer];
+        
+        self.footerOptionsController = [[OptionsFooterViewController alloc] init];
+        [self addChildController:self.footerOptionsController toContainerView:optionsContainer];
+        
+        LegalFooterViewController *legalController = [[LegalFooterViewController alloc] init];
+        [self addChildController:legalController toContainerView:legalContainer];
+    }
+}
+
+- (void)addChildController: (UIViewController*)childController
+           toContainerView: (UIView *)containerView;
+{
+   [self addChildViewController:childController];
+   childController.view.translatesAutoresizingMaskIntoConstraints = NO;
+   [containerView addSubview:childController.view];
+
+    NSDictionary *views = @{
+        @"contentView": childController.view
+    };
+
+    [containerView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[contentView]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views]];
+    [containerView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat: @"H:|[contentView]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views]];
+
+   [childController didMoveToParentViewController:self];
 }
 
 @end

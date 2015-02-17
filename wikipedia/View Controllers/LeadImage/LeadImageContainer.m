@@ -184,18 +184,8 @@ Do *not* leave this set to YES for release.
     [self.titleLabel layoutIfNeeded];
     [self.titleDescriptionContainer layoutIfNeeded];
 
-    // Next update height of this image container.
-    CGFloat containerHeight =
-        ([self shouldHideImage]) ? (-self.frame.size.height + self.titleDescriptionContainer.frame.size.height) : 0;
-
-    self.frame =
-    (CGRect){
-        {0, containerHeight},
-        {self.frame.size.width, self.frame.size.height}
-    };
-
     // Now notify the web view of the height change.
-    CGFloat webDivHeight = ([self shouldHideImage]) ? self.titleDescriptionContainer.frame.size.height : self.bounds.size.height;
+    CGFloat webDivHeight = ([self shouldHideImage]) ? self.titleDescriptionContainer.frame.size.height : LEAD_IMAGE_CONTAINER_HEIGHT;
 
     [self.delegate leadImageHeightChangedTo:@(webDivHeight)];
 }
