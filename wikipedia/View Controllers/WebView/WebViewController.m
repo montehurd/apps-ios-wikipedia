@@ -1586,6 +1586,9 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
         (lastModifiedBy && !lastModifiedBy.anonymous) ? lastModifiedBy.name : nil;
         [self.footerOptionsController updateLanguageCount:langCount];
         [self.footerOptionsController updateLastModifiedDate:lastModified userName:lastModifiedByUserName];
+        
+        self.searchSuggestionsController.searchString = article.title.text;
+        [self.searchSuggestionsController search];
     }
     
     // This is important! Ensures bottom of web view article can be scrolled closer to the top of
@@ -2237,26 +2240,32 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
                                                        views: @{@"subContainer": subContainer}]];
             return subContainer;
         };
-        
+
+        UIView *suggestionsHeaderContainer = addSubContainer();
         UIView *suggestionsContainer = addSubContainer();
         UIView *optionsContainer = addSubContainer();
         UIView *legalContainer = addSubContainer();
         
         NSDictionary *views =
         @{
+          @"suggestionsHeaderContainer": suggestionsHeaderContainer,
           @"suggestionsContainer": suggestionsContainer,
           @"optionsContainer": optionsContainer,
           @"legalContainer": legalContainer
           };
         
         [self.footerContainer addConstraints:
-         [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[suggestionsContainer(240)][optionsContainer(140)][legalContainer(130)]"
+         [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[suggestionsHeaderContainer(30)][suggestionsContainer(237)][optionsContainer(140)][legalContainer(130)]"
                                                  options: 0
                                                  metrics: nil
                                                    views: views]];
         
-        SuggestionsFooterViewController *suggestionsController = [[SuggestionsFooterViewController alloc] init];
-        [self addChildController:suggestionsController toContainerView:suggestionsContainer];
+        UILabel* suggestionsLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        suggestionsLabel.text = @"Read more";
+        [self addSubview:suggestionsLabel toContainerView:suggestionsHeaderContainer];
+        
+        self.searchSuggestionsController = [[WMFReadMoreSuggestionsViewController alloc] init];
+        [self addChildController:self.searchSuggestionsController toContainerView:suggestionsContainer];
         
         self.footerOptionsController = [[OptionsFooterViewController alloc] init];
         [self addChildController:self.footerOptionsController toContainerView:optionsContainer];
@@ -2264,6 +2273,29 @@ NSString* const kSelectedStringJS = @"window.getSelection().toString()";
         LegalFooterViewController *legalController = [[LegalFooterViewController alloc] init];
         [self addChildController:legalController toContainerView:legalContainer];
     }
+}
+
+- (void)addSubview: (UIView*)subView
+           toContainerView: (UIView *)containerView;
+{
+    subView.translatesAutoresizingMaskIntoConstraints = NO;
+    [containerView addSubview:subView];
+    
+    NSDictionary *views = @{
+                            @"contentView": subView
+                            };
+    
+    [containerView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat: @"V:|[contentView]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views]];
+    [containerView addConstraints:
+     [NSLayoutConstraint constraintsWithVisualFormat: @"H:|[contentView]|"
+                                             options: 0
+                                             metrics: nil
+                                               views: views]];
+    
 }
 
 - (void)addChildController: (UIViewController*)childController

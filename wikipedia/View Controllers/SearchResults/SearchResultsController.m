@@ -23,17 +23,18 @@
 #import "NSArray+Predicate.h"
 #import "SearchResultAttributedString.h"
 #import "UITableView+DynamicCellHeight.h"
+#import "NSArray+WMFExtensions.h"
 
 #define TABLE_CELL_ID @"SearchResultCell"
 #define SEARCH_DELAY 0.4
 #define MIN_RESULTS_BEFORE_AUTO_FULL_TEXT_SEARCH 12
 
-@interface SearchResultsController (){
+@interface SearchResultsController ()<FetchFinishedDelegate>{
     CGFloat scrollViewDragBeganVerticalOffset_;
 }
 
 @property (nonatomic, strong) NSString *searchSuggestion;
-@property (nonatomic, weak) IBOutlet UITableView *searchResultsTable;
+@property (nonatomic, strong, readwrite) IBOutlet UITableView *searchResultsTable;
 @property (nonatomic, strong) NSArray *searchStringWordsToHighlight;
 
 @property (nonatomic, strong) UIImage *placeholderImage;
@@ -61,6 +62,36 @@
 @end
 
 @implementation SearchResultsController
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+    
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        self.numberOfResults = NSUIntegerMax;
+        self.enableSupplementalFullTextSearch = YES;
+    }
+    return self;
+    
+}
+
+- (void)awakeFromNib{
+    
+    [super awakeFromNib];
+    self.numberOfResults = NSUIntegerMax;
+    self.enableSupplementalFullTextSearch = YES;
+}
+
+- (UITableView*)searchResultsTable{
+    
+    if(!_searchResultsTable){
+        
+        _searchResultsTable = [[UITableView alloc] initWithFrame:self.view.bounds];
+        _searchResultsTable.dataSource = self;
+        _searchResultsTable.delegate = self;
+    }
+    
+    return _searchResultsTable;
+}
 
 -(void)setupStringAttributes
 {
@@ -167,6 +198,8 @@
     self.searchSuggestion = nil;
     self.navigationItem.hidesBackButton = YES;
 
+    [self.view addSubview:self.searchResultsTable];
+    
     // Register the search results cell for reuse
     [self.searchResultsTable registerNib:[UINib nibWithNibName:@"SearchResultPrototypeView" bundle:nil] forCellReuseIdentifier:TABLE_CELL_ID];
 
@@ -263,7 +296,7 @@
 
     SearchReason reason = ((NSNumber *)timer.userInfo[@"reason"]).integerValue;
 
-    if (self.navigationController.topViewController != self) return;
+//    if (self.navigationController.topViewController != self) return;
 
     if (self.searchString.length == 0) return;
     
@@ -390,10 +423,11 @@
                         [self removePrefixResultsFromSupplementalResults:searchResultFetcher.searchResults];
 
                     self.searchResults =
-                        [self.searchResults arrayByAddingObjectsFromArray:supplementalFullTextResults];
+                        [[self.searchResults arrayByAddingObjectsFromArray:supplementalFullTextResults] wmf_arrayByTrimmingToLength:self.numberOfResults];
                     
                 }else{
-                    self.searchResults = searchResultFetcher.searchResults;
+                    
+                    self.searchResults = [searchResultFetcher.searchResults wmf_arrayByTrimmingToLength:self.numberOfResults];
                 }
                 //NSLog(@"self.searchResultsOrdered = %@", self.searchResultsOrdered);
 
@@ -509,6 +543,11 @@
 
 -(void)performSupplementalFullTextSearchForTerm:(NSString *)searchTerm
 {
+    
+    if(!self.enableSupplementalFullTextSearch){
+        return;
+    }
+    
     (void)[[SearchResultFetcher alloc] initAndSearchForTerm: searchTerm
                                                  searchType: SEARCH_TYPE_IN_ARTICLES
                                                searchReason: SEARCH_REASON_SUPPLEMENT_PREFIX_WITH_FULL_TEXT
