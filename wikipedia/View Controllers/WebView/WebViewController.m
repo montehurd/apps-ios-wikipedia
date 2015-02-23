@@ -1574,6 +1574,9 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
         (lastModifiedBy && !lastModifiedBy.anonymous) ? lastModifiedBy.name : nil;
         [self.footerOptionsController updateLanguageCount:langCount];
         [self.footerOptionsController updateLastModifiedDate:lastModified userName:lastModifiedByUserName];
+
+        self.searchSuggestionsController.searchString = article.title.text;
+        [self.searchSuggestionsController search];
     }
     
     // This is important! Ensures bottom of web view article can be scrolled closer to the top of
@@ -2108,6 +2111,7 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
             UIView *subContainer = [[UIView alloc] init];
             //subContainer.layer.borderWidth = 1.0f;
             //subContainer.layer.borderColor = [UIColor greenColor].CGColor;
+            subContainer.clipsToBounds = YES;
             subContainer.translatesAutoresizingMaskIntoConstraints = NO;
             [self.footerContainer addSubview:subContainer];
             [self.footerContainer addConstraints:
@@ -2135,8 +2139,9 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
                                                  metrics: nil
                                                    views: views]];
         
-        SuggestionsFooterViewController *suggestionsController = [[SuggestionsFooterViewController alloc] init];
-        [self addChildController:suggestionsController toContainerView:suggestionsContainer];
+        self.searchSuggestionsController =
+            [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"SearchResultsController"];
+        [self addChildController:self.searchSuggestionsController toContainerView:suggestionsContainer];
         
         self.footerOptionsController = [[OptionsFooterViewController alloc] init];
         [self addChildController:self.footerOptionsController toContainerView:optionsContainer];

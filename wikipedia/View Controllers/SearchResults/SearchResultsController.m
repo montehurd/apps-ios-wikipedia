@@ -263,7 +263,7 @@
 
     SearchReason reason = ((NSNumber *)timer.userInfo[@"reason"]).integerValue;
 
-    if (self.navigationController.topViewController != self) return;
+    //if (self.navigationController.topViewController != self) return;
 
     if (self.searchString.length == 0) return;
     
