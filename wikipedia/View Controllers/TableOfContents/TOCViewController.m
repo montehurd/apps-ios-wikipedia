@@ -134,19 +134,26 @@
     // Set up the scrollContainer fresh every time!
     [self setupScrollContainer];
 
-    [self setupSectionCells];
-    
-    for (TOCSectionCellView *cell in self.sectionCells.copy) {
-        [self.scrollContainer addSubview:cell];
-    }
-    
-    // Ensure the scrollContainer is scrolled to the top before its sub-views are constrained.
-    self.scrollView.contentOffset = CGPointZero;
-
-    [self.view setNeedsUpdateConstraints];
-    
-    // Don't start monitoring scrollView scrolling until view has appeared.
-    self.scrollView.delegate = self;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        
+        [self setupSectionCells];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            for (TOCSectionCellView *cell in self.sectionCells.copy) {
+                [self.scrollContainer addSubview:cell];
+            }
+            
+            // Ensure the scrollContainer is scrolled to the top before its sub-views are constrained.
+            self.scrollView.contentOffset = CGPointZero;
+            
+            [self.view setNeedsUpdateConstraints];
+            
+            // Don't start monitoring scrollView scrolling until view has appeared.
+            self.scrollView.delegate = self;
+        });
+        
+    });
 
     //CFTimeInterval begin = CACurrentMediaTime();
 }

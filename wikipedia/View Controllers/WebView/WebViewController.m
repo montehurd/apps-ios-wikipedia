@@ -1293,7 +1293,7 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     }
 }
 
-#pragma mark Article loading ops
+#pragma mark Article loading
 
 -(void)navigateToPage: (MWKTitle *)title
       discoveryMethod: (MWKHistoryDiscoveryMethod)discoveryMethod
@@ -2028,7 +2028,7 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
                      }];
 }
 
-#pragma mark Lead image container
+#pragma mark Lead image
 
 -(void)setupLeadImageContainer
 {
@@ -2052,6 +2052,13 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     [self.bridge sendMessage: @"setLeadImageDivHeight"
                  withPayload: @{@"height": height}];
 }
+
+- (void)didTouchLeadImage:(id)sender
+{
+    [self presentGalleryForArticle:session.article showingImage:session.article.image];
+}
+
+#pragma mark Sharing
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
     if (action == @selector(shareSnippet:)) {
@@ -2079,11 +2086,6 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
 {
     NSString *selectedText = [self.webView stringByEvaluatingJavaScriptFromString:kSelectedStringJS];
     return selectedText.length < kMinimumTextSelectionLength ? @"" : selectedText;
-}
-
-- (void)didTouchLeadImage:(id)sender
-{
-    [self presentGalleryForArticle:session.article showingImage:session.article.image];
 }
 
 #pragma mark Footer container
