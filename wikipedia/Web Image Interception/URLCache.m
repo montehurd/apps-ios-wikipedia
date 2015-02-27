@@ -135,6 +135,10 @@
                                                       userInfo:@{
          @"fileName": image.fileName,
          @"data": imageDataToUse,
+         @"width": image.width,
+         @"height": image.height,
+         @"url": image.sourceURL,
+         @"fileNameNoSizePrefix": image.fileNameNoSizePrefix
      }];
 }
 

@@ -307,14 +307,19 @@ static NSString* const MWKImageInfoFilename      = @"ImageInfo.plist";
     }
 }
 
+- (NSString*)pathForImageBinary:(MWKImage*)image {
+    NSString* path     = [self pathForImage:image];
+    NSString* fileName = [@"Image" stringByAppendingPathExtension:image.extension];
+    NSString* filePath = [path stringByAppendingPathComponent:fileName];
+    return filePath;
+}
+
 - (NSData*)imageDataWithImage:(MWKImage*)image {
     if (image == nil) {
         NSLog(@"nil image passed to imageDataWithImage");
         return nil;
     }
-    NSString* path     = [self pathForImage:image];
-    NSString* fileName = [@"Image" stringByAppendingPathExtension:image.extension];
-    NSString* filePath = [path stringByAppendingPathComponent:fileName];
+    NSString* filePath = [self pathForImageBinary:image];
 
     NSError* err;
     NSData* data = [NSData dataWithContentsOfFile:filePath options:0 error:&err];

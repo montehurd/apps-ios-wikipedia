@@ -13,6 +13,7 @@
 #import "FocalImage.h"
 #import "MWKArticle+isMain.h"
 #import "UIView+Debugging.h"
+#import "WebViewController.h"
 
 #define PLACEHOLDER_IMAGE_ALPHA 0.3f
 
@@ -33,7 +34,7 @@
 
 @property (weak, nonatomic) IBOutlet UIView* titleDescriptionContainer;
 @property (weak, nonatomic) IBOutlet LeadImageTitleLabel* titleLabel;
-@property (strong, nonatomic) FocalImage* image;
+@property (strong, atomic) FocalImage* image;
 @property (nonatomic) CGRect focalFaceBounds;
 @property(strong, nonatomic) MWKArticle* article;
 @property (nonatomic) BOOL isPlaceholder;
@@ -73,11 +74,42 @@
     // Important! "clipsToBounds" must be "NO" so super long titles lay out properly!
     self.clipsToBounds = NO;
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sectionImageRetrieved:) name:@"SectionImageRetrieved" object:nil];
+
     //[self randomlyColorSubviews];
+}
+
+- (void)sectionImageRetrieved:(NSNotification*)notification {
+    // Notification received each time the web view retrieves an image.
+
+    if (![NAV.topViewController isMemberOfClass:[WebViewController class]]) {
+        return;
+    }
+
+    // Check if this image is a variant of the lead image.
+    NSDictionary* payload = notification.userInfo;
+    BOOL isVariant        = (payload && [self.article.image.fileNameNoSizePrefix isEqualToString:payload[@"fileNameNoSizePrefix"]]) ? YES : NO;
+
+    // It's a variant. Is it bigger than the one presently being shown? If so, show this bigger one.
+    if (isVariant) {
+        NSData* imageData = payload[@"data"];
+        NSNumber* width   = payload[@"width"];
+        // Compare widths to ensure "sectionImageRetrieved" notification images won't
+        // override the ThumbnailFetcher image if we fired off a ThumbnailFetcher request.
+        if (self.isPlaceholder || (width.floatValue > self.image.size.width)) {
+            self.isPlaceholder = NO;
+            self.image         = [[FocalImage alloc] initWithData:imageData];
+
+            NSLog(@"INTERCEPTED WEBVIEW IMAGE of width: %f", width.floatValue);
+
+            [self showImage];
+        }
+    }
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self.rotationObserver];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"SectionImageRetrieved" object:nil];
 }
 
 - (void)drawRect:(CGRect)rect {
@@ -222,78 +254,89 @@
     return (url.pathExtension && [url.pathExtension isEqualToString:@"gif"]) ? YES : NO;
 }
 
-- (void)showForArticle:(MWKArticle*)article {
-    self.article         = article;
-    self.focalFaceBounds = CGRectZero;
+- (CGFloat)widestVariantWebViewWillDownload {
+    MWKImage* widestUncachedVariant = nil;
+    NSArray* arr                    = [self.article.images imageSizeVariants:self.article.imageURL];
+    for (NSString* variantURL in [arr reverseObjectEnumerator]) {
+        MWKImage* image = [self.article imageWithURL:variantURL];
+        // Must exclude article.image because it is not retrieved by the web view
+        // (it's the thing we're deciding if we need to download!)
+        if (![image isEqualToImage:self.article.image]) {
+            if (!image.isCached) {
+                widestUncachedVariant = image;
+                break;
+            }
+        }
+    }
+    if (widestUncachedVariant) {
+        // Parse the width out of the url - necessary because the image probably hasn't been
+        // retrieved yet, so width and height properties won't be set yet.
+        // Note: occasionally images don't have size prefix in their file name, so for these
+        // images we won't be able to divine ahead of time whether among the images to be
+        // downloaded by the webview there will be one of sufficient resolution. In these
+        // cases it's ok because the higher res image will be fetched with the ThumbnailFetcher.
+        return [MWKImage fileSizePrefix:widestUncachedVariant.sourceURL];
+    }
+    return -1;
+}
 
+- (void)showForArticle:(MWKArticle*)article {
+    static FocalImage* placeholderImage = nil;
+    if (!placeholderImage) {
+        placeholderImage = [[FocalImage alloc] initWithCGImage:[UIImage imageNamed:@"lead-default"].CGImage];
+    }
+
+    self.article                = article;
+    self.focalFaceBounds        = CGRectZero;
     self.titleLabel.imageExists = [self imageExists];
+    self.image                  = nil;
 
     if (self.article.isMain) {
         [self.titleLabel setTitle:@"" description:@""];
+        [self updateNonImageElements];
+        return;
     } else {
         NSString* title = [self.article.displaytitle getStringWithoutHTML];
         [self.titleLabel setTitle:title description:[self getCurrentArticleDescription]];
     }
 
-    if (!self.article.image.asUIImage && [self imageExists]) {
-        [self loadPlaceholderImage];
-
-        (void)[[ThumbnailFetcher alloc] initAndFetchThumbnailFromURL:[@"http:" stringByAppendingString:self.article.imageURL]
-                                                         withManager:[QueuesSingleton sharedInstance].articleFetchManager
-                                                  thenNotifyDelegate:self];
+    // Show largest cached variant of lead image immediately.
+    // This image is shown until the webview (potentially) retrieves higher resolution variants.
+    MWKImage* largestCachedVariant = self.article.image.largestCachedVariant;
+    if (largestCachedVariant) {
+        NSLog(@"SHOWING LARGEST CACHED VARIANT of width: %f", largestCachedVariant.width.floatValue);
+        self.isPlaceholder = NO;
+        self.image         = [[FocalImage alloc] initWithData:[largestCachedVariant asNSData]];
     } else {
-        [self showImage];
+        self.isPlaceholder = YES;
+        self.image         = placeholderImage;
+    }
+    [self showImage];
+
+    // Fetch ONLY if absolutely neccessary.
+    CGFloat okMinimumWidth = LEAD_IMAGE_WIDTH * 0.6f;
+    if (largestCachedVariant.width.floatValue < okMinimumWidth) {
+        if (self.article.imageURL) {
+            CGFloat widestExpectedImageWidth = [self widestVariantWebViewWillDownload];
+            if (widestExpectedImageWidth < okMinimumWidth) {
+                (void)[[ThumbnailFetcher alloc] initAndFetchThumbnailFromURL:[@"http:" stringByAppendingString:self.article.imageURL]
+                                                                 withManager:[QueuesSingleton sharedInstance].articleFetchManager
+                                                          thenNotifyDelegate:self];
+            }
+        }
     }
 }
 
-- (void)loadPlaceholderImage {
-    FocalImage* placeholderImage =
-        [[FocalImage alloc] initWithCGImage:[UIImage imageNamed:@"lead-default"].CGImage];
-    self.isPlaceholder = YES;
-    self.image         = placeholderImage;
-    [self updateNonImageElements];
-}
-
 - (void)showImage {
-    UIImage* img = self.article.image.asUIImage;
-
-    FocalImage* image = [[FocalImage alloc] initWithCGImage:img.CGImage];
-
-    // Biggest face.
-    self.focalFaceBounds = [image getFaceBounds];
-
-    //NSLog(@"Requested lead image width = %d", LEAD_IMAGE_WIDTH);
-    //NSLog(@"Returned lead image width = %d", self.article.image.width.integerValue);
-    //NSLog(@"percent = %f", self.article.image.width.floatValue / LEAD_IMAGE_WIDTH);
-
-    /*
-       Note: this doesn't work as-is. Would need to listen for "SectionImageRetrieved"
-       notifications because article images are late-arriving.
-
-       Use first article image if no image at this point.
-
-       Should probably only do this if the image above is going to be greatly
-       cropped *and* no faces were detected. Then, instead of loading first image
-       of minimum size, as noted below, use first image of sufficient area which
-       would not need to be aggresively cropped.
-
-       Note: commented this out because I'm not sure it ever gets called.
-       Would also probably want to only use the first article image if it's
-       bigger than some minimum size.
-
-       if(!img){
-        MWKImage *firstArticleImage = self.article.sections[0].images[0];
-        UIImage *firstUIImage = firstArticleImage.asUIImage;
-        if(firstUIImage){
-            img = firstUIImage;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        if (!self.isPlaceholder) {
+            // Biggest face.
+            self.focalFaceBounds = [self.image getFaceBounds];
         }
-       }
-     */
-
-    self.isPlaceholder = NO;
-    self.image         = image;
-
-    [self updateNonImageElements];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateNonImageElements];
+        });
+    });
 }
 
 - (void)fetchFinished:(id)sender
@@ -304,14 +347,21 @@
         switch (status) {
             case FETCH_FINAL_STATUS_SUCCEEDED:
             {
-                // Associate the image retrieved with article.image.
-                ThumbnailFetcher* fetcher = (ThumbnailFetcher*)sender;
-                NSString* thumbnailURL    = [fetcher.url getUrlWithoutScheme];
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+                    // Associate the image retrieved with article.image.
+                    ThumbnailFetcher* fetcher = (ThumbnailFetcher*)sender;
+                    NSString* thumbnailURL = [fetcher.url getUrlWithoutScheme];
 
-                MWKImage* articleImage = [[MWKImage alloc] initWithArticle:self.article sourceURL:thumbnailURL];
-                [articleImage importImageData:fetchedData];
+                    MWKImage* articleImage = [[MWKImage alloc] initWithArticle:self.article sourceURL:thumbnailURL];
+                    [articleImage importImageData:fetchedData];
 
-                [self showImage];
+                    NSLog(@"FETCHED HIGHER RES VARIANT of width: %f", articleImage.width.floatValue);
+
+                    self.isPlaceholder = NO;
+                    self.image = [[FocalImage alloc] initWithData:[articleImage asNSData]];
+
+                    [self showImage];
+                });
             }
             break;
             case FETCH_FINAL_STATUS_FAILED:

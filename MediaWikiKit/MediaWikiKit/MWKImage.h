@@ -48,8 +48,10 @@
 - (void)save;
 
 - (UIImage*)asUIImage;
+- (NSData*) asNSData;
 
 - (MWKImage*)largestVariant;
+- (MWKImage*)largestCachedVariant;
 
 /// Return the folder containing the image file from receiver's @c sourceURL.
 - (NSString*)basename;

@@ -45,6 +45,7 @@ FOUNDATION_EXPORT NSString* const MWKDataStoreValidImageSitePrefix;
 - (NSString*)pathForImagesWithTitle:(MWKTitle*)title;
 - (NSString*)pathForImageURL:(NSString*)url title:(MWKTitle*)title;
 - (NSString*)pathForImage:(MWKImage*)image;
+- (NSString*)pathForImageBinary:(MWKImage*)image;
 
 /**
  * The path where the image info is stored for a given article.

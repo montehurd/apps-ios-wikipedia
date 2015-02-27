@@ -159,15 +159,23 @@
     return [UIImage imageWithData:imageData scale:1.0];
 }
 
+- (NSData*)asNSData {
+    return [self.article.dataStore imageDataWithImage:self];
+}
+
 - (MWKImage*)largestVariant {
     NSString* largestURL = [self.article.images largestImageVariant:self.sourceURL];
     return [self.article imageWithURL:largestURL];
 }
 
+- (MWKImage*)largestCachedVariant {
+    return [self.article.images largestImageVariantForURL:self.sourceURL cachedOnly:YES];
+}
+
 - (BOOL)isCached {
-    // @fixme maybe make this more efficient
-    NSData* data = [self.article.dataStore imageDataWithImage:self];
-    return (data != nil);
+    NSString* fullPath = [self.article.dataStore pathForImageBinary:self];
+    BOOL fileExists    = [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+    return fileExists;
 }
 
 - (BOOL)isEqual:(id)object {
