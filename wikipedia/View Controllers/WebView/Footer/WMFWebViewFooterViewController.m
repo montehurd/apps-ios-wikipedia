@@ -15,6 +15,8 @@
 @property (strong, nonatomic) WMFReadMoreViewController* readMoreViewController;
 @property (strong, nonatomic) WMFLegalFooterViewController* legalViewController;
 
+@property (weak, nonatomic) IBOutlet UIView* containerContainer;
+
 @property (weak, nonatomic) IBOutlet UIView* readMoreContainerView;
 @property (weak, nonatomic) IBOutlet UIView* optionsContainerView;
 @property (weak, nonatomic) IBOutlet UIView* legalContainerView;
@@ -39,8 +41,12 @@
     [self wmf_addChildController:self.legalViewController andConstrainToEdgesOfContainerView:self.legalContainerView];
 }
 
-- (CGFloat)scrollLimitingNativeSubContainerY {
-    return self.optionsContainerView.frame.origin.y;
+- (CGFloat)footerHeight {
+    // Find the overall height of the content shown by the web footer.
+    // Note: can't just use self.view's height because it extends down farther than the sub-containers' content.
+    // We need the containerContainer's height plus any top padding, which the line below provides.
+    CGPoint p = [self.containerContainer convertPoint:CGPointMake(0, self.containerContainer.frame.size.height) toView:self.view];
+    return p.y;
 }
 
 - (void)search {
