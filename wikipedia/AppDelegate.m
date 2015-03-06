@@ -6,17 +6,21 @@
 #import "WikipediaAppUtils.h"
 #import "SessionSingleton.h"
 #import <HockeySDK/HockeySDK.h>
+#import "ChromeBrowserURLProtocol.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+    [NSURLProtocol registerClass:[ChromeBrowserURLProtocol class]];
+
+
     NSString* currentBundle = [WikipediaAppUtils wmf_appBundleIdentifierForCrashReporting];
     if (currentBundle) {
         [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:currentBundle];
         [[BITHockeyManager sharedHockeyManager] startManager];
         [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     }
-    
+
     [self systemWideStyleOverrides];
 
     // Enables Alignment Rect highlighting for debugging
