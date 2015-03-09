@@ -75,6 +75,12 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
         [weakSelf.bridge sendMessage:@"collapseTables"
                          withPayload:nil];
+
+        // Update toc after a slight delay to give web view
+        // more uninterrupted main thread time to render page.
+        [weakSelf.tocVC performSelector:@selector(setTocSectionDataForSections:)
+                             withObject:[SessionSingleton sharedInstance].currentArticle.sections
+                             afterDelay:0.5];
     }];
 
     self.unsafeToScroll    = NO;
@@ -1380,8 +1386,7 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
                     return;
                 }
 
-                // Update the toc and web view.
-                [self.tocVC setTocSectionDataForSections:article.sections];
+                // Update the web view.
                 [self displayArticle:article.title];
             }
             break;
@@ -1494,7 +1499,6 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
 
     // If article with sections just show them (unless needsRefresh is YES)
     if ([article.sections count] > 0 && !article.needsRefresh) {
-        [self.tocVC setTocSectionDataForSections:session.currentArticle.sections];
         [self displayArticle:session.currentArticle.title];
         //[self showAlert:MWLocalizedString(@"search-loading-article-loaded", nil) type:ALERT_TYPE_TOP duration:-1];
         [self fadeAlert];
@@ -1605,14 +1609,6 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
 
     if (!self.editable) {
         [self.bridge sendMessage:@"setPageProtected" withPayload:@{}];
-    }
-
-    if ([self tocDrawerIsOpen]) {
-        // Drawer is already open, so just refresh the toc quickly w/o animation.
-        // Make sure "tocShowWithDuration:" is allowed to happen even if the TOC
-        // is already onscreen or non-lead sections won't appear in the TOC when
-        // they've been retrieved if the TOC is open.
-        [self tocShowWithDuration:@0.0f];
     }
 }
 
