@@ -55,6 +55,8 @@
 #import "ArticleFetcher.h"
 #import "AssetsFileFetcher.h"
 
+#import "WMFWebViewHeaderViewController.h"
+#import "WMFWebViewHeaderContainerView.h"
 #import "LeadImageContainer.h"
 #import "DataMigrationProgressViewController.h"
 #import "UIFont+WMFStyle.h"
@@ -145,6 +147,9 @@ static const int kMinimumTextSelectionLength = 2;
 @property (strong, nonatomic) UIView* activityIndicatorBackgroundView;
 
 @property (strong, nonatomic) LeadImageContainer* leadImageContainer;
+
+@property (strong, nonatomic) WMFWebViewHeaderContainerView* headerContainer;
+@property (strong, nonatomic) WMFWebViewHeaderViewController* headerViewController;
 
 @property (strong, nonatomic) WMFWebViewFooterContainerView* footerContainer;
 @property (strong, nonatomic) WMFWebViewFooterViewController* footerViewController;

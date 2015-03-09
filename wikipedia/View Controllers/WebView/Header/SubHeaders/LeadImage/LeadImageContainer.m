@@ -45,6 +45,22 @@
 
 @implementation LeadImageContainer
 
+
+// Temporary until controller bits are moved to lead image view controller.
+// (the label sub-view needs to be moved to lead image vc, logic too etc)
+- (id)awakeAfterUsingCoder:(NSCoder*)aDecoder {
+    if (![self.subviews count]) {
+        NSBundle* mainBundle           = [NSBundle mainBundle];
+        NSArray* loadedViews           = [mainBundle loadNibNamed:NSStringFromClass([self class]) owner:nil options:nil];
+        LeadImageContainer* loadedView = [loadedViews firstObject];
+        loadedView.frame             = self.frame;
+        loadedView.layer.borderWidth = 1;
+        loadedView.layer.borderColor = [UIColor redColor].CGColor;
+        return loadedView;
+    }
+    return self;
+}
+
 - (void)awakeFromNib {
     self.height          = LEAD_IMAGE_CONTAINER_HEIGHT;
     self.isPlaceholder   = NO;
@@ -217,11 +233,15 @@
     // Notify the layout system that the height has changed.
     [self invalidateIntrinsicContentSize];
 
+    NSLog(@"self.height = %f", self.height);
+
     // Now notify the web view of the height change.
     [self.delegate leadImageHeightChangedTo:@(self.height)];
 }
 
 - (CGSize)intrinsicContentSize {
+    NSLog(@"intrinsicContentSize height = %f", self.height);
+
     return CGSizeMake(UIViewNoIntrinsicMetric, self.height);
 }
 
@@ -297,6 +317,9 @@
         return;
     } else {
         NSString* title = [self.article.displaytitle getStringWithoutHTML];
+
+        NSLog(@"self.titleLabel = %@", self.titleLabel);
+
         [self.titleLabel setTitle:title description:[self getCurrentArticleDescription]];
     }
 

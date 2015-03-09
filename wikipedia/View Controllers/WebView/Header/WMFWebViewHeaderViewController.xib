@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6254"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WMFWebViewHeaderViewController">
+            <connections>
+                <outlet property="container" destination="x4r-2i-Xtj" id="XAQ-NL-HP1"/>
+                <outlet property="leadImageSubContainerView" destination="y70-U4-k5a" id="Ez1-eX-hWO"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="369" height="197"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="x4r-2i-Xtj" userLabel="Sub-container container">
+                    <rect key="frame" x="0.0" y="0.0" width="369" height="197"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="y70-U4-k5a" userLabel="Lead image container">
+                            <rect key="frame" x="0.0" y="0.0" width="369" height="197"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="y70-U4-k5a" firstAttribute="leading" secondItem="x4r-2i-Xtj" secondAttribute="leading" id="2NW-sh-TiG"/>
+                        <constraint firstAttribute="bottom" secondItem="y70-U4-k5a" secondAttribute="bottom" id="8yj-VH-FXJ"/>
+                        <constraint firstItem="y70-U4-k5a" firstAttribute="top" secondItem="x4r-2i-Xtj" secondAttribute="top" id="p8M-T1-Nyw"/>
+                        <constraint firstAttribute="trailing" secondItem="y70-U4-k5a" secondAttribute="trailing" id="qmi-OO-fVr"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="x4r-2i-Xtj" secondAttribute="bottom" id="9Zx-ch-RGE"/>
+                <constraint firstItem="x4r-2i-Xtj" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="Q1U-ne-cIE"/>
+                <constraint firstItem="x4r-2i-Xtj" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="cdC-vY-aM8"/>
+                <constraint firstAttribute="trailing" secondItem="x4r-2i-Xtj" secondAttribute="trailing" id="wJi-JO-i9o"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="281.5" y="306.5"/>
+        </view>
+    </objects>
+</document>

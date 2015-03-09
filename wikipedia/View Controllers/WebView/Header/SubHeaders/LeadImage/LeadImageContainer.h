@@ -15,4 +15,6 @@
 
 @property (nonatomic, weak) id <LeadImageHeightDelegate> delegate;
 
+@property (nonatomic, readonly) CGFloat height;
+
 @end

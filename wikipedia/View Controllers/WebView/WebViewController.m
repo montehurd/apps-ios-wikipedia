@@ -35,7 +35,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self setupLeadImageContainer];
+    [self setupTrackingHeader];
     [self setupTrackingFooter];
 
     session = [SessionSingleton sharedInstance];
@@ -65,7 +65,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
         [weakSelf performSelector:@selector(autoScrollToLastScrollOffsetIfNecessary) withObject:nil afterDelay:0.5f];
 
         // Show lead image!
-        [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
+        [weakSelf.headerViewController.leadImageController.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
         [weakSelf.bridge sendMessage:@"setTableLocalization"
                          withPayload:@{
              @"string_table_infobox": MWLocalizedString(@"info-box-title", nil),
@@ -1821,7 +1821,6 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     // (even though it makes the toc animate offscreen nicely if it was onscreen) as
     // it messes up in rtl langs for some reason, blanking out the screen.
     //[self tocHideWithDuration:@0.0f];
-
     [self updateReferencesHeightAndBottomConstraints];
 }
 
@@ -2002,28 +2001,7 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     }];
 }
 
-#pragma mark Lead image container
-
-- (void)setupLeadImageContainer {
-    self.leadImageContainer = [[[NSBundle mainBundle] loadNibNamed:@"LeadImageContainer"
-                                                             owner:nil
-                                                           options:nil] firstObject];
-
-    self.leadImageContainer.delegate = self;
-
-    [self.leadImageContainer addTarget:self
-                                action:@selector(didTouchLeadImage:)
-                      forControlEvents:UIControlEventTouchUpInside];
-
-    [self.webView wmf_addTrackingView:self.leadImageContainer
-                           atLocation:WMFTrackingViewLocationTop];
-}
-
-- (void)leadImageHeightChangedTo:(NSNumber*)height {
-    // Let the html spacer div adjust to the new height of the lead image container.
-    [self.bridge sendMessage:@"setLeadImageDivHeight"
-                 withPayload:@{ @"height": height }];
-}
+#pragma mark Sharing
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender {
     if (action == @selector(shareSnippet:)) {
@@ -2052,11 +2030,83 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     return selectedText.length < kMinimumTextSelectionLength ? @"" : selectedText;
 }
 
+#pragma mark Lead image
+
+- (void)leadImageHeightChangedTo:(NSNumber*)height {
+    // Let the html spacer div adjust to the new height of the lead image container.
+    [self.bridge sendMessage:@"setLeadImageDivHeight"
+                 withPayload:@{ @"height": height }];
+}
+
 - (void)didTouchLeadImage:(id)sender {
     [self presentGalleryForArticle:session.currentArticle showingImage:session.currentArticle.image];
 }
 
-#pragma mark Tracking Footer
+#pragma mark Tracking Header/Footer
+/*
+   - (void)setupTrackingHeader {
+    if (!self.headerViewController) {
+
+        self.headerViewController = [[WMFWebViewHeaderViewController alloc] init];
+
+
+
+    [self addChildViewController:self.headerViewController];
+
+
+
+
+
+
+
+        [self.webView wmf_addTrackingView:self.headerViewController.view
+                               atLocation:WMFTrackingViewLocationTop];
+
+    [self.headerViewController didMoveToParentViewController:self];
+
+
+
+
+   self.leadImageContainer = self.headerViewController.leadImageController.leadImageContainer;
+   self.leadImageContainer.delegate = self;
+   [self.leadImageContainer addTarget:self
+                            action:@selector(didTouchLeadImage:)
+                  forControlEvents:UIControlEventTouchUpInside];
+
+
+   //self.headerContainer.leadImageContainer = self.leadImageContainer;
+
+
+
+    }
+   }
+ */
+
+- (void)setupTrackingHeader {
+    if (!self.headerContainer) {
+        self.headerContainer = [[WMFWebViewHeaderContainerView alloc] initWithHeight:LEAD_IMAGE_CONTAINER_HEIGHT];
+        [self.webView wmf_addTrackingView:self.headerContainer
+                               atLocation:WMFTrackingViewLocationTop];
+
+        self.headerViewController = [[WMFWebViewHeaderViewController alloc] init];
+
+//self.headerViewController.view.alpha = 0.5;
+        self.headerContainer.alpha = 0.5;
+
+        [self wmf_addChildController:self.headerViewController andConstrainToEdgesOfContainerView:self.headerContainer];
+
+
+
+        self.leadImageContainer          = self.headerViewController.leadImageController.leadImageContainer;
+        self.leadImageContainer.delegate = self;
+        [self.leadImageContainer addTarget:self
+                                    action:@selector(didTouchLeadImage:)
+                          forControlEvents:UIControlEventTouchUpInside];
+
+
+//self.headerContainer.leadImageContainer = self.leadImageContainer;
+    }
+}
 
 - (void)setupTrackingFooter {
     if (!self.footerContainer) {
