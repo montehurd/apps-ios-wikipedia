@@ -30,6 +30,8 @@
 #import "UIView+WMFFrameUtils.h"
 #import "WMFGradientView.h"
 
+#import "WMFImageInfoController.h"
+
 // Model
 #import "MWKDataStore.h"
 #import "MWKImage.h"
@@ -41,7 +43,6 @@
 #import <AFNetworking/AFHTTPRequestOperationManager.h>
 #import "AFHTTPRequestOperationManager+WMFConfig.h"
 #import "AFHTTPRequestOperationManager+UniqueRequests.h"
-#import "MWKImageInfoFetcher.h"
 #import "MWKImageInfoResponseSerializer.h"
 
 #if DEBUG && 0
@@ -59,7 +60,7 @@ NSDictionary* WMFIndexImageInfo(NSArray* imageInfo){
 }
 
 @interface WMFImageGalleryViewController ()
-<UIGestureRecognizerDelegate, UICollectionViewDelegateFlowLayout>
+<UIGestureRecognizerDelegate, UICollectionViewDelegateFlowLayout, WMFImageInfoControllerDelegate>
 
 @property (nonatomic) BOOL didApplyInitialVisibleImageIndex;
 @property (nonatomic, getter = isChromeHidden) BOOL chromeHidden;
@@ -71,17 +72,18 @@ NSDictionary* WMFIndexImageInfo(NSArray* imageInfo){
 @property (nonatomic, weak, readonly) UITapGestureRecognizer* chromeTapGestureRecognizer;
 
 @property (nonatomic, strong, readonly) AFHTTPRequestOperationManager* imageFetcher;
-@property (nonatomic, strong, readonly) MWKImageInfoFetcher* imageInfoFetcher;
 
 /// Array of the article's images without duplicates in order of appearance.
 @property (nonatomic, strong, readonly) NSArray* uniqueArticleImages;
 
 /// Map of canonical filenames to image info objects.
-@property (nonatomic, strong, readonly) NSDictionary* indexedImageInfo;
+//@property (nonatomic, strong, readonly) NSDictionary* indexedImageInfo;
 
 /// Map of URLs to bitmaps, serves as a simple cache for uncompressed images.
 // !!!: This means we're store image data in 2 different memory locations, but we save a lot of time by not decoding
 @property (nonatomic, strong, readonly) NSMutableDictionary* bitmapsForImageURL;
+
+@property (nonatomic, strong, readonly) WMFImageInfoController* infoController;
 
 - (MWKDataStore*)dataStore;
 
@@ -90,10 +92,10 @@ NSDictionary* WMFIndexImageInfo(NSArray* imageInfo){
 static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGalleryCollectionViewCellReuseId";
 
 @implementation WMFImageGalleryViewController
-@synthesize imageInfoFetcher    = _imageInfoFetcher;
-@synthesize imageFetcher        = _imageFetcher;
-@synthesize indexedImageInfo    = _indexedImageInfo;
-@synthesize uniqueArticleImages = _uniqueArticleImages;
+@synthesize imageFetcher = _imageFetcher;
+//@synthesize indexedImageInfo    = _indexedImageInfo;
+//@synthesize uniqueArticleImages = _uniqueArticleImages;
+@synthesize infoController = _infoController;
 
 - (instancetype)initWithArticle:(MWKArticle*)article {
     // TODO(bgerstle): use non-zero inset, disable bouncing, and customize scroll target to land images in center
@@ -107,7 +109,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
     self = [super initWithCollectionViewLayout:defaultLayout];
     if (self) {
         _article            = article;
-        _bitmapsForImageURL = [NSMutableDictionary dictionaryWithCapacity:[_uniqueArticleImages count]];
+        _bitmapsForImageURL = [NSMutableDictionary dictionaryWithCapacity:[self.uniqueArticleImages count]];
         _chromeHidden       = NO;
     }
     return self;
@@ -124,20 +126,16 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 
 #pragma mark - Getters
 
-- (NSArray*)uniqueArticleImages {
-    if (!_uniqueArticleImages) {
-        _uniqueArticleImages = [WikipediaAppUtils isDeviceLanguageRTL] ?
-                               [[[self.article.images uniqueLargestVariants] reverseObjectEnumerator] allObjects]
-                               : [self.article.images uniqueLargestVariants];
+- (WMFImageInfoController*)infoController {
+    if (!_infoController) {
+        _infoController          = [[WMFImageInfoController alloc] initWithArticle:self.article batchSize:50];
+        _infoController.delegate = self;
     }
-    return _uniqueArticleImages;
+    return _infoController;
 }
 
-- (NSDictionary*)indexedImageInfo {
-    if (!_indexedImageInfo) {
-        _indexedImageInfo = WMFIndexImageInfo([self.dataStore imageInfoForArticle:self.article]);
-    }
-    return _indexedImageInfo;
+- (NSArray*)uniqueArticleImages {
+    return self.infoController.uniqueArticleImages;
 }
 
 - (AFHTTPRequestOperationManager*)imageFetcher {
@@ -146,13 +144,6 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
         _imageFetcher.responseSerializer = [AFImageResponseSerializer serializer];
     }
     return _imageFetcher;
-}
-
-- (MWKImageInfoFetcher*)imageInfoFetcher {
-    if (!_imageInfoFetcher) {
-        _imageInfoFetcher = [[MWKImageInfoFetcher alloc] initWithDelegate:nil];
-    }
-    return _imageInfoFetcher;
 }
 
 - (MWKDataStore*)dataStore {
@@ -173,41 +164,6 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 
 - (NSUInteger)mostVisibleItemIndex {
     return [self.collectionViewFlowLayout wmf_indexPathClosestToContentOffset].item;
-}
-
-#pragma mark - Networking & Persistence
-
-- (void)fetchImageInfo {
-    [[MWNetworkActivityIndicatorManager sharedManager] push];
-    AFHTTPRequestOperation* requestOperation = [self.imageInfoFetcher fetchInfoForArticle:self.article];
-    requestOperation.completionQueue = dispatch_get_main_queue();
-
-    __weak WMFImageGalleryViewController* weakSelf = self;
-    [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation* operation, id responseObject) {
-        [[MWNetworkActivityIndicatorManager sharedManager] pop];
-        WMFImageGalleryViewController* strSelf = weakSelf;
-        if (!strSelf) {
-            return;
-        }
-        // persist to disk then update UI
-        [[strSelf dataStore] saveImageInfo:operation.responseObject forArticle:strSelf.article];
-        [strSelf updateImageInfo:operation.responseObject];
-    } failure:^(AFHTTPRequestOperation* operation, NSError* error) {
-        [[MWNetworkActivityIndicatorManager sharedManager] pop];
-        WMFImageGalleryViewController* strSelf = weakSelf;
-        BOOL wasCancelled = [operation.error.domain isEqualToString:NSURLErrorDomain]
-                            && operation.error.code == NSURLErrorCancelled;
-        if (strSelf && !wasCancelled) {
-            [strSelf showAlert:error.localizedDescription type:ALERT_TYPE_TOP duration:-1];
-        }
-    }];
-}
-
-- (void)updateImageInfo:(NSArray*)imageInfo {
-    _indexedImageInfo = WMFIndexImageInfo(imageInfo);
-    [self forEachVisibleCell:^(WMFImageGalleryCollectionViewCell* cell, NSIndexPath* indexPath) {
-        [self updateCell:cell atIndexPath:indexPath];
-    }];
 }
 
 - (void)forEachVisibleCell:(void (^)(WMFImageGalleryCollectionViewCell*, NSIndexPath*))block {
@@ -259,7 +215,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     // fetch after appearing so we don't do work while the animation is rendering
-    [self fetchImageInfo];
+    [self.infoController fetchBatchContainingIndex:self.visibleImageIndex];
 }
 
 - (void)viewDidLoad {
@@ -467,6 +423,23 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
     return [self.collectionViewFlowLayout wmf_itemSizeThatFits:self.view.bounds.size];
 }
 
+- (void)collectionView:(UICollectionView*)collectionView
+       willDisplayCell:(UICollectionViewCell*)cell
+    forItemAtIndexPath:(NSIndexPath*)indexPath {
+    /*
+       since we have to wait until the cells are laid out before applying visibleImageIndex, this method can be
+       called before visibleImageIndex has been applied.  as a result, we check the flag here to ensure our first fetch
+       doesn't involve the first image if the user tapped on the last image.
+     */
+    if (self.didApplyInitialVisibleImageIndex) {
+        // fetch the current batch, if needed
+        if (![self.infoController fetchBatchContainingIndex:indexPath.item]) {
+            // if the current batch doesn't need to be fetched, and the next one is 5 cells away, fetch it instead
+            [self.infoController fetchNextBatchIfIndex:indexPath.item isWithinDistanceOfNextBatch:5];
+        }
+    }
+}
+
 #pragma mark DataSource
 
 - (UICollectionViewCell*)collectionView:(UICollectionView*)collectionView
@@ -487,7 +460,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 
 - (void)updateCell:(WMFImageGalleryCollectionViewCell*)cell atIndexPath:(NSIndexPath*)indexPath {
     MWKImage* imageStub        = self.uniqueArticleImages[indexPath.item];
-    MWKImageInfo* infoForImage = self.indexedImageInfo[imageStub.infoAssociationValue];
+    MWKImageInfo* infoForImage = [self.infoController infoForImage:imageStub];
 
     [self updateDetailVisibilityForCell:cell withInfo:infoForImage];
 
@@ -519,7 +492,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 - (void)updateDetailVisibilityForCell:(WMFImageGalleryCollectionViewCell*)cell
                           atIndexPath:(NSIndexPath*)indexPath {
     MWKImage* imageStub        = self.uniqueArticleImages[indexPath.item];
-    MWKImageInfo* infoForImage = self.indexedImageInfo[imageStub.infoAssociationValue];
+    MWKImageInfo* infoForImage = [self.infoController infoForImage:imageStub];
     [self updateDetailVisibilityForCell:cell withInfo:infoForImage];
 }
 
@@ -533,7 +506,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
 - (void)updateImageAtIndexPath:(NSIndexPath*)indexPath {
     NSParameterAssert(indexPath);
     MWKImage* image                         = self.uniqueArticleImages[indexPath.item];
-    MWKImageInfo* infoForImage              = self.indexedImageInfo[image.infoAssociationValue];
+    MWKImageInfo* infoForImage              = [self.infoController infoForImage:image];
     WMFImageGalleryCollectionViewCell* cell =
         (WMFImageGalleryCollectionViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
     [self updateImageForCell:cell atIndexPath:indexPath image:image info:infoForImage];
@@ -622,6 +595,18 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
         // request will be nil if no request was sent (if another operation is already requesting the specified image)
         [[MWNetworkActivityIndicatorManager sharedManager] push];
     }
+}
+
+#pragma mark - WMFImageInfoControllerDelegate
+
+- (void)imageInfoControllerDidFetchInfo:(WMFImageInfoController*)controller {
+    [self forEachVisibleCell:^(WMFImageGalleryCollectionViewCell* cell, NSIndexPath* indexPath) {
+        [self updateCell:cell atIndexPath:indexPath];
+    }];
+}
+
+- (void)imageInfoControllerFetchFailed:(WMFImageInfoController*)controller error:(NSError*)error {
+    [self showAlert:error.localizedDescription type:ALERT_TYPE_TOP duration:-1];
 }
 
 @end
