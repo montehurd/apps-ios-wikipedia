@@ -36,7 +36,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
 
 @interface LeadImageContainer ()
 
-#pragma mark Private properties
+#pragma mark - Private properties
 
 @property (weak, nonatomic) IBOutlet UIView* titleDescriptionContainer;
 @property (weak, nonatomic) IBOutlet LeadImageTitleLabel* titleLabel;
@@ -56,7 +56,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
 
 @implementation LeadImageContainer
 
-#pragma mark Setup
+#pragma mark - Setup
 
 - (void)awakeFromNib {
     [self setupSerialFaceDetectionQueue];
@@ -102,7 +102,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     dispatch_set_target_queue(self.serialFaceDetectionQueue, low);
 }
 
-#pragma mark WebView image retrieval interception
+#pragma mark - WebView image retrieval interception
 
 - (void)webViewRetrievedAnImage:(NSNotification*)notification {
     // Notification received each time the web view retrieves an image.
@@ -139,7 +139,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     return ([self.article.image.fileNameNoSizePrefix isEqualToString:retrievedImageNameNoSizePrefix]);
 }
 
-#pragma mark Drawing
+#pragma mark - Drawing
 
 - (void)drawRect:(CGRect)rect {
     [super drawRect:rect];
@@ -225,7 +225,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     CGColorSpaceRelease(colorSpace);
 }
 
-#pragma mark Layout
+#pragma mark - Layout
 
 - (void)updateNonImageElements {
     // Updates title/description text color.
@@ -235,14 +235,6 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     [self updateHeights];
 
     [self setNeedsDisplay];
-}
-
-- (void)updateNonImageElementsIfNecessary {
-    if (!(self.isFaceDetectionNeeded && !self.isPlaceholder)) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateNonImageElements];
-        });
-    }
 }
 
 - (void)updateHeights {
@@ -278,7 +270,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     self.titleLabel.shadowColor = shadowColor;
 }
 
-#pragma mark Flags
+#pragma mark - Flags
 
 - (BOOL)shouldHideImage {
     return
@@ -295,7 +287,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     return (url.pathExtension && [url.pathExtension isEqualToString:@"gif"]) ? YES : NO;
 }
 
-#pragma mark Show
+#pragma mark - Show
 
 - (void)showForArticle:(MWKArticle*)article {
     self.article                = article;
@@ -352,8 +344,13 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     CIImage* ciImage = [[CIImage alloc] initWithData:retrievedImageData];
     self.image = [UIImage imageWithCIImage:ciImage];
 
-    [self detectFaceIfNecessary];
-    [self updateNonImageElementsIfNecessary];
+    if (self.isFaceDetectionNeeded && !self.isPlaceholder) {
+        [self detectFace];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateNonImageElements];
+        });
+    }
 }
 
 - (NSInteger)widthOfWidestVariantWebViewWillDownload {
@@ -382,7 +379,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     return -1;
 }
 
-#pragma mark Fetch finished
+#pragma mark - Fetch finished
 
 - (void)fetchFinished:(id)sender
           fetchedData:(id)fetchedData
@@ -418,7 +415,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     }
 }
 
-#pragma mark Description
+#pragma mark - Description
 
 - (NSString*)getCurrentArticleDescription {
     NSString* description = self.article.entityDescription;
@@ -429,40 +426,31 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     return description;
 }
 
-#pragma mark Face detection
+#pragma mark - Face detection
 
-- (void)detectFaceIfNecessary {
-    if (self.isFaceDetectionNeeded && !self.isPlaceholder) {
-        UIImage* imageToDetect = self.image; // Ensure async block is working on this size variant.
+- (void)detectFace {
+    UIImage* imageToDetect = self.image; // Ensure async block is working on this size variant.
+    dispatch_async(self.serialFaceDetectionQueue, ^{
+        if (self.isFaceDetectionNeeded) { // Re-check in case it changed since block was dispatched.
+            self.faceDetector.image = imageToDetect;
+            CGRect faceBounds = [self.faceDetector detectFace];
 
-        dispatch_async(self.serialFaceDetectionQueue, ^{ // Important that this is a serial queue!
-            //NSLog(@"Face detection block ran for image of size = %@", NSStringFromCGSize(imageToDetect.size));
+            BOOL faceDetected = !CGRectIsEmpty(faceBounds);
 
-            if (self.isFaceDetectionNeeded) { // Re-check in case it changed since block was dispatched.
-                self.faceDetector.image = imageToDetect;
-                CGRect faceBounds = [self.faceDetector detectFace];
+            // Store as unit rect so we don't have to re-run face detection on subsequently retrieved size variants
+            self.focalFaceBounds = WMFUnitRectFromRectForReferenceSize(faceBounds, imageToDetect.size);
 
-                //NSLog(@"FACE DETECTION ACTUALLY RAN FOR IMAGE SIZE = %@", NSStringFromCGSize(imageToDetect.size));
-
-                BOOL faceDetected = !CGRectIsEmpty(faceBounds);
-
-                // Store as unit rect so we don't have to re-run face detection on subsequent size
-                self.focalFaceBounds = WMFUnitRectFromRectForReferenceSize(faceBounds, imageToDetect.size);
-
-                if (faceDetected) {
-                    //NSLog(@"FACE FOUND FOR IMAGE SIZE = %@", NSStringFromCGSize(imageToDetect.size));
-
-                    self.isFaceDetectionNeeded = NO;
-                }
+            if (faceDetected) {
+                self.isFaceDetectionNeeded = NO;
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateNonImageElements];
-            });
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateNonImageElements];
         });
-    }
+    });
 }
 
-#pragma mark Easy face detection debugging
+#pragma mark - Easy face detection debugging
 
 - (void)debugSetupToggle {
     // Testing code so we can hit "Command-Shift-M" to toggle through focal images.
@@ -490,7 +478,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
     [self setNeedsDisplay];
 }
 
-#pragma mark Dealloc
+#pragma mark - Dealloc
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self.rotationObserver];
