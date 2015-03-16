@@ -357,7 +357,7 @@
                 NSData* data   = [NSData dataWithContentsOfFile:cacheFilePath options:0 error:&error];
                 if (!error) {
                     // Copy Search/Nearby thumb binary to core data store so it doesn't have to be re-downloaded.
-                    MWKImage* image = [self.article importImageURL:thumbURL sectionId:MWK_SECTION_THUMBNAIL];
+                    MWKImage* image = [self.article importImageURL:thumbURL sectionId:kMWKArticleSectionNone];
                     [self.article importImageData:data image:image];
                     foundThumbInTempDir = YES;
                 }

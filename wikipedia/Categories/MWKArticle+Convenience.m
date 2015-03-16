@@ -2,6 +2,7 @@
 //  Copyright (c) 2014 Wikimedia Foundation. Provided under MIT-style license; please copy and modify!
 
 #import "MWKArticle+Convenience.h"
+#import "NSString+Extras.h"
 
 @implementation MWKArticle (Convenience)
 
@@ -18,6 +19,24 @@
         }
     }
     return soughtImage;
+}
+
+- (MWKImage*)importImageURL:(NSString*)url
+                  imageData:(NSData*)imageData {
+    // Remove scheme ("http:" or "https:") so any fallback to
+    // http doesn't cause image assets to require re-cache.
+    // "importImageURL:sectionId:" also updates the article's
+    // "images" list.
+    MWKImage* image = [self importImageURL:[url getUrlWithoutScheme]
+                                 sectionId:kMWKArticleSectionNone];
+
+    [image importImageData:imageData];
+    [image save];
+
+    // MWKArticle's "save" causes its "images" list to be saved.
+    [self save];
+
+    return image;
 }
 
 @end
