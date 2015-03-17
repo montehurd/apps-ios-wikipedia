@@ -22,25 +22,9 @@ NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
 
 @property (readonly) MWKArticle* article;
 
-// Reminder: When using this debugging image to test caching (i.e. seeing if article images
-// show the placeholder) be sure to quit and restart the app (double-tap the home button
-// and flick the app up offscreen) otherwise the web view keeps showing its memory cache
-// version of the actual image it downloaded - that is, it has no need to attempt a cache hit.
-// Once the app is then restarted if everything is working the article images should all
-// show the placeholder image.
-@property (strong, nonatomic) NSData* debuggingPlaceHolderImageData;
-
 @end
 
 @implementation URLCache
-
-- (id)initWithMemoryCapacity:(NSUInteger)memoryCapacity diskCapacity:(NSUInteger)diskCapacity diskPath:(NSString*)path {
-    self = [super initWithMemoryCapacity:memoryCapacity diskCapacity:diskCapacity diskPath:path];
-    if (self) {
-        self.debuggingPlaceHolderImageData = UIImagePNGRepresentation([UIImage imageNamed:@"logo-onboarding-subtitle.png"]);
-    }
-    return self;
-}
 
 - (MWKArticle*)article {
     return [SessionSingleton sharedInstance].currentArticle;
@@ -86,40 +70,25 @@ NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
         return;
     }
 
-    // Save image to articleData store instead of default NSURLCache store.
-    NSURL* url       = cachedResponse.response.URL;
-    NSString* urlStr = [url absoluteString];
+    NSString* urlStr = [cachedResponse.response.URL absoluteString];
 
-    NSData* imageDataToUse = cachedResponse.data;
+    // Save image to article data store instead of default NSURLCache store if
+    // "createImageRecordsForSection:" pre-created a placeholder MWKImage record.
 
-    MWKImage* image = [self.article imageWithURL:urlStr];
-
-    if (!image) {
-        // If an Image object wasn't pre-created by :createSectionImageRecordsForSectionHtml:onContext:" then don't try to cache.
+    // If no placeholder record, call super and return for default NSURLCache behavior.
+    NSString* thisImageCacheFolderPath  = [self.article.dataStore pathForImageURL:urlStr title:self.article.title];
+    BOOL isDirectory                    = NO;
+    BOOL thisImageCacheFolderPathExists = [[NSFileManager defaultManager] fileExistsAtPath:thisImageCacheFolderPath isDirectory:&isDirectory];
+    if (!thisImageCacheFolderPathExists) {
+        // If an Image folder wasn't pre-created by "createImageRecordsForSection:" then don't try to cache.
         URLCacheLog(@"Storing cached response without image record for %@", request);
         [super storeCachedResponse:cachedResponse forRequest:request];
         return;
     }
 
-    /*
-       // Quick debugging filter which makes image blue before saving them to our articleData store.
-       // (locks up occasionally - probably not thread safe - only for testing so no worry for now)
-       CIImage *inputImage = [[CIImage alloc] initWithData:cachedResponse.data];
-
-       CIFilter *colorMonochrome = [CIFilter filterWithName:@"CIColorMonochrome"];
-       [colorMonochrome setDefaults];
-       [colorMonochrome setValue: inputImage forKey: @"inputImage"];
-       [colorMonochrome setValue: [CIColor colorWithRed:0.6f green:0.6f blue:1.0f alpha:1.0f] forKey: @"inputColor"];
-
-       CIImage *outputImage = [colorMonochrome valueForKey:@"outputImage"];
-       CIContext *context = [CIContext contextWithOptions:nil];
-       UIImage *outputUIImage = [UIImage imageWithCGImage:[context createCGImage:outputImage fromRect:outputImage.extent]];
-       imageDataToUse = UIImagePNGRepresentation(outputUIImage);
-     */
-
-    // Another quick debugging indicator which caches a "W" logo image instead of the real image.
-    // (This one has no thread safety issues.)
-    //imageDataToUse = self.debuggingPlaceHolderImageData;
+    // Placeholder record found, so route image data to article data store.
+    MWKImage* image        = [self.article imageWithURL:urlStr];
+    NSData* imageDataToUse = cachedResponse.data;
 
     @try {
         URLCacheLog(@"Rerouting cached response to WMF data store for %@", request);

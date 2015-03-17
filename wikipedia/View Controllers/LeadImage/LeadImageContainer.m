@@ -329,6 +329,9 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
         if (largestCachedVariant.width.floatValue < okMinimumWidth) {
             if (self.article.imageURL) {
                 NSInteger widestExpectedImageWidth = [self widthOfWidestVariantWebViewWillDownload];
+                if (widestExpectedImageWidth == NSNotFound) {
+                    return NO;
+                }
                 if (widestExpectedImageWidth < okMinimumWidth) {
                     return NO;
                 }
@@ -373,7 +376,7 @@ static const CGFloat kMinimumAcceptableCachedVariantThreshold = 0.6f;
         // cases it's ok because the higher res image will be fetched with the ThumbnailFetcher.
         return [MWKImage fileSizePrefix:widestUncachedVariant.sourceURL];
     }
-    return -1;
+    return NSNotFound;
 }
 
 #pragma mark - Fetch finished
