@@ -281,8 +281,8 @@
             continue;
         }
 
-        NSString* src = imageNode.attributes[@"src"];
-        int density   = 1;
+        NSString* src     = imageNode.attributes[@"src"];
+        NSInteger density = 1;
 
         // This is a horrible hack to compensate for iOS 8 WebKit's srcset
         // handling and the way we currently handle image caching which
@@ -319,6 +319,18 @@
         }
 
         MWKImage* image = [self.article importImageURL:src sectionId:sectionId];
+
+        // If dimensions determined, save them so they don't have to be expensively determined later.
+        if (width && height) {
+            // Don't record dimensions if image file name doesn't have size prefix.
+            // (Sizes from the img tag don't tend to correspond closely to actual
+            // image binary sizes for these.)
+            if (![src.lastPathComponent isEqualToString:image.fileNameNoSizePrefix]) {
+                image.width  = @(width.integerValue * density);
+                image.height = @(height.integerValue * density);
+            }
+        }
+
         [image save];
 
         imageIndexInSection++;

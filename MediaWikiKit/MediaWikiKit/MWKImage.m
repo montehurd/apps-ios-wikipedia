@@ -127,10 +127,12 @@
     _dateLastAccessed = [[NSDate alloc] init];
     _mimeType         = [self getImageMimeTypeForExtension:self.extension];
 
-#warning TODO(bgerstle): get width & height info w/o expensively inflating the image data and then throwing it away
-    UIImage* img = [UIImage imageWithData:data scale:1.0];
-    _width  = [NSNumber numberWithInt:img.size.width];
-    _height = [NSNumber numberWithInt:img.size.height];
+    // Width / height may already be set, so only inflate image data to get these if necessary.
+    if (!_width || !_height) {
+        UIImage* img = [UIImage imageWithData:data];
+        _width  = [NSNumber numberWithInt:img.size.width];
+        _height = [NSNumber numberWithInt:img.size.height];
+    }
 }
 
 - (NSString*)getImageMimeTypeForExtension:(NSString*)extension {
