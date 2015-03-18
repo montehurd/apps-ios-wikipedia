@@ -99,11 +99,20 @@
                 return;
             }
 
+
+            CFTimeInterval startTime = CACurrentMediaTime();
+
+
+
             //[self applyResultsForLeadSection:leadSectionResults];
             for (int n = 0; n < [self.article.sections count]; n++) {
                 (void)self.article.sections[n].images;             // hack
                 [self createImageRecordsForSection:n];
             }
+
+            CFTimeInterval elapsedTime = CACurrentMediaTime() - startTime;
+            NSLog(@"elapsedTime = %f", elapsedTime);
+
 
             [self associateThumbFromTempDirWithArticle];
 
@@ -232,8 +241,29 @@
     [requestSerializer setValue:nil forHTTPHeaderField:@"X-MCCMNC"];
 }
 
+- (NSString*)reduceHTMLtoImgTagsOnly:(NSString*)html {
+    NSString* marker                    = @"<img ";
+    NSArray* stringsStartingWithImgTags = [html componentsSeparatedByString:marker];
+    if (stringsStartingWithImgTags.count == 0) {
+        return @"";
+    }
+    NSMutableArray* output = [NSMutableArray arrayWithCapacity:stringsStartingWithImgTags.count];
+    NSInteger iStart       = [html hasPrefix:marker] ? 0 : 1;
+    NSInteger counter      = 0;
+    for (NSInteger i = iStart; i < stringsStartingWithImgTags.count; i++) {
+        NSString* thisImgTagPlusStuff = [marker stringByAppendingString:stringsStartingWithImgTags[i]];
+        NSRange endOfImgTag           = [thisImgTagPlusStuff rangeOfString:@">"];
+        output[counter++] =
+            (endOfImgTag.location != NSNotFound) ? [thisImgTagPlusStuff substringToIndex : endOfImgTag.location + 1] : thisImgTagPlusStuff;
+    }
+    return [output componentsJoinedByString:@""];
+}
+
 - (void)createImageRecordsForSection:(int)sectionId {
     NSString* html = self.article.sections[sectionId].text;
+
+    // This reduction makes "searchWithXPathQuery" MUCH faster.
+    html = [self reduceHTMLtoImgTagsOnly:html];
 
     // Parse the section html extracting the image urls (in order)
     // See: http://www.raywenderlich.com/14172/how-to-parse-html-on-ios
@@ -241,37 +271,21 @@
 
     // Call *after* article record created but before section html sent across bridge.
 
-    // Reminder: don't do "context performBlockAndWait" here - createImageRecordsForHtmlOnContext gets
-    // called in a loop which is encompassed by such a block already!
-
     if (html.length == 0) {
         return;
     }
 
-    NSData* sectionHtmlData               = [html dataUsingEncoding:NSUTF8StringEncoding];
-    TFHpple* sectionParser                = [TFHpple hppleWithHTMLData:sectionHtmlData];
-    NSString* imageLinkElementsXpathQuery = @"//a[@class='image']";
-    // ^ the navbox exclusion prevents images from the hidden navbox table from appearing
-    // in the last section's TOC cell.
+    NSData* sectionHtmlData = [html dataUsingEncoding:NSUTF8StringEncoding];
 
-    NSArray* imageLinks            = [sectionParser searchWithXPathQuery:imageLinkElementsXpathQuery];
+    TFHpple* sectionParser = [TFHpple hppleWithHTMLData:sectionHtmlData];
+
+    NSString* imageElementsXpathQuery = @"//img[@src]";
+
+    NSArray* imageNodes = [sectionParser searchWithXPathQuery:imageElementsXpathQuery];
+
     NSUInteger imageIndexInSection = 0;
 
-    for (TFHppleElement* linkNode in imageLinks) {
-        NSInteger imageNodeIndex = [linkNode.children indexOfObjectPassingTest:^BOOL (TFHppleElement* child, NSUInteger idx, BOOL* stop) {
-            if ([child.tagName isEqualToString:@"img"]) {
-                *stop = YES;
-                return YES;
-            } else {
-                return NO;
-            }
-        }];
-        NSParameterAssert(imageNodeIndex != NSNotFound);
-        if (imageNodeIndex == NSNotFound) {
-            // TODO: handle this error somehow, for now, go to the next linkNode
-            continue;
-        }
-        TFHppleElement* imageNode  = linkNode.children[imageNodeIndex];
+    for (TFHppleElement* imageNode in imageNodes) {
         NSString* heightFromImgTag = imageNode.attributes[@"height"];
         NSString* widthFromImgTag  = imageNode.attributes[@"width"];
 
