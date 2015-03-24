@@ -83,6 +83,8 @@
 		045D872119FAD2FA0035C1F9 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 045D872019FAD2FA0035C1F9 /* AboutViewController.m */; };
 		045EFF1A19A25FEB00D0EDBB /* logo-placeholder-search.png in Resources */ = {isa = PBXBuildFile; fileRef = 045EFF1819A25FEB00D0EDBB /* logo-placeholder-search.png */; };
 		045EFF1B19A25FEB00D0EDBB /* logo-placeholder-search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 045EFF1919A25FEB00D0EDBB /* logo-placeholder-search@2x.png */; };
+		0461F3771AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 0461F3761AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m */; };
+		0461F3781AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 0461F3761AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m */; };
 		0462A6D11A1FE016009412D4 /* SearchResultAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 0462A6D01A1FE016009412D4 /* SearchResultAttributedString.m */; };
 		0463639818A844570049EE4F /* KeychainCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 0463639718A844570049EE4F /* KeychainCredentials.m */; };
 		0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */ = {isa = PBXBuildFile; fileRef = 0472BC17193AD88C00C40BDA /* MWKSection+DisplayHtml.m */; };
@@ -528,6 +530,8 @@
 		045D872019FAD2FA0035C1F9 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		045EFF1819A25FEB00D0EDBB /* logo-placeholder-search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-placeholder-search.png"; sourceTree = "<group>"; };
 		045EFF1919A25FEB00D0EDBB /* logo-placeholder-search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "logo-placeholder-search@2x.png"; sourceTree = "<group>"; };
+		0461F3751AC0D9DE00B521F4 /* SavedPageTitleAttributedString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SavedPageTitleAttributedString.h; sourceTree = "<group>"; };
+		0461F3761AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SavedPageTitleAttributedString.m; sourceTree = "<group>"; };
 		0462A6CF1A1FE016009412D4 /* SearchResultAttributedString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchResultAttributedString.h; sourceTree = "<group>"; };
 		0462A6D01A1FE016009412D4 /* SearchResultAttributedString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchResultAttributedString.m; sourceTree = "<group>"; };
 		0463639618A844570049EE4F /* KeychainCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainCredentials.h; sourceTree = "<group>"; };
@@ -1306,6 +1310,8 @@
 				0429300918604898002A13FC /* SavedPagesViewController.m */,
 				0429300318604898002A13FC /* SavedPagesResultCell.h */,
 				0429300418604898002A13FC /* SavedPagesResultCell.m */,
+				0461F3751AC0D9DE00B521F4 /* SavedPageTitleAttributedString.h */,
+				0461F3761AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m */,
 				047E74131860509000916964 /* SavedPagesResultPrototypeView.xib */,
 			);
 			path = SavedPages;
@@ -2936,6 +2942,7 @@
 				04D686CA1AB28FE40009B44A /* UIImage+WMFFocalImageDrawing.m in Sources */,
 				04D686FF1AB2949C0009B44A /* WikiGlyphLabel.m in Sources */,
 				BC0FED711AAA026C002488D7 /* WMFJoinedPropertyParametersTests.m in Sources */,
+				0461F3781AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m in Sources */,
 				BC0FED6A1AAA0268002488D7 /* MWKDataStorePathTests.m in Sources */,
 				BC0FED761AAA026C002488D7 /* NSString+WMFHTMLParsingTests.m in Sources */,
 				04D686CF1AB292160009B44A /* WMFFaceDetector.m in Sources */,
@@ -3035,6 +3042,7 @@
 				0415581C18ADFA5D00B81A59 /* UIImage+ColorMask.m in Sources */,
 				04A70FD7185BB6C300E24515 /* URLCache.m in Sources */,
 				C90799BA1A8564C60044E13C /* WMFShareOptionsViewController.m in Sources */,
+				0461F3771AC0D9DE00B521F4 /* SavedPageTitleAttributedString.m in Sources */,
 				04C91CEB195517250035ED1B /* OnboardingViewController.m in Sources */,
 				04D686FA1AB2949C0009B44A /* TabularScrollView.m in Sources */,
 				041A3B5E18E11ED90079FF1C /* LanguagesCell.m in Sources */,

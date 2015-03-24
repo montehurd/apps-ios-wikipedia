@@ -4,11 +4,14 @@
 #import "SavedPagesResultCell.h"
 #import "Defines.h"
 #import "NSObject+ConstraintsScale.h"
+#import "UIView+Debugging.h"
+#import "PaddedLabel.h"
+
+static CGFloat const kMinVerticalPadding = 4.0f;
 
 @implementation SavedPagesResultCell
 
 @synthesize imageView;
-@synthesize textLabel;
 @synthesize useField;
 
 - (id)initWithCoder:(NSCoder*)aDecoder {
@@ -22,7 +25,7 @@
 
 - (void)setUseField:(BOOL)use {
     if (use) {
-        // This "field" - ie a slight background color, slightly rounded corners,
+        // This "field" - ie a slight background color
         // and a light border - helps images which may have large amounts of white,
         // or which may have transparent parts, look much nicer and more visually
         // consistent. The thumbnails for search terms "Monaco" and "Poland", for
@@ -32,8 +35,7 @@
         self.imageView.layer.borderColor = borderColor.CGColor;
         self.imageView.layer.borderWidth = 1.0f / [UIScreen mainScreen].scale;
 
-        self.imageView.layer.cornerRadius = 0.0f;
-        self.imageView.backgroundColor    = [UIColor colorWithWhite:0.0 alpha:0.025];
+        self.imageView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.025];
     } else {
         // The field can be turned off, when displaying the search term placeholder
         // image, for example.
@@ -46,18 +48,12 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    // Initial changes to ui elements go here.
-    // See: http://stackoverflow.com/a/15591474 for details.
+    self.savedItemLabel.padding =
+        UIEdgeInsetsMake(kMinVerticalPadding, 0.0f, kMinVerticalPadding, 0.0f);
 
-    //self.textLabel.layer.borderWidth = 1;
-    //self.textLabel.layer.borderColor = [UIColor redColor].CGColor;
-    //self.backgroundColor = [UIColor greenColor];
+    [self adjustConstraintsScaleForViews:@[self.imageView, self.savedItemLabel]];
 
-    [self adjustConstraintsScaleForViews:@[self.imageView, self.textLabel]];
-}
-
-- (void)prepareForReuse {
-    //NSLog(@"imageView frame = %@", NSStringFromCGRect(self.imageView.frame));
+    //[self randomlyColorSubviews];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
