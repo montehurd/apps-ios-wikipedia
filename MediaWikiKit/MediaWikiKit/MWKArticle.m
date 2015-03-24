@@ -188,6 +188,16 @@
     [self.sections save];
 }
 
+- (void)saveExceptSectionHTML {
+    [self.dataStore saveArticle:self];
+    [self.images save];
+    for (MWKSection* section in self.sections) {
+        if (section.images) {
+            [section.images save];
+        }
+    }
+}
+
 - (void)remove {
     NSString* path = [self.dataStore pathForArticle:self];
     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
