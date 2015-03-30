@@ -13,6 +13,7 @@
 #import "UILabel+WMFStyling.h"
 #import "MWKLicense+ToGlyph.h"
 #import "NSParagraphStyle+WMFNaturalAlignmentStyle.h"
+#import "NSString+WMFHTMLParsing.h"
 
 static double const WMFImageGalleryLicenseFontSize       = 19.0;
 static double const WMFImageGalleryLicenseBaselineOffset = -1.5;
@@ -46,7 +47,7 @@ static NSAttributedString* ConcatOwnerAndLicense(NSString* owner, MWKLicense* li
 
     NSAttributedString* attributedOwnerAndSeparator =
         [[NSAttributedString alloc]
-         initWithString:[@" " stringByAppendingString:owner]
+         initWithString:[@" " stringByAppendingString:[owner wmf_getCollapsedWhitespaceStringAdjustedForTerminalPunctuation]]
              attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:WMFImageGalleryOwnerFontSize],
                           NSForegroundColorAttributeName: [UIColor whiteColor]}];
 

@@ -71,7 +71,7 @@ static CGSize MWKImageInfoSizeFromJSON(NSDictionary* json, NSString* widthKey, N
             [[MWKImageInfo alloc]
              initWithCanonicalPageTitle:image[@"title"]
                        canonicalFileURL:[NSURL URLWithString:imageInfo[@"url"]]
-                       imageDescription:[extMetadata[ExtMetadataImageDescriptionKey][@"value"] wmf_joinedHtmlTextNodes]
+                       imageDescription:[[extMetadata[ExtMetadataImageDescriptionKey][@"value"] wmf_joinedHtmlTextNodes] wmf_getCollapsedWhitespaceStringAdjustedForTerminalPunctuation]
                                 license:license
                             filePageURL:[NSURL URLWithString:imageInfo[@"descriptionurl"]]
                                imageURL:[NSURL URLWithString:imageInfo[@"url"]]

@@ -14,6 +14,18 @@ static const int kHighestIndexForSubstringAfterHTMLRemoved     = 350;
             valueForKey:WMF_SAFE_KEYPATH([TFHppleElement new], content)];
 }
 
+- (NSString*)wmf_stringByCollapsingWhitespaceToSingleSpace {
+    return [self stringByReplacingOccurrencesOfString:@"\\s+" withString:@" " options:NSRegularExpressionSearch range:NSMakeRange(0, self.length)];
+}
+
+- (NSString*)wmf_getCollapsedWhitespaceStringAdjustedForTerminalPunctuation {
+    NSString* result = [self wmf_stringByCollapsingWhitespaceToSingleSpace];
+    result = [result wmf_stringByRemovingWhiteSpaceBeforeCommasAndSemicolons];
+    result = [result wmf_stringByRemovingWhiteSpaceBeforePeriod];
+    result = [result stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    return result;
+}
+
 - (NSString*)wmf_joinedHtmlTextNodes {
     return [self wmf_joinedHtmlTextNodesWithDelimiter:@" "];
 }
