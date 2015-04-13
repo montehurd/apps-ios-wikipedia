@@ -11,9 +11,17 @@ document.addEventListener("DOMContentLoaded", function() {
     transformer.transform( "hideRedlinks", document );
     transformer.transform( "disableFilePageEdit", document );
     transformer.transform( "addImageOverflowXContainers", document );
+    transformer.transform( "collapsePageIssuesAndDisambig", document );
 
     bridge.sendMessage( "DOMContentLoaded", {} );
 });
+
+bridge.registerListener( "setInnerHTML", function( payload ){
+    var element = document.getElementById( payload.id );
+    if(element){
+        element.innerHTML = payload.innerHTML;
+    }
+} );
 
 bridge.registerListener( "setLanguage", function( payload ){
     var html = document.querySelector( "html" );
@@ -169,8 +177,15 @@ function maybeSendMessageForTarget(event, hrefTarget){
         // Handle reference links with a popup view instead of scrolling about!
         refs.sendNearbyReferences( hrefTarget );
     } else if (href && href[0] === "#") {
-        // If it is a link to an anchor in the current page, just scroll to it
-        document.getElementById( href.substring( 1 ) ).scrollIntoView();
+        var targetId = href.slice(1);
+        if ( "issues" === targetId ) {
+            issuesClicked( hrefTarget );
+        } else if ( "disambig" === targetId ) {
+            disambigClicked( hrefTarget );
+        } else {
+            // If it is a link to an anchor in the current page, just scroll to it
+            document.getElementById( href.substring( 1 ) ).scrollIntoView();
+        }
     } else if (typeof hrefClass === 'string' && hrefClass.indexOf('image') !== -1) {
         bridge.sendMessage('imageClicked', { 'url': event.target.getAttribute('src') });
     } else if (href) {
@@ -188,5 +203,41 @@ bridge.registerListener( "setLeadImageDivHeight", function( payload ) {
     if (payload.height == div.offsetHeight) return;
     div.style.height = payload.height + 'px';
 });
+
+function issuesClicked( sourceNode ) {
+    var issues = collectIssues( sourceNode.parentNode );
+    var disambig = collectDisambig( sourceNode.parentNode.parentNode ); // not clicked node
+    bridge.sendMessage( 'issuesClicked', { "hatnotes": disambig, "issues": issues } );
+}
+
+function disambigClicked( sourceNode ) {
+    var disambig = collectDisambig( sourceNode.parentNode );
+    var issues = collectIssues( sourceNode.parentNode.parentNode ); // not clicked node
+    bridge.sendMessage( 'disambigClicked', { "hatnotes": disambig, "issues": issues } );
+}
+
+function collectDisambig( sourceNode ) {
+    var res = [];
+    var links = sourceNode.querySelectorAll( 'div.hatnote a' );
+    var i = 0,
+        len = links.length;
+    for (; i < len; i++) {
+        // Pass the href; we'll decode it into a proper page title in Obj-C
+        res.push( links[i].getAttribute( 'href' ) );
+    }
+    return res;
+}
+
+function collectIssues( sourceNode ) {
+    var res = [];
+    var issues = sourceNode.querySelectorAll( 'table.ambox' );
+    var i = 0,
+        len = issues.length;
+    for (; i < len; i++) {
+        // .ambox- is used e.g. on eswiki
+        res.push( issues[i].querySelector( '.mbox-text, .ambox-text' ).innerHTML );
+    }
+    return res;
+}
 
 })();

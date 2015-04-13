@@ -65,6 +65,9 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
         // Show lead image!
         [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
 
+        [weakSelf setInnerHTML:MWLocalizedString(@"page-similar-titles", nil) ofButton:@"disambig_button" ];
+        [weakSelf setInnerHTML:MWLocalizedString(@"page-issues", nil) ofButton:@"issues_button"];
+
         [weakSelf.bridge sendMessage:@"setTableLocalization"
                          withPayload:@{
              @"string_table_infobox": MWLocalizedString(@"info-box-title", nil),
@@ -159,6 +162,16 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
     [self tocUpdateViewLayout];
 
     [self loadingIndicatorAdd];
+}
+
+-(void)setInnerHTML:(NSString *)innerHTML ofButton:(NSString *)buttonId
+{
+    [self.bridge sendMessage: @"setInnerHTML"
+                 withPayload: @{
+                                @"id": buttonId,
+                                @"innerHTML": innerHTML
+                                }
+     ];
 }
 
 - (void)jumpToFragmentIfNecessary {
@@ -381,9 +394,6 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
     };
 
     fetch(WMFAssetsFileTypeConfig);
-    fetch(WMFAssetsFileTypeCSS);
-    fetch(WMFAssetsFileTypeCSSAbuseFilter);
-    fetch(WMFAssetsFileTypeCSSPreview);
 }
 
 #pragma mark Edit section
@@ -805,6 +815,8 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
 
         NSString* href = payload[@"href"];
 
+NSLog(@"payload = %@", payload);
+
         if ([strSelf tocDrawerIsOpen]) {
             [strSelf tocHide];
             return;
@@ -904,6 +916,18 @@ static const CGFloat kScrollIndicatorMinYMargin = 4.0f;
 
         //NSLog(@"referenceClicked: %@", payload);
         [strSelf referencesShow:payload];
+    }];
+
+    [self.bridge addListener:@"disambigClicked" withBlock:^(NSString* messageType, NSDictionary* payload) {
+
+        NSLog(@"disambigClicked: %@", payload);
+
+    }];
+
+    [self.bridge addListener:@"issuesClicked" withBlock:^(NSString* messageType, NSDictionary* payload) {
+
+        NSLog(@"issuesClicked: %@", payload);
+
     }];
 
     UIMenuItem* shareSnippet = [[UIMenuItem alloc] initWithTitle:MWLocalizedString(@"share-custom-menu-item", nil)

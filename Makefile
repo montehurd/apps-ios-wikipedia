@@ -113,7 +113,11 @@ exec-check:  ##Check that executable dependencies are installed
 web: ##Make web assets
 web: css grunt
 
-CSS_ORIGIN = http://bits.wikimedia.org/en.wikipedia.org/load.php?debug=false&lang=en&only=styles&skin=vector&modules=
+ 
+# DON'T MERGE THE CHANGE TO THE NEXT LINE!!!! FOR TESTING ONLY!!!!
+# Once this https://gerrit.wikimedia.org/r/#/c/203997/ the url  can go back to using https://bits.wikimedia.org/en.wikipedia.org
+
+CSS_ORIGIN = http://bits.beta.wmflabs.org/en.wikipedia.beta.wmflabs.org/load.php?debug=false&lang=en&only=styles&skin=vector&modules=
 WEB_ASSETS_DIR = "Wikipedia/assets"
 
 define get_css_module
@@ -189,4 +193,3 @@ ruby-check: ##Make sure Ruby is installed
 
 get-ruby: ##Install Ruby via Homebrew (to remove need for sudo)
 		brew install ruby
-

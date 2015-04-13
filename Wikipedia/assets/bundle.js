@@ -110,9 +110,17 @@ document.addEventListener("DOMContentLoaded", function() {
     transformer.transform( "hideRedlinks", document );
     transformer.transform( "disableFilePageEdit", document );
     transformer.transform( "addImageOverflowXContainers", document );
+    transformer.transform( "collapsePageIssuesAndDisambig", document );
 
     bridge.sendMessage( "DOMContentLoaded", {} );
 });
+
+bridge.registerListener( "setInnerHTML", function( payload ){
+    var element = document.getElementById( payload.id );
+    if(element){
+        element.innerHTML = payload.innerHTML;
+    }
+} );
 
 bridge.registerListener( "setLanguage", function( payload ){
     var html = document.querySelector( "html" );
@@ -268,8 +276,15 @@ function maybeSendMessageForTarget(event, hrefTarget){
         // Handle reference links with a popup view instead of scrolling about!
         refs.sendNearbyReferences( hrefTarget );
     } else if (href && href[0] === "#") {
-        // If it is a link to an anchor in the current page, just scroll to it
-        document.getElementById( href.substring( 1 ) ).scrollIntoView();
+        var targetId = href.slice(1);
+        if ( "issues" === targetId ) {
+            issuesClicked( hrefTarget );
+        } else if ( "disambig" === targetId ) {
+            disambigClicked( hrefTarget );
+        } else {
+            // If it is a link to an anchor in the current page, just scroll to it
+            document.getElementById( href.substring( 1 ) ).scrollIntoView();
+        }
     } else if (typeof hrefClass === 'string' && hrefClass.indexOf('image') !== -1) {
         bridge.sendMessage('imageClicked', { 'url': event.target.getAttribute('src') });
     } else if (href) {
@@ -287,6 +302,42 @@ bridge.registerListener( "setLeadImageDivHeight", function( payload ) {
     if (payload.height == div.offsetHeight) return;
     div.style.height = payload.height + 'px';
 });
+
+function issuesClicked( sourceNode ) {
+    var issues = collectIssues( sourceNode.parentNode );
+    var disambig = collectDisambig( sourceNode.parentNode.parentNode ); // not clicked node
+    bridge.sendMessage( 'issuesClicked', { "hatnotes": disambig, "issues": issues } );
+}
+
+function disambigClicked( sourceNode ) {
+    var disambig = collectDisambig( sourceNode.parentNode );
+    var issues = collectIssues( sourceNode.parentNode.parentNode ); // not clicked node
+    bridge.sendMessage( 'disambigClicked', { "hatnotes": disambig, "issues": issues } );
+}
+
+function collectDisambig( sourceNode ) {
+    var res = [];
+    var links = sourceNode.querySelectorAll( 'div.hatnote a' );
+    var i = 0,
+        len = links.length;
+    for (; i < len; i++) {
+        // Pass the href; we'll decode it into a proper page title in Obj-C
+        res.push( links[i].getAttribute( 'href' ) );
+    }
+    return res;
+}
+
+function collectIssues( sourceNode ) {
+    var res = [];
+    var issues = sourceNode.querySelectorAll( 'table.ambox' );
+    var i = 0,
+        len = issues.length;
+    for (; i < len; i++) {
+        // .ambox- is used e.g. on eswiki
+        res.push( issues[i].querySelector( '.mbox-text, .ambox-text' ).innerHTML );
+    }
+    return res;
+}
 
 })();
 
@@ -722,6 +773,72 @@ transformer.register( "addImageOverflowXContainers", function( content ) {
         // Load event used so images w/o style or inline width/height
         // attributes can still have their size determined reliably.
         images[i].addEventListener('load', addImageOverflowXContainer, false);
+    }
+} );
+
+transformer.register( 'collapsePageIssuesAndDisambig', function( content ) {
+    transformer.transform( "displayDisambigLink", content);
+    transformer.transform( "displayIssuesLink", content);
+
+    var issuesContainer = document.getElementById('issues_container');
+    if(!issuesContainer){
+        return;
+    }
+    issuesContainer.setAttribute( "dir", window.directionality );
+
+    //if there were no page issues, then hide the container
+    if (!issuesContainer.hasChildNodes()) {
+        issuesContainer.style.display = 'none';
+    }
+
+    //if we have both issues and disambiguation, then insert the separator
+    var disambigBtn = document.getElementById( "disambig_button" );
+    var issuesBtn = document.getElementById( "issues_button" );
+    if (issuesBtn !== null && disambigBtn !== null) {
+        var separator = document.createElement( 'span' );
+        separator.innerText = '|';
+        separator.className = 'issues_separator';
+        issuesContainer.insertBefore(separator, issuesBtn.parentNode);
+    }
+} );
+
+transformer.register( 'displayDisambigLink', function( content ) {
+    var hatnotes = content.querySelectorAll( "div.hatnote" );
+    if ( hatnotes.length > 0 ) {
+        var container = document.getElementById( "issues_container" );
+        var wrapper = document.createElement( 'div' );
+        var link = document.createElement( 'a' );
+        link.setAttribute( 'href', '#disambig' );
+        link.className = 'disambig_button';
+        link.id = 'disambig_button';
+        wrapper.appendChild( link );
+        var i = 0,
+            len = hatnotes.length;
+        for (; i < len; i++) {
+            wrapper.appendChild( hatnotes[i] );
+        }
+        container.appendChild( wrapper );
+    }
+} );
+
+transformer.register( 'displayIssuesLink', function( content ) {
+    var issues = content.querySelectorAll( "table.ambox:not([class*='ambox-multiple_issues']):not([class*='ambox-notice'])" );
+    if ( issues.length > 0 ) {
+        var el = issues[0];
+        var container = document.getElementById( "issues_container" );
+        var wrapper = document.createElement( 'div' );
+        var link = document.createElement( 'a' );
+        link.setAttribute( 'href', '#issues' );
+        link.className = 'issues_button';
+        link.id = 'issues_button';
+        wrapper.appendChild( link );
+        el.parentNode.replaceChild( wrapper, el );
+        var i = 0,
+            len = issues.length;
+        for (; i < len; i++) {
+            wrapper.appendChild( issues[i] );
+        }
+        container.appendChild( wrapper );
     }
 } );
 

@@ -277,3 +277,69 @@ transformer.register( "addImageOverflowXContainers", function( content ) {
         images[i].addEventListener('load', addImageOverflowXContainer, false);
     }
 } );
+
+transformer.register( 'collapsePageIssuesAndDisambig', function( content ) {
+    transformer.transform( "displayDisambigLink", content);
+    transformer.transform( "displayIssuesLink", content);
+
+    var issuesContainer = document.getElementById('issues_container');
+    if(!issuesContainer){
+        return;
+    }
+    issuesContainer.setAttribute( "dir", window.directionality );
+
+    //if there were no page issues, then hide the container
+    if (!issuesContainer.hasChildNodes()) {
+        issuesContainer.style.display = 'none';
+    }
+
+    //if we have both issues and disambiguation, then insert the separator
+    var disambigBtn = document.getElementById( "disambig_button" );
+    var issuesBtn = document.getElementById( "issues_button" );
+    if (issuesBtn !== null && disambigBtn !== null) {
+        var separator = document.createElement( 'span' );
+        separator.innerText = '|';
+        separator.className = 'issues_separator';
+        issuesContainer.insertBefore(separator, issuesBtn.parentNode);
+    }
+} );
+
+transformer.register( 'displayDisambigLink', function( content ) {
+    var hatnotes = content.querySelectorAll( "div.hatnote" );
+    if ( hatnotes.length > 0 ) {
+        var container = document.getElementById( "issues_container" );
+        var wrapper = document.createElement( 'div' );
+        var link = document.createElement( 'a' );
+        link.setAttribute( 'href', '#disambig' );
+        link.className = 'disambig_button';
+        link.id = 'disambig_button';
+        wrapper.appendChild( link );
+        var i = 0,
+            len = hatnotes.length;
+        for (; i < len; i++) {
+            wrapper.appendChild( hatnotes[i] );
+        }
+        container.appendChild( wrapper );
+    }
+} );
+
+transformer.register( 'displayIssuesLink', function( content ) {
+    var issues = content.querySelectorAll( "table.ambox:not([class*='ambox-multiple_issues']):not([class*='ambox-notice'])" );
+    if ( issues.length > 0 ) {
+        var el = issues[0];
+        var container = document.getElementById( "issues_container" );
+        var wrapper = document.createElement( 'div' );
+        var link = document.createElement( 'a' );
+        link.setAttribute( 'href', '#issues' );
+        link.className = 'issues_button';
+        link.id = 'issues_button';
+        wrapper.appendChild( link );
+        el.parentNode.replaceChild( wrapper, el );
+        var i = 0,
+            len = issues.length;
+        for (; i < len; i++) {
+            wrapper.appendChild( issues[i] );
+        }
+        container.appendChild( wrapper );
+    }
+} );
