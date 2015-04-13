@@ -150,7 +150,7 @@ transformer.register( "hideTables", function( content ) {
         if (findAncestor (tables[i], 'app_table_container')) continue;
 
         //is the table already hidden? if so, don't worry about it
-        if (tables[i].style.display === 'none' || tables[i].classList.contains( 'navbox' ) || tables[i].classList.contains( 'vertical-navbox' ) || tables[i].classList.contains( 'navbox-inner' ) || tables[i].classList.contains( 'metadata' )) {
+        if (tables[i].style.display === 'none' || tables[i].classList.contains( 'navbox' ) || tables[i].classList.contains( 'vertical-navbox' ) || tables[i].classList.contains( 'navbox-inner' ) || tables[i].classList.contains( 'metadata' ) || tables[i].classList.contains( 'mbox-small' )) {
             continue;
         }
 
