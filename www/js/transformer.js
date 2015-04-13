@@ -18,4 +18,12 @@ Transformer.prototype.transform = function( transform, element ) {
     }
 };
 
+Transformer.prototype.httpGet = function (theUrl) {
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+};
+
 module.exports = new Transformer();
