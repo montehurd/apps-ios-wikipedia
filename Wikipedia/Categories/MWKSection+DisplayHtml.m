@@ -27,7 +27,7 @@
         // Lead section.
         // The lead section is a special case because of the native component used
         // for lead image styling. The title text is now shown by the native component.
-        return [self getLeadImagePlaceholderDiv];
+        return [[self getLeadImagePlaceholderDiv] stringByAppendingString:[self getDisambigAndPageIssuesPlaceholderDiv]];
     } else {
         // Non-lead section.
         NSInteger headingTagSize = [self getHeadingTagSize];
@@ -77,6 +77,10 @@
         [NSString stringWithFormat:@"<div id='lead_image_div' style='height:%fpx;background-color:white;'></div>",
          initialLeadImageHeight
         ];
+}
+
+- (NSString*)getDisambigAndPageIssuesPlaceholderDiv {
+    return @"<div class='issues_container' id='issues_container'></div>";
 }
 
 @end

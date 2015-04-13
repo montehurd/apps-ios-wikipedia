@@ -266,3 +266,5 @@
 "hockeyapp-alert-always-send" = "Alert dialog button text for crash reporting to always be sent";
 "hockeyapp-alert-do-not-send" = "Alert dialog button text for crash reporting to not send the crash report";
 "hockeyapp-alert-privacy" = "Alert dialog button text for HockeyApp privacy policy. $1 will be replaced programmatically with the constant string 'HockeyApp'";
+"page-issues" = "Label for button that shows the Page issues dialog.";
+"page-similar-titles" = "Label for button that shows a list of similar titles (disambiguation) for the current page";
