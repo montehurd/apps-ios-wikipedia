@@ -35,8 +35,11 @@ The **Wikipedia** scheme is configured to execute the project's iOS unit tests, 
 ## Contributing
 If you're interested in contributing to the project, you can find our current product, bug, and engineering backlogs on the [iOS App Phabricator project board](https://phabricator.wikimedia.org/project/profile/782/). Once you pick a task, make sure you assign it to yourself to ensure nobody else duplicates your work.
 
-Before submitting changes for review, please be sure to use [uncrustify](#uncrustify) to lint the code and [run the unit tests](#testing).  Now that the code is lint-free and the new tests (you did add tests, right?) it's time to submit the changes for review!
-
+### Before Submitting
+1. If you add any new files, make sure your project group structure matches the directory structure. The [synx](#synx) tool is an easy way to do this.
+2. Be sure to use [uncrustify](#uncrustify) to lint the code.
+3. Add a unit test for your change and [run the unit tests](#testing) to make sure everything passes.
+ 
 ### Gerrit
 Gerrit is our main vehicle for reviewing and merging code. You'll need to:
 
@@ -62,6 +65,9 @@ While typical application development is optimized to have as few dependencies a
 As mentioned in [best practices and coding style](#best-practices-and-coding-style), we use [uncrustify](http://uncrustify.sourceforge.net/) to lint the project's Objective-C code. Installation via Homebrew is straightforward: `brew install uncrustify`. We've also provided a pre-push git hook which automatically lints the code before pushing, which can be installed by running `./scripts/setup_git_hooks.sh`.
 
 > [BBUncrustifyPlugin](https://github.com/benoitsan/BBUncrustifyPlugin-Xcode) is an easy way to uncrustify files within the Xcode UI. You can install it from source or using [Alcatraz](http://alcatraz.io), the unofficial Xcode package/plugin manager.
+
+### Synx
+[Synx](https://github.com/venmo/synx) is an easy way to keep the project group structure in sync with the project directory structure. You can run this to keep everything nice an tidy. It even finds unused files and prunes them from the project.
 
 ### CocoaPods
 [CocoaPods](cocoapods.org) is a Ruby gem that the project uses to download and integrate third-party iOS components (see `Podfile` for an up-to-date list). We have committed all of these dependnecies to the repository itself, removing the need to install the gem or run before building the project. However, if you want to do anything related to CocoaPods (such as upgrading the version of CocoaPods or adding a dependency), please refer to the [Working With Cocoapods documentation](docs/working-with-cocoapods.md).

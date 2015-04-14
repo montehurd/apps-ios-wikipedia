@@ -9,8 +9,8 @@
 $base = realpath( dirname( __DIR__) );
 
 $tmpfile = tempnam( "/var/tmp", "apps-ios-wikipedia-storyboard-strings");
-$infile = "$base/wikipedia/Base.lproj/Main_iPhone.storyboard";
-$outfile = "$base/wikipedia/en.lproj/Main_iPhone.strings";
+$infile = "$base/Wikipedia/Base.lproj/Main_iPhone.storyboard";
+$outfile = "$base/Wikipedia/en.lproj/Main_iPhone.strings";
 
 $encInfile = escapeshellarg( $infile );
 $encTmpfile = escapeshellarg( $tmpfile );
