@@ -516,7 +516,7 @@ static NSUInteger const kWMFReadMoreNumberOfArticles           = 3;
             self.searchSuggestion = [searchResultFetcher.searchSuggestion copy];
         }
         if (self.searchSuggestion) {
-            [self.didYouMeanButton showWithText:MWLocalizedString(@"search-did-you-mean", nil)
+            [self.didYouMeanButton showWithText:(self.type == WMFSearchResultsControllerTypeReadMore) ? MWCurrentArticleLanguageLocalizedString(@"search-did-you-mean", nil) : MWLocalizedString(@"search-did-you-mean", nil)
                                            term:self.searchSuggestion];
         }
     } else if ([sender isKindOfClass:[ThumbnailFetcher class]]) {
