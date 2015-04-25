@@ -301,8 +301,7 @@ static CGFloat const kMinimumAcceptableCachedVariantThreshold = 0.6f;
         [self setTitle:@"" description:@""];
         return;
     } else {
-        NSString* title = [self.article.displaytitle getStringWithoutHTML];
-        [self setTitle:title description:[self getCurrentArticleDescription]];
+        [self setTitle:self.article.displaytitle description:[self getCurrentArticleDescription]];
     }
 
     // Show largest cached variant of lead image, or placeholder, immediately.

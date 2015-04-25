@@ -59,15 +59,13 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
     __weak WebViewController* weakSelf = self;
     [self.bridge addListener:@"DOMContentLoaded" withBlock:^(NSString* type, NSDictionary* payload) {
-        [weakSelf jumpToFragmentIfNecessary];
-        [weakSelf autoScrollToLastScrollOffsetIfNecessary];
-
-        // Show lead image!
-        [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
-
-        [weakSelf.loadingIndicatorOverlay setVisible:NO animated:YES];
-
         dispatch_async(dispatch_get_main_queue(), ^{
+            // Show lead image!
+            [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
+            [weakSelf jumpToFragmentIfNecessary];
+            [weakSelf autoScrollToLastScrollOffsetIfNecessary];
+            [weakSelf.loadingIndicatorOverlay setVisible:NO animated:YES];
+
             [weakSelf.tocVC updateTocForArticle:[SessionSingleton sharedInstance].currentArticle];
             [weakSelf updateTOCScrollPositionWithoutAnimationIfHidden];
         });

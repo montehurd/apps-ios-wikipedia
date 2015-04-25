@@ -2,61 +2,124 @@
 //  Copyright (c) 2014 Wikimedia Foundation. Provided under MIT-style license; please copy and modify!
 
 #import "LeadImageTitleAttributedString.h"
-#import "NSString+FormattedAttributedString.h"
 #import "Defines.h"
+#import "NSString+Extras.h"
 
-#define FONT @"Times New Roman"
-#define FONT_SIZE_TITLE (34.0f * MENUS_SCALE_MULTIPLIER)
-#define FONT_SIZE_DESCRIPTION (17.0f * MENUS_SCALE_MULTIPLIER)
+static NSString* const kFont = @"Times New Roman";
 
-#define LINE_SPACING_TITLE (-5.0f * MENUS_SCALE_MULTIPLIER)
-#define LINE_SPACING_DESCRIPTION (2.0f * MENUS_SCALE_MULTIPLIER)
+static CGFloat const kFontSizeTitle       = 34.0f;
+static CGFloat const kFontSizeDescription = 17.0f;
 
-#define SPACE_ABOVE_DESCRIPTION (4.0f * MENUS_SCALE_MULTIPLIER)
+static CGFloat const kLineSpacingTitle       = 0.0f;
+static CGFloat const kLineSpacingDescription = 2.0f;
+
+static CGFloat const kSpacingAboveDescription = 4.0f;
+
+static NSString* const kHTMLFormatString = @"<span style='font-family:%@;font-size:%f;'>%@</span>%@";
 
 @implementation LeadImageTitleAttributedString
 
 + (NSAttributedString*)attributedStringWithTitle:(NSString*)title
                                      description:(NSString*)description {
-    CGFloat shadowBlurRadius = 0.5;
+    CGFloat adjustedTitleFontSize = [self getTitleFontSizeForTitleOfLength:title.length];
 
-    NSShadow* shadow = [[NSShadow alloc] init];
+    NSMutableAttributedString* attributedTitle = nil;
+    NSAttributedString* attributedDescription  = nil;
+    BOOL isIOS6                                = (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_6_1);
 
-    [shadow setShadowOffset:CGSizeMake(0.0, 1.0)];
-    [shadow setShadowBlurRadius:shadowBlurRadius];
+    if (isIOS6) {
+        title = [title getStringWithoutHTML];
+        if (description.length > 0) {
+            title = [title stringByAppendingString:@"\n"];
+        }
+        NSMutableDictionary* titleAttribs = [self titleAttribs].mutableCopy;
+        titleAttribs[NSFontAttributeName] = [UIFont fontWithName:kFont size:adjustedTitleFontSize];
+        attributedTitle                   = [[NSAttributedString alloc] initWithString:title attributes:titleAttribs].mutableCopy;
+    } else {
+        // Set font and size via html span *not* via NSFontAttributeName. This is so we can apply
+        // titleAttribs after creating attributed string via NSHTMLTextDocumentType *without* blasting
+        // any substring italic styling resulting from that NSHTMLTextDocumentType parsing.
+        // Reminder: setting NSFontAttributeName resets any substring italic font attributes.
+        title = [NSString stringWithFormat:kHTMLFormatString, kFont, adjustedTitleFontSize, title, (description.length > 0) ? @"<br>" : @""];
+        NSError* error = nil;
+        attributedTitle =
+            [[NSAttributedString alloc] initWithData:[title dataUsingEncoding:NSUTF8StringEncoding]
+                                             options:@{
+                 NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+                 NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)
+             }
+                                  documentAttributes:nil
+                                               error:&error].mutableCopy;
 
-    CGFloat titleFontSizeMultiplier = [self getSizeReductionMultiplierForTitleOfLength:title.length];
+        [attributedTitle addAttributes:[self titleAttribs] range:NSMakeRange(0, attributedTitle.length)];
+    }
 
-    CGFloat titleFontSize = floor(FONT_SIZE_TITLE * titleFontSizeMultiplier);
+    NSMutableAttributedString* output = attributedTitle;
 
-    NSMutableParagraphStyle* titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    titleParagraphStyle.lineSpacing = LINE_SPACING_TITLE;
+    if (description.length > 0) {
+        attributedDescription = [[NSAttributedString alloc] initWithString:description attributes:[self descAttribs]];
+        [output appendAttributedString:attributedDescription];
+    }
 
-    NSMutableParagraphStyle* descParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    descParagraphStyle.lineSpacing            = LINE_SPACING_DESCRIPTION;
-    descParagraphStyle.paragraphSpacingBefore = SPACE_ABOVE_DESCRIPTION;
+    return output;
+}
 
-    NSDictionary* titleAttribs =
-        @{
-        NSShadowAttributeName: shadow,
-        NSFontAttributeName: [UIFont fontWithName:FONT size:titleFontSize],
-        NSParagraphStyleAttributeName: titleParagraphStyle
-    };
-    NSDictionary* descripAttribs =
-        @{
-        NSShadowAttributeName: shadow,
-        NSFontAttributeName: [UIFont fontWithName:FONT size:FONT_SIZE_DESCRIPTION],
-        NSParagraphStyleAttributeName: descParagraphStyle
-    };
++ (NSShadow*)shadow {
+    static NSShadow* shadow = nil;
+    if (!shadow) {
+        CGFloat shadowBlurRadius = 0.5;
+        shadow = [[NSShadow alloc] init];
+        [shadow setShadowOffset:CGSizeMake(0.0, 1.0)];
+        [shadow setShadowBlurRadius:shadowBlurRadius];
+    }
+    return shadow;
+}
 
-    NSString* lineBreak = (description.length == 0) ? @"" : @"\n";
-    description = description ? description : @"";
++ (NSMutableParagraphStyle*)titleParagraphStyle {
+    static NSMutableParagraphStyle* style = nil;
+    if (!style) {
+        style             = [[NSMutableParagraphStyle alloc] init];
+        style.lineSpacing = kLineSpacingTitle * MENUS_SCALE_MULTIPLIER;
+    }
+    return style;
+}
 
-    return
-        [@"$1$2$3" attributedStringWithAttributes:@{}
-                              substitutionStrings:@[title, lineBreak, description]
-                           substitutionAttributes:@[titleAttribs, @{}, descripAttribs]
-        ];
++ (NSMutableParagraphStyle*)descParagraphStyle {
+    static NSMutableParagraphStyle* style = nil;
+    if (!style) {
+        style                        = [[NSMutableParagraphStyle alloc] init];
+        style.lineSpacing            = kLineSpacingDescription * MENUS_SCALE_MULTIPLIER;
+        style.paragraphSpacingBefore = kSpacingAboveDescription * MENUS_SCALE_MULTIPLIER;
+    }
+    return style;
+}
+
++ (NSDictionary*)titleAttribs {
+    static NSDictionary* attribs = nil;
+    if (!attribs) {
+        attribs = @{
+            NSShadowAttributeName: [self shadow],
+            NSParagraphStyleAttributeName: [self titleParagraphStyle]
+        };
+    }
+    return attribs;
+}
+
++ (NSDictionary*)descAttribs {
+    static NSDictionary* attribs = nil;
+    if (!attribs) {
+        attribs = @{
+            NSShadowAttributeName: [self shadow],
+            NSFontAttributeName: [UIFont fontWithName:kFont size:kFontSizeDescription * MENUS_SCALE_MULTIPLIER],
+            NSParagraphStyleAttributeName: [self descParagraphStyle]
+        };
+    }
+    return attribs;
+}
+
++ (CGFloat)getTitleFontSizeForTitleOfLength:(NSUInteger)length {
+    CGFloat titleFontSizeMultiplier = [self getSizeReductionMultiplierForTitleOfLength:length];
+    return floor(kFontSizeTitle * MENUS_SCALE_MULTIPLIER * titleFontSizeMultiplier);
 }
 
 + (CGFloat)getSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
