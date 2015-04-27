@@ -110,6 +110,8 @@ var issuesAndDisambig = require("./transforms/collapsePageIssuesAndDisambig");
 // See: http://stackoverflow.com/a/3698214/135557
 document.addEventListener("DOMContentLoaded", function() {
 
+    window.scrollTo(0, window.wmf_last_scroll_offset_y);
+
     transformer.transform( "moveFirstGoodParagraphUp", document );
     transformer.transform( "hideRedlinks", document );
     transformer.transform( "disableFilePageEdit", document );
@@ -286,12 +288,6 @@ function maybeSendMessageForTarget(event, hrefTarget){
 }
 
 document.addEventListener("touchend", handleTouchEnded, false);
-
-bridge.registerListener( "setLeadImageDivHeight", function( payload ) {
-    var div = document.getElementById( "lead_image_div" );
-    if (payload.height == div.offsetHeight) return;
-    div.style.height = payload.height + 'px';
-});
 
 })();
 

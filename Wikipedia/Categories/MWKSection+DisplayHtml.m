@@ -7,6 +7,8 @@
 
 static NSString* const MWKSectionDisambigAndPageIssuesPlaceholderDiv = @"<div class='issues_container' id='issues_container'><a href='#issues_container_close_button' id='issues_container_close_button' style='float:right;'>X</a></div>";
 
+static NSString* const MWKLeadImagePlaceholderDiv = @"<div id='lead_image_div' style='background-color:white;'></div>";
+
 @implementation MWKSection (DisplayHtml)
 
 - (NSString*)displayHTML:(NSString*)html {
@@ -29,7 +31,7 @@ static NSString* const MWKSectionDisambigAndPageIssuesPlaceholderDiv = @"<div cl
         // Lead section.
         // The lead section is a special case because of the native component used
         // for lead image styling. The title text is now shown by the native component.
-        return [[self getLeadImagePlaceholderDiv] stringByAppendingString:MWKSectionDisambigAndPageIssuesPlaceholderDiv];
+        return [MWKLeadImagePlaceholderDiv stringByAppendingString:MWKSectionDisambigAndPageIssuesPlaceholderDiv];
     } else {
         // Non-lead section.
         NSInteger headingTagSize = [self getHeadingTagSize];
@@ -65,19 +67,6 @@ static NSString* const MWKSectionDisambigAndPageIssuesPlaceholderDiv = @"<div cl
         [NSString stringWithFormat:@"<a class='edit_section_button' data-action='edit_section' data-id='%ld' id='edit_section_button_%ld'></a>",
          (long)self.sectionId,
          (long)self.sectionId
-        ];
-}
-
-- (NSString*)getLeadImagePlaceholderDiv {
-    // Placeholder div to reserve vertical space for the lead image native component.
-
-    // Its height needs to be set right away, here, so there's no flicker on load.
-    CGFloat initialLeadImageHeight =
-        (!self.article.imageURL) ? 0.0f : LEAD_IMAGE_CONTAINER_HEIGHT;
-
-    return
-        [NSString stringWithFormat:@"<div id='lead_image_div' style='height:%fpx;background-color:white;'></div>",
-         initialLeadImageHeight
         ];
 }
 

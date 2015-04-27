@@ -27,6 +27,10 @@ static NSString* const kHTMLFormatString = @"<span style='font-family:%@;font-si
     NSAttributedString* attributedDescription  = nil;
     BOOL isIOS6                                = (NSFoundationVersionNumber <= NSFoundationVersionNumber_iOS_6_1);
 
+
+//isIOS6 = YES;
+
+
     if (isIOS6) {
         title = [title getStringWithoutHTML];
         if (description.length > 0) {

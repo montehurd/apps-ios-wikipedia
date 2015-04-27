@@ -436,7 +436,7 @@ typedef enum {
             case FETCH_FINAL_STATUS_SUCCEEDED: {
                 [self fadeAlert];
 
-                [self.bridge loadHTML:fetchedData withAssetsFile:@"preview.html"];
+                [self.bridge loadHTML:fetchedData withAssetsFile:@"preview.html" leadImageHeight:@(0)];
 
                 [self.bridge sendMessage:@"setLanguage"
                              withPayload:@{

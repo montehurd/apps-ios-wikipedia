@@ -9,7 +9,8 @@ static CGFloat const kActivityIndicatorWidth             = 100.0f;
 static CGFloat const kActivityIndicatorCornerRadius      = 10.0f;
 static NSInteger const kActivityIndicatorBackgroundColor = 0x000000;
 
-static CGFloat const kFadeAnimationDuration = 0.33f;
+static CGFloat const kShowFadeAnimationDuration = 0.43f;
+static CGFloat const kHideFadeAnimationDuration = 0.23f;
 
 @interface WMFLoadingIndicatorOverlay ()
 
@@ -48,7 +49,6 @@ static CGFloat const kFadeAnimationDuration = 0.33f;
 }
 
 - (void)setVisible:(BOOL)isVisible animated:(BOOL)animated {
-    CGFloat durationToUse = animated ? kFadeAnimationDuration : 0.0f;
     if (isVisible) {
         self.isVisible = YES;
         if (self.showSpinner) {
@@ -57,11 +57,11 @@ static CGFloat const kFadeAnimationDuration = 0.33f;
 
         [self performAnimations:^{
             self.alpha = self.lastNonZeroAlpha;
-        } duration:durationToUse completion:nil];
+        } duration:(animated ? kShowFadeAnimationDuration : 0.0f) completion:nil];
     } else {
         [self performAnimations:^{
             self.alpha = 0.0;
-        } duration:durationToUse completion:^{
+        } duration:(animated ? kHideFadeAnimationDuration : 0.0f) completion:^{
             [self.activityIndicator stopAnimating];
             self.isVisible = NO;
         }];

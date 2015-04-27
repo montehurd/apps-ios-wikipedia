@@ -35,10 +35,12 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+
     [self setupLeadImageContainer];
     [self setupTrackingFooter];
 
-    session = [SessionSingleton sharedInstance];
+    self->session = [SessionSingleton sharedInstance];
 
     self.bottomNavHeightConstraint.constant = CHROME_MENUS_HEIGHT;
 
@@ -59,16 +61,12 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
     __weak WebViewController* weakSelf = self;
     [self.bridge addListener:@"DOMContentLoaded" withBlock:^(NSString* type, NSDictionary* payload) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // Show lead image!
-            [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
             [weakSelf jumpToFragmentIfNecessary];
-            [weakSelf autoScrollToLastScrollOffsetIfNecessary];
+//            [weakSelf autoScrollToLastScrollOffsetIfNecessary];
             [weakSelf.loadingIndicatorOverlay setVisible:NO animated:YES];
 
             [weakSelf.tocVC updateTocForArticle:[SessionSingleton sharedInstance].currentArticle];
             [weakSelf updateTOCScrollPositionWithoutAnimationIfHidden];
-        });
     }];
 
     self.unsafeToScroll    = NO;
@@ -101,7 +99,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
     [self fadeAlert];
 
-    scrollViewDragBeganVerticalOffset_ = 0.0f;
+    self->scrollViewDragBeganVerticalOffset_ = 0.0f;
 
     // Ensure web view can appear beneath translucent nav bar when scrolled up
     for (UIView* subview in self.webView.subviews) {
@@ -147,6 +145,8 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
     [self tocUpdateViewLayout];
 
     [self loadingIndicatorAdd];
+
+}];
 }
 
 - (void)jumpToFragmentIfNecessary {
@@ -1511,8 +1511,16 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 - (void)displayArticle:(MWKTitle*)title {
     MWKArticle* article = [session.dataStore articleWithTitle:title];
     session.currentArticle = article;
+ 
+// self.view.alpha = 0.0f;
+    [self.leadImageContainer showForArticle:article];
+}
 
-    MWLanguageInfo* languageInfo = [MWLanguageInfo languageInfoForCode:title.site.language];
+- (void)displayArticle2:(NSNumber*)height{
+
+    MWKArticle* article = session.currentArticle;
+    
+    MWLanguageInfo* languageInfo = [MWLanguageInfo languageInfoForCode:article.title.site.language];
     NSString* uidir              = ([WikipediaAppUtils isDeviceLanguageRTL] ? @"rtl" : @"ltr");
 
     int langCount           = article.languagecount;
@@ -1593,7 +1601,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         return;
     }
 
-    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html"];
+    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html" leadImageHeight:height];
 
     // NSLog(@"languageInfo = %@", languageInfo.code);
     [self.bridge sendMessage:@"setLanguage"
@@ -1909,7 +1917,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 - (void)loadingIndicatorAdd {
     self.loadingIndicatorOverlay                 = [[WMFLoadingIndicatorOverlay alloc] init];
     self.loadingIndicatorOverlay.backgroundColor = [UIColor whiteColor];
-    self.loadingIndicatorOverlay.alpha           = 0.8f;
+    self.loadingIndicatorOverlay.alpha           = 0.9f;
 
     [self.view insertSubview:self.loadingIndicatorOverlay belowSubview:self.bottomBarView];
     [self.loadingIndicatorOverlay mas_makeConstraints:^(MASConstraintMaker* make) {
@@ -1936,8 +1944,18 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
 - (void)leadImageHeightChangedTo:(NSNumber*)height {
     // Let the html spacer div adjust to the new height of the lead image container.
-    [self.bridge sendMessage:@"setLeadImageDivHeight"
-                 withPayload:@{ @"height": height }];
+//    [self.bridge sendMessage:@"setLeadImageDivHeight"
+//                 withPayload:@{ @"height": height }];
+
+
+//session.currentArticle.needsRefresh = YES;
+
+
+[self displayArticle2:height];
+
+
+
+// self.view.alpha = 1.0f;
 }
 
 - (void)didTouchLeadImage:(id)sender {
