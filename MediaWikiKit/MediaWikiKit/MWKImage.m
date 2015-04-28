@@ -27,6 +27,7 @@
         _mimeType         = nil;
         _width            = nil;
         _height           = nil;
+        _yFocalOffset     = nil;
     }
     return self;
 }
@@ -40,6 +41,7 @@
         _mimeType         = [self optionalString:@"mimeType" dict:dict];
         _width            = [self optionalNumber:@"width" dict:dict];
         _height           = [self optionalNumber:@"height" dict:dict];
+        _yFocalOffset     = [self optionalNumber:@"yFocalOffset" dict:dict];
     }
     return self;
 }
@@ -102,6 +104,9 @@
     }
     if (self.height) {
         dict[@"height"] = self.height;
+    }
+    if (self.yFocalOffset) {
+        dict[@"yFocalOffset"] = self.yFocalOffset;
     }
 
     return [dict copy];
@@ -251,6 +256,10 @@
     NSString* fileName = [@"Image" stringByAppendingPathExtension:self.extension];
     NSString* filePath = [path stringByAppendingPathComponent:fileName];
     return filePath;
+}
+
+- (BOOL)isLeadImage {
+    return [self.article.image isEqualToImage:self];
 }
 
 @end

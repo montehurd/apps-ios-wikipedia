@@ -10,6 +10,7 @@
 
 #import <BlocksKit/BlocksKit.h>
 #import "NSString+Extras.h"
+#import "WMFFaceDetector.h"
 
 NSString* const MWKDataStoreValidImageSitePrefix = @"//upload.wikimedia.org/";
 NSString* MWKCreateImageURLWithPath(NSString* path) {
@@ -208,6 +209,30 @@ static NSString* const MWKImageInfoFilename = @"ImageInfo.plist";
 - (void)saveImageData:(NSData*)data image:(MWKImage*)image {
     NSString* path     = [self pathForImage:image];
     NSString* filename = [@"Image" stringByAppendingPathExtension:image.extension];
+
+// TODO: move this face detection to MWKImage? Is here at present so "data" can be accessed w/o
+// expensively re-retrieving it.
+    if ([image isLeadImage]) {
+        // Detect face if is article main image.
+        // Don't run face detection needlessly if it has failed previously.
+        if (image.yFocalOffset.integerValue != -1) {
+            static WMFFaceDetector* faceDetector = nil;
+            if(!faceDetector) {
+                faceDetector = [[WMFFaceDetector alloc] init];
+            }
+            CIImage* ciImage              = [[CIImage alloc] initWithData:data];
+            faceDetector.image = [UIImage imageWithCIImage:ciImage];
+            CGRect faceRect = [faceDetector detectFace];
+            if (CGRectEqualToRect(faceRect, CGRectZero)) {
+                // Record failure so we don't run face detection again needlessly.
+                image.yFocalOffset = @(-1);
+            } else {
+                image.yFocalOffset = @((CGRectGetMidY(faceRect) / faceDetector.image.size.height) * 100);
+            }
+        }
+        
+    }
+
     [self saveData:data path:path name:filename];
 
     [image updateWithData:data];

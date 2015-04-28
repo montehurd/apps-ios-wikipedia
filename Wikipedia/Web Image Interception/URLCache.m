@@ -11,6 +11,8 @@ NSString* const kURLCacheKeyWidth                = @"width";
 NSString* const kURLCacheKeyHeight               = @"height";
 NSString* const kURLCacheKeyURL                  = @"url";
 NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
+NSString* const kURLCacheKeyIsLeadImage          = @"isLeadImage";
+NSString* const kURLCacheKeyYFocalOffset         = @"yFocalOffset";
 
 #if 0
 #define URLCacheLog(...) NSLog(__VA_ARGS__)
@@ -84,7 +86,6 @@ NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
     }
 
     // Placeholder record found, so route image data to article data store.
-
     NSData* imageDataToUse = cachedResponse.data;
 
     @try {
@@ -105,7 +106,9 @@ NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
          kURLCacheKeyWidth: image.width,
          kURLCacheKeyHeight: image.height,
          kURLCacheKeyURL: image.sourceURL,
-         kURLCacheKeyFileNameNoSizePrefix: image.fileNameNoSizePrefix
+         kURLCacheKeyFileNameNoSizePrefix: image.fileNameNoSizePrefix,
+         kURLCacheKeyIsLeadImage : @([image isLeadImage]),
+         kURLCacheKeyYFocalOffset : (!image.yFocalOffset) ? @(-1) : image.yFocalOffset
      }];
 }
 

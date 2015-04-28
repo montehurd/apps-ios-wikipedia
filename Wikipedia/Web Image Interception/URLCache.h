@@ -9,6 +9,8 @@ extern NSString* const kURLCacheKeyWidth;
 extern NSString* const kURLCacheKeyHeight;
 extern NSString* const kURLCacheKeyURL;
 extern NSString* const kURLCacheKeyFileNameNoSizePrefix;
+extern NSString* const kURLCacheKeyIsLeadImage;
+extern NSString* const kURLCacheKeyYFocalOffset;
 
 @interface URLCache : NSURLCache
 

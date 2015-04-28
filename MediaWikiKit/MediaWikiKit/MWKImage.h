@@ -32,6 +32,8 @@
 @property (copy) NSNumber* width;
 @property (copy) NSNumber* height;
 
+@property (copy) NSNumber* yFocalOffset;
+
 // Local storage status
 @property (readonly) BOOL isCached;
 
@@ -99,5 +101,7 @@
 - (BOOL)isVariantOfImage:(MWKImage*)otherImage;
 
 - (NSString*)fullImageBinaryPath;
+
+- (BOOL)isLeadImage; 
 
 @end
