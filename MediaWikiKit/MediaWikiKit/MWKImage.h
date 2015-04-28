@@ -1,10 +1,3 @@
-//
-//  MWKImage.h
-//  MediaWikiKit
-//
-//  Created by Brion on 10/7/14.
-//  Copyright (c) 2014 Wikimedia Foundation. All rights reserved.
-//
 
 #import "UIKit/UIKit.h"
 #import "MWKSiteDataObject.h"
@@ -29,14 +22,44 @@
 @property (copy) NSDate* dateLastAccessed;
 @property (copy) NSDate* dateRetrieved;
 @property (copy) NSString* mimeType;
+
 @property (copy) NSNumber* width;
 @property (copy) NSNumber* height;
+- (CGSize)size;
+
+
 
 // Local storage status
 @property (readonly) BOOL isCached;
 
 - (instancetype)initWithArticle:(MWKArticle*)article sourceURL:(NSString*)url;
 - (instancetype)initWithArticle:(MWKArticle*)article dict:(NSDictionary*)dict;
+
+/**
+ *  Calculate focal rects
+ *
+ *  @param imageData optional, if you do not pass it the image data will be extracted from disk
+ */
+- (void)calculateFocalRectsBasedOnFaceDetectionWithImageData:(NSData*)imageData;
+
+/**
+ *  All focal rects as strings
+ */
+@property (copy, readonly) NSArray* focalRectsInUnitCoordinatesAsStrings;
+
+/**
+ *  Returns the primary rect in normalized to the image size
+ *
+ *  @return The normalized rect
+ */
+- (CGRect)normalizedPrimaryFocalRect;
+
+/**
+ *  Returns a rect enclosing all focal rects normalized to the image size
+ *
+ *  @return The normalized rect
+ */
+- (CGRect)normalizedRectEnclosingAllFocalRects;
 
 - (void)importImageData:(NSData*)data;
 
@@ -99,5 +122,7 @@
 - (BOOL)isVariantOfImage:(MWKImage*)otherImage;
 
 - (NSString*)fullImageBinaryPath;
+
+- (BOOL)isLeadImage;
 
 @end
