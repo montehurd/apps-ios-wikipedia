@@ -56,7 +56,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self setupLeadImageContainer];
+//    [self setupLeadImageContainer];
     [self setupTrackingFooter];
 
     self.bottomNavHeightConstraint.constant = CHROME_MENUS_HEIGHT;
@@ -80,7 +80,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
         [weakSelf autoScrollToLastScrollOffsetIfNecessary];
 
         // Show lead image!
-        [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
+//        [weakSelf.leadImageContainer showForArticle:[SessionSingleton sharedInstance].currentArticle];
 
         [weakSelf.loadingIndicatorOverlay setVisible:NO animated:YES];
 
@@ -1540,6 +1540,108 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
 #pragma mark Display article from core data
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+-(NSString *)getLeadImageHtml {
+    // Get lead image html structured such that no JS bridge messages are needed for lead image presentation.
+    // Set everything here via css before the html payload is delivered to the web view.
+
+    MWKArticle *article = session.currentArticle;
+    NSString* title = article.displaytitle;
+    NSString* description = article.entityDescription ? [[article.entityDescription getStringWithoutHTML] capitalizeFirstLetter] : @"";
+
+    BOOL hasImage = article.imageURL ? YES : NO;
+    CGFloat fontMultiplier = [self getSizeReductionMultiplierForTitleOfLength:title.length];
+
+
+//TODO: offsetY is percent to shift image vertically. 0 aligns top to top of lead_image_div, 50 centers it vertically, and 100
+// aligns bottom of image to bottom of lead_image_div.
+// so make leadImageFocalOffsetY parameter in MWKImage, and use it for offsetY here if present. If not attempt to run
+// face detection to determine it and save it if found (save -1 to denote face detection ran but failed to find face)
+// and invoke a callback which will call JS to set "background-position: calc(100%) calc(X%);"
+
+// but don't invoke face detection here? trigger it in the spot where the image gets saved to disk
+// but only do if its url is the current article.imageURL and only if it has not been attempted before - ie it leadImageFocalOffsetY
+// is not non-zero
+
+// (may be able to even use css animation to shift the image offset...)
+
+NSInteger offsetY = 100; //0 50 100
+
+    NSString *leadImageDivStyleOverrides = !hasImage ? @"" : [NSString stringWithFormat:
+        @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 25%%, rgba(0,0,0,0.5) 100%%), url('%@');"
+        "background-position: calc(100%%) calc(%ld%%);", article.imageURL, offsetY];
+    
+    return [NSString stringWithFormat:
+        @"<div class='lead_image_div %@' id='lead_image_div' style=\"%@\">"
+            "<div class='lead_image_text_container %@'>"
+                "<div class='lead_image_title %@' style='%@'>%@</div>"
+                "<div class='lead_image_description %@' style='%@'>%@</div>"
+            "</div>"
+        "</div>",
+        hasImage ? @"" : @"lead_image_div_no_image",
+        leadImageDivStyleOverrides,
+        hasImage ? @"" : @"lead_image_text_container_no_image",
+        hasImage ? @"" : @"lead_image_title_no_image",
+        [NSString stringWithFormat:@"font-size:%.02fpx;", 28.0f * fontMultiplier],
+        title,
+        hasImage ? @"" : @"lead_image_description_no_image",
+        [NSString stringWithFormat:@"font-size:%.02fpx;", 14.0f],
+        description];
+}
+
+- (CGFloat)getSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
+    // Quick hack for shrinking long titles in rough proportion to their length.
+
+    CGFloat multiplier = 1.0f;
+
+    // Assume roughly title 28 chars per line. Note this doesn't take in to account
+    // interface orientation, which means the reduction is really not strictly
+    // in proportion to line count, rather to string length. This should be ok for
+    // now. Search for "lopado" and you'll see an insanely long title in the search
+    // results, which is nice for testing, and which this seems to handle.
+    // Also search for "list of accidents" for lots of other long title articles,
+    // many with lead images.
+
+    CGFloat charsPerLine = 28;
+    CGFloat lines        = ceil(length / charsPerLine);
+
+    // For every 2 "lines" (after the first 2) reduce title text size by 10%.
+    if (lines > 2) {
+        CGFloat linesAfter2Lines = lines - 2;
+        multiplier = 1.0f - (linesAfter2Lines * 0.1f);
+    }
+
+    // Don't shrink below 60%.
+    return MAX(multiplier, 0.6f);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (void)displayArticle:(MWKTitle*)title {
     MWKArticle* article = [session.dataStore articleWithTitle:title];
     session.currentArticle = article;
@@ -1633,7 +1735,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         return;
     }
 
-    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html"];
+    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html" leadSectionHtml:[self getLeadImageHtml]];
 
     // NSLog(@"languageInfo = %@", languageInfo.code);
     [self.bridge sendMessage:@"setLanguage"
@@ -1691,6 +1793,10 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
                    @"})()";
     NSString* js2         = [NSString stringWithFormat:js, self.relativeScrollOffsetBeforeRotate, self.relativeScrollOffsetBeforeRotate];
     int finalScrollOffset = [[self.webView stringByEvaluatingJavaScriptFromString:js2] intValue];
+
+if (finalScrollOffset < 150) {
+    finalScrollOffset = 0;
+}
 
     CGPoint point = CGPointMake(0, finalScrollOffset);
 
