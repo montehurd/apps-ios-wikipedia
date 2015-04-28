@@ -1559,7 +1559,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     // offsetY is percent to shift image vertically. 0 aligns top to top of lead_image_div, 50 centers it vertically, and 100
     // aligns bottom of image to bottom of lead_image_div.
 
-    CGFloat offsetY = 15; // start 15% down from top of image
+    CGFloat offsetY = 25; // start 25% down from top of image
 
     if (hasImage) {
         MWKImage* img        = article.image;
@@ -1573,27 +1573,30 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
                                                               @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 0%%, rgba(0,0,0,0.5) 100%%),"
                                                               @"url('%@')"
                                                               @"%@;"
-                                                              "background-position: calc(100%%) calc(%f%%);",
+                                                              "background-position: calc(50%%) calc(%f%%);",
                                                               article.imageURL,
                                                               [article.image isCached] ? @"" : @",url('wmf://bundledImage/lead-default.png')",
                                                               offsetY];
 
-    return [NSString stringWithFormat:
-            @"<div class='lead_image_div %@' id='lead_image_div' style=\"%@\">"
-            "<div class='lead_image_text_container %@'>"
-            "<div class='lead_image_title %@' style='%@'>%@</div>"
-            "<div class='lead_image_description %@' style='%@'>%@</div>"
-            "</div>"
-            "</div>",
-            hasImage ? @"" : @"lead_image_div_no_image",
-            leadImageDivStyleOverrides,
-            hasImage ? @"" : @"lead_image_text_container_no_image",
-            hasImage ? @"" : @"lead_image_title_no_image",
-            [NSString stringWithFormat:@"font-size:%.02fpx;", 28.0f * fontMultiplier],
-            title,
-            hasImage ? @"" : @"lead_image_description_no_image",
-            [NSString stringWithFormat:@"font-size:%.02fpx;", 14.0f],
-            description];
+    NSString* leadImageHtml = [NSString stringWithFormat:
+                               @"<div id='lead_image_div' class='lead_image_div' style=\"%@\">"
+                               "<div id='lead_image_text_container'>"
+                               "<div id='lead_image_title' style='%@'>%@</div>"
+                               "<div id='lead_image_description' style='%@'>%@</div>"
+                               "</div>"
+                               "</div>",
+                               leadImageDivStyleOverrides,
+                               [NSString stringWithFormat:@"font-size:%.02fpx;", 28.0f * fontMultiplier],
+                               title,
+                               [NSString stringWithFormat:@"font-size:%.02fpx;", 14.0f],
+                               description
+                              ];
+
+    if (!hasImage) {
+        leadImageHtml = [NSString stringWithFormat:@"<div id='lead_image_none'>%@</div>", leadImageHtml];
+    }
+
+    return leadImageHtml;
 }
 
 - (CGFloat)leadImageGetSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
@@ -1640,7 +1643,11 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         hidePlaceholderJS = @"document.getElementById('lead_image_div').style.backgroundImage = document.getElementById('lead_image_div').style.backgroundImage.replace('wmf://bundledImage/lead-default.png', 'wmf://bundledImage/empty.png');";
     }
     NSDictionary* payload = notification.userInfo;
-    //NSNumber* yFocalOffset       = payload[kURLCacheKeyFocalRectStrings];
+
+    NSString* stringRect   = payload[kURLCacheKeyFocalRectStrings];
+    CGRect rect            = CGRectFromString(stringRect);
+    NSNumber* yFocalOffset = @(100 - (CGRectGetMidY(rect) * 100));
+
     NSString* applyFocalOffsetJS = @"";
     if (yFocalOffset && (yFocalOffset.integerValue != -1)) {
         applyFocalOffsetJS = [NSString stringWithFormat:@"document.getElementById('lead_image_div').style.backgroundPosition = 'calc(100%%) calc(%f%%)';", yFocalOffset.floatValue];
@@ -1654,18 +1661,6 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
     NSString* js = [NSString stringWithFormat:@"%@%@%@", animationCss, hidePlaceholderJS, applyFocalOffsetJS];
     [self.webView stringByEvaluatingJavaScriptFromString:js];
-}
-
-- (void)leadImageFaceDetected:(NSNotification*)notification {
-    NSDictionary* payload = notification.userInfo;
-    //NSNumber* yFocalOffset       = payload[kURLCacheKeyFocalRectStrings];
-    if (yFocalOffset) {
-        static NSString* applyFocalOffsetJS = nil;
-        if (!applyFocalOffsetJS) {
-            applyFocalOffsetJS = @"document.getElementById('lead_image_div').style.transition = 'background-position 0.5s';document.getElementById('lead_image_div').style.backgroundPosition = 'calc(100%%) calc(%f%%)';";
-        }
-        [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:applyFocalOffsetJS, yFocalOffset.floatValue]];
-    }
 }
 
 #pragma mark Display article from data store

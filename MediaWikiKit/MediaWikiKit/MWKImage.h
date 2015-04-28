@@ -29,6 +29,8 @@
 
 
 
+@property (copy) NSNumber* yFocalOffset;
+
 // Local storage status
 @property (readonly) BOOL isCached;
 

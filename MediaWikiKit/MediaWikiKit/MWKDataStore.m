@@ -3,6 +3,7 @@
 
 #import <BlocksKit/BlocksKit.h>
 #import "NSString+Extras.h"
+#import "WMFFaceDetector.h"
 
 NSString* const MWKDataStoreValidImageSitePrefix = @"//upload.wikimedia.org/";
 NSString* MWKCreateImageURLWithPath(NSString* path) {
