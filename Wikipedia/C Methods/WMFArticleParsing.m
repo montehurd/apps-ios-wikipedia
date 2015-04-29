@@ -35,7 +35,8 @@ NSString* WMFImgTagsFromHTML(NSString* html) {
 
 void WMFInjectArticleWithImagesFromSection(MWKArticle* article, NSString* sectionHTML, int sectionID) {
     // Reduce to img tags only. Causes TFHpple parse time to drop by ~50%.
-    NSString* sectionImageTags = WMFImgTagsFromHTML(sectionHTML);
+    // (conditionally prepend with the lead image so it goes through caching too)
+    NSString* sectionImageTags = (sectionID == 0) && article.imageURL ? [[NSString stringWithFormat:@"<img src=\"%@\">", article.imageURL] stringByAppendingString:WMFImgTagsFromHTML(sectionHTML)] : WMFImgTagsFromHTML(sectionHTML);
 
     if (sectionImageTags.length == 0 || !article) {
         return;
@@ -52,11 +53,12 @@ void WMFInjectArticleWithImagesFromSection(MWKArticle* article, NSString* sectio
 
     for (TFHppleElement* imageNode in imageNodes) {
         NSString* imgHeight = imageNode.attributes[@"height"];
-        if (imgHeight.integerValue < THUMBNAIL_MINIMUM_SIZE_TO_CACHE.height) {
+
+        if (imgHeight && imgHeight.integerValue < THUMBNAIL_MINIMUM_SIZE_TO_CACHE.height) {
             continue;
         }
         NSString* imgWidth = imageNode.attributes[@"width"];
-        if (imgWidth.integerValue < THUMBNAIL_MINIMUM_SIZE_TO_CACHE.width) {
+        if (imgWidth && imgWidth.integerValue < THUMBNAIL_MINIMUM_SIZE_TO_CACHE.width) {
             continue;
         }
 

@@ -1558,6 +1558,11 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     // Set everything here via css before the html payload is delivered to the web view.
 
     MWKArticle *article = session.currentArticle;
+
+    if ([session articleIsAMainArticle:article]) {
+        return @"";
+    }
+
     NSString* title = article.displaytitle;
     NSString* description = article.entityDescription ? [[article.entityDescription getStringWithoutHTML] capitalizeFirstLetter] : @"";
 
@@ -1577,11 +1582,34 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
 // (may be able to even use css animation to shift the image offset...)
 
-NSInteger offsetY = 100; //0 50 100
+
+
+
+
+CGFloat offsetY = 100; // start 15% down from top of image
+//CGFloat imageScaleRatio = 1.0f;
+if (hasImage) {
+    MWKImage *img = article.image;
+    CGFloat yFocalOffset = img.yFocalOffset.floatValue;
+    if (yFocalOffset != -1) {
+        offsetY = yFocalOffset;
+//        imageScaleRatio = img.width.floatValue / self.view.frame.size.width;
+    }
+}
+
+//offsetY *= 0.7;
+//NSLog(@"imageScaleRatio = %f", imageScaleRatio);
+
+
+
 
     NSString *leadImageDivStyleOverrides = !hasImage ? @"" : [NSString stringWithFormat:
-        @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 25%%, rgba(0,0,0,0.5) 100%%), url('%@');"
-        "background-position: calc(100%%) calc(%ld%%);", article.imageURL, offsetY];
+        @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 25%%, rgba(0,0,0,0.5) 100%%),"
+        @"url('%@'),"
+        @"url('wmf://bundledImage/lead-default.png');"
+        "background-position: calc(100%%) calc(%f%%);",
+        article.imageURL,
+        offsetY];
     
     return [NSString stringWithFormat:
         @"<div class='lead_image_div %@' id='lead_image_div' style=\"%@\">"
@@ -1785,6 +1813,7 @@ NSInteger offsetY = 100; //0 50 100
 - (void)scrollToElementOnScreenBeforeRotate {
     NSString* js = @"(function() {"
                    @"    if (_topElement) {"
+                   @"    if (_topElement.id && (_topElement.id === 'lead_image_div')) return 0;"
                    @"        var rect = _topElement.getBoundingClientRect();"
                    @"        return (window.scrollY + rect.top) - (%f * rect.height);"
                    @"    } else {"
@@ -1793,10 +1822,6 @@ NSInteger offsetY = 100; //0 50 100
                    @"})()";
     NSString* js2         = [NSString stringWithFormat:js, self.relativeScrollOffsetBeforeRotate, self.relativeScrollOffsetBeforeRotate];
     int finalScrollOffset = [[self.webView stringByEvaluatingJavaScriptFromString:js2] intValue];
-
-if (finalScrollOffset < 150) {
-    finalScrollOffset = 0;
-}
 
     CGPoint point = CGPointMake(0, finalScrollOffset);
 

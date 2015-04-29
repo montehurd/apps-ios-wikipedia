@@ -10,6 +10,7 @@
 #import "WikipediaAppUtils.h"
 #import "MediaWikiKit.h"
 #import "WMFImageURLParsing.h"
+#import "WMFFaceDetector.h"
 
 @implementation MWKImage
 @synthesize fileNameNoSizePrefix = _fileNameNoSizePrefix;
@@ -27,6 +28,7 @@
         _mimeType         = nil;
         _width            = nil;
         _height           = nil;
+        _yFocalOffset     = nil;
     }
     return self;
 }
@@ -40,6 +42,7 @@
         _mimeType         = [self optionalString:@"mimeType" dict:dict];
         _width            = [self optionalNumber:@"width" dict:dict];
         _height           = [self optionalNumber:@"height" dict:dict];
+        _yFocalOffset     = [self optionalNumber:@"yFocalOffset" dict:dict];
     }
     return self;
 }
@@ -103,6 +106,9 @@
     if (self.height) {
         dict[@"height"] = self.height;
     }
+    if (self.yFocalOffset) {
+        dict[@"yFocalOffset"] = self.yFocalOffset;
+    }
 
     return [dict copy];
 }
@@ -122,6 +128,23 @@
         UIImage* img = [UIImage imageWithData:data];
         _width  = [NSNumber numberWithInt:img.size.width];
         _height = [NSNumber numberWithInt:img.size.height];
+    }
+
+    // Detect face if is article main image.
+    if ([self.article.image isEqualToImage:self]) {
+        // Don't run face detection needlessly if it has failed previously.
+        if (self.yFocalOffset.integerValue != -1) {
+            WMFFaceDetector* faceDetector = [[WMFFaceDetector alloc] init];
+            CIImage* ciImage              = [[CIImage alloc] initWithData:data];
+            faceDetector.image = [UIImage imageWithCIImage:ciImage];
+            CGRect faceRect = [faceDetector detectFace];
+            if (CGRectEqualToRect(faceRect, CGRectZero)) {
+                // Record failure so we don't run face detection again needlessly.
+                _yFocalOffset = @(-1);
+            } else {
+                _yFocalOffset = @((CGRectGetMidY(faceRect) / _height.floatValue) * 100);
+            }
+        }
     }
 }
 
