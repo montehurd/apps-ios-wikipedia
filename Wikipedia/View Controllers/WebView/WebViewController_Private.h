@@ -70,6 +70,8 @@
 
 #import "WMFLoadingIndicatorOverlay.h"
 
+#import "URLCache.h"
+
 //#import "UIView+Debugging.h"
 
 #define TOC_TOGGLE_ANIMATION_DURATION @0.225f

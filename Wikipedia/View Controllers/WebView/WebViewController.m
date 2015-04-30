@@ -118,6 +118,19 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(leadImageFaceDetected:)
+                                                 name:@"LeadImageFaceDetected"
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(leadImageRetrieved:)
+                                                 name:@"LeadImageRetrieved"
+                                               object:nil];
+
+
+
+
     [self fadeAlert];
 
     scrollViewDragBeganVerticalOffset_ = 0.0f;
@@ -1538,22 +1551,9 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     }
 }
 
-#pragma mark Display article from core data
+#pragma mark Lead image
 
-
-
-
-
-
-
-
-
-
-
-
-
-
--(NSString *)getLeadImageHtml {
+-(NSString *)leadImageGetHtml {
     // Get lead image html structured such that no JS bridge messages are needed for lead image presentation.
     // Set everything here via css before the html payload is delivered to the web view.
 
@@ -1567,48 +1567,28 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     NSString* description = article.entityDescription ? [[article.entityDescription getStringWithoutHTML] capitalizeFirstLetter] : @"";
 
     BOOL hasImage = article.imageURL ? YES : NO;
-    CGFloat fontMultiplier = [self getSizeReductionMultiplierForTitleOfLength:title.length];
+    CGFloat fontMultiplier = [self leadImageGetSizeReductionMultiplierForTitleOfLength:title.length];
 
+    // offsetY is percent to shift image vertically. 0 aligns top to top of lead_image_div, 50 centers it vertically, and 100
+    // aligns bottom of image to bottom of lead_image_div.
 
-//TODO: offsetY is percent to shift image vertically. 0 aligns top to top of lead_image_div, 50 centers it vertically, and 100
-// aligns bottom of image to bottom of lead_image_div.
-// so make leadImageFocalOffsetY parameter in MWKImage, and use it for offsetY here if present. If not attempt to run
-// face detection to determine it and save it if found (save -1 to denote face detection ran but failed to find face)
-// and invoke a callback which will call JS to set "background-position: calc(100%) calc(X%);"
-
-// but don't invoke face detection here? trigger it in the spot where the image gets saved to disk
-// but only do if its url is the current article.imageURL and only if it has not been attempted before - ie it leadImageFocalOffsetY
-// is not non-zero
-
-// (may be able to even use css animation to shift the image offset...)
-
-
-
-
-
-CGFloat offsetY = 100; // start 15% down from top of image
-//CGFloat imageScaleRatio = 1.0f;
-if (hasImage) {
-    MWKImage *img = article.image;
-    CGFloat yFocalOffset = img.yFocalOffset.floatValue;
-    if (yFocalOffset != -1) {
-        offsetY = yFocalOffset;
-//        imageScaleRatio = img.width.floatValue / self.view.frame.size.width;
+    CGFloat offsetY = 15; // start 15% down from top of image
+    
+    if (hasImage) {
+        MWKImage *img = article.image;
+        CGFloat yFocalOffset = img.yFocalOffset.floatValue;
+        if (yFocalOffset != -1) {
+            offsetY = yFocalOffset;
+        }
     }
-}
-
-//offsetY *= 0.7;
-//NSLog(@"imageScaleRatio = %f", imageScaleRatio);
-
-
-
 
     NSString *leadImageDivStyleOverrides = !hasImage ? @"" : [NSString stringWithFormat:
-        @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 25%%, rgba(0,0,0,0.5) 100%%),"
-        @"url('%@'),"
-        @"url('wmf://bundledImage/lead-default.png');"
+        @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 0%%, rgba(0,0,0,0.5) 100%%),"
+        @"url('%@')"
+        @"%@;"
         "background-position: calc(100%%) calc(%f%%);",
         article.imageURL,
+        [article.image isCached] ? @"" : @",url('wmf://bundledImage/lead-default.png')",
         offsetY];
     
     return [NSString stringWithFormat:
@@ -1629,7 +1609,7 @@ if (hasImage) {
         description];
 }
 
-- (CGFloat)getSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
+- (CGFloat)leadImageGetSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
     // Quick hack for shrinking long titles in rough proportion to their length.
 
     CGFloat multiplier = 1.0f;
@@ -1655,20 +1635,31 @@ if (hasImage) {
     return MAX(multiplier, 0.6f);
 }
 
+-(void)leadImageRetrieved:(NSNotification *)notification{
+    static NSString *hidePlaceholderJS = nil;
+    if (!hidePlaceholderJS) {
 
+        //document.getElementById('lead_image_div').style.transition = 'background-image 0.5s';
 
+        hidePlaceholderJS = @"document.getElementById('lead_image_div').style.backgroundImage = document.getElementById('lead_image_div').style.backgroundImage.replace('wmf://bundledImage/lead-default.png', 'wmf://bundledImage/empty.png');";
+    }
+    
+    [self.webView stringByEvaluatingJavaScriptFromString:hidePlaceholderJS];
+}
 
+-(void)leadImageFaceDetected:(NSNotification *)notification{
+    NSDictionary *payload = notification.userInfo;
+    NSNumber *yFocalOffset = payload[kURLYFocalOffset];
+    if (yFocalOffset) {
+        static NSString *applyFocalOffsetJS = nil;
+        if (!applyFocalOffsetJS) {
+            applyFocalOffsetJS = @"document.getElementById('lead_image_div').style.transition = 'background-position 0.5s';document.getElementById('lead_image_div').style.backgroundPosition = 'calc(100%%) calc(%f%%)';";
+        }
+        [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:applyFocalOffsetJS , yFocalOffset.floatValue]];
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
+#pragma mark Display article from data store
 
 - (void)displayArticle:(MWKTitle*)title {
     MWKArticle* article = [session.dataStore articleWithTitle:title];
@@ -1763,7 +1754,7 @@ if (hasImage) {
         return;
     }
 
-    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html" leadSectionHtml:[self getLeadImageHtml]];
+    [self.bridge loadHTML:htmlStr withAssetsFile:@"index.html" leadSectionHtml:[self leadImageGetHtml]];
 
     // NSLog(@"languageInfo = %@", languageInfo.code);
     [self.bridge sendMessage:@"setLanguage"

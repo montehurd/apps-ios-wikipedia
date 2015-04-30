@@ -102,4 +102,6 @@
 
 - (NSString*)fullImageBinaryPath;
 
+- (BOOL)isLeadImage; 
+
 @end

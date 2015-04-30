@@ -4,6 +4,8 @@
 #import "URLCache.h"
 #import "NSString+Extras.h"
 #import "SessionSingleton.h"
+#import "UIImage+WMFAdjustAlpha.h"
+#import "WMFFaceDetector.h"
 
 NSString* const kURLCacheKeyFileName             = @"fileName";
 NSString* const kURLCacheKeyData                 = @"data";
@@ -11,6 +13,7 @@ NSString* const kURLCacheKeyWidth                = @"width";
 NSString* const kURLCacheKeyHeight               = @"height";
 NSString* const kURLCacheKeyURL                  = @"url";
 NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
+NSString* const kURLYFocalOffset                 = @"yFocalOffset";
 
 #if 0
 #define URLCacheLog(...) NSLog(__VA_ARGS__)
@@ -86,6 +89,70 @@ NSString* const kURLCacheKeyFileNameNoSizePrefix = @"fileNameNoSizePrefix";
     // Placeholder record found, so route image data to article data store.
 
     NSData* imageDataToUse = cachedResponse.data;
+
+
+
+
+
+
+
+
+
+
+
+
+if ([image isLeadImage]) {
+
+[[NSNotificationCenter defaultCenter] postNotificationName:@"LeadImageRetrieved"
+                                                    object:nil
+                                                  userInfo:@{
+     kURLCacheKeyFileName: image.fileName
+ }];
+
+
+
+
+//    UIImage *flatImage = [[UIImage imageWithData:imageDataToUse] wmf_imageByChangingAlphaToColor:[UIColor whiteColor]];
+//    imageDataToUse = UIImagePNGRepresentation(flatImage);
+//    //NSData *data = UIImageJPEGRepresentation(myImageView.image, 0.8);
+
+// Detect face if is article main image.
+
+    // Don't run face detection needlessly if it has failed previously.
+    if (image.yFocalOffset.integerValue != -1) {
+        static WMFFaceDetector* faceDetector = nil;
+        if(!faceDetector) {
+            faceDetector = [[WMFFaceDetector alloc] init];
+        }
+        CIImage* ciImage              = [[CIImage alloc] initWithData:imageDataToUse];
+        faceDetector.image = [UIImage imageWithCIImage:ciImage];
+        CGRect faceRect = [faceDetector detectFace];
+        if (CGRectEqualToRect(faceRect, CGRectZero)) {
+            // Record failure so we don't run face detection again needlessly.
+            image.yFocalOffset = @(-1);
+        } else {
+            image.yFocalOffset = @((CGRectGetMidY(faceRect) / faceDetector.image.size.height) * 100);
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"LeadImageFaceDetected"
+                                                                object:nil
+                                                              userInfo:@{
+                 kURLCacheKeyFileName: image.fileName,
+                 kURLYFocalOffset: image.yFocalOffset
+             }];
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
 
     @try {
         URLCacheLog(@"Rerouting cached response to WMF data store for %@", request);

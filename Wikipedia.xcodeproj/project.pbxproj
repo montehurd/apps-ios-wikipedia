@@ -61,6 +61,7 @@
 		0447863D185145090050563B /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0447862E185145090050563B /* WebViewController.m */; };
 		0447866F1852B5010050563B /* SessionSingleton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0447866E1852B5010050563B /* SessionSingleton.m */; };
 		04490FD51AF16A83009FAB52 /* WMFBundledImageProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 04490FD41AF16A83009FAB52 /* WMFBundledImageProtocol.m */; };
+		04490FD81AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.m in Sources */ = {isa = PBXBuildFile; fileRef = 04490FD71AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.m */; };
 		0449E63518A9845C00D51524 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0449E63418A9845C00D51524 /* LoginViewController.m */; };
 		0449E63918AAA26A00D51524 /* NSHTTPCookieStorage+CloneCookie.m in Sources */ = {isa = PBXBuildFile; fileRef = 0449E63818AAA26A00D51524 /* NSHTTPCookieStorage+CloneCookie.m */; };
 		044BD6B618849AD000FFE4BE /* SectionEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 044BD6B418849AD000FFE4BE /* SectionEditorViewController.m */; };
@@ -488,6 +489,8 @@
 		0447866E1852B5010050563B /* SessionSingleton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionSingleton.m; sourceTree = "<group>"; };
 		04490FD31AF16A83009FAB52 /* WMFBundledImageProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFBundledImageProtocol.h; path = Wikipedia/Protocols/WMFBundledImageProtocol.h; sourceTree = SOURCE_ROOT; };
 		04490FD41AF16A83009FAB52 /* WMFBundledImageProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WMFBundledImageProtocol.m; path = Wikipedia/Protocols/WMFBundledImageProtocol.m; sourceTree = SOURCE_ROOT; };
+		04490FD61AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+WMFAdjustAlpha.h"; sourceTree = "<group>"; };
+		04490FD71AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+WMFAdjustAlpha.m"; sourceTree = "<group>"; };
 		0449E63318A9845C00D51524 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		0449E63418A9845C00D51524 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = LoginViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		0449E63718AAA26A00D51524 /* NSHTTPCookieStorage+CloneCookie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSHTTPCookieStorage+CloneCookie.h"; sourceTree = "<group>"; };
@@ -1815,6 +1818,8 @@
 				043F8BF11A11699A00D1AE44 /* UIView+WMFRoundCorners.m */,
 				04D686C71AB28FE40009B44A /* UIImage+WMFFocalImageDrawing.h */,
 				04D686C81AB28FE40009B44A /* UIImage+WMFFocalImageDrawing.m */,
+				04490FD61AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.h */,
+				04490FD71AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.m */,
 				044396211A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.h */,
 				044396221A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.m */,
 				0433542018A023FE009305F0 /* UIViewController+HideKeyboard.h */,
@@ -3161,6 +3166,7 @@
 				041C6206199ED2A20061516F /* MWKSection+TOC.m in Sources */,
 				BC2CBB8E1AA10F400079A313 /* UIView+WMFFrameUtils.m in Sources */,
 				0447862F185145090050563B /* HistoryResultCell.m in Sources */,
+				04490FD81AF180D8009FAB52 /* UIImage+WMFAdjustAlpha.m in Sources */,
 				BCA6765D1AC0686600A16160 /* Article+ConvenienceAccessors.m in Sources */,
 				04B0EA45190AFDD8007458AF /* ArticleImporter.m in Sources */,
 				042A5B2619253D2A0095E172 /* CenterNavController.m in Sources */,
