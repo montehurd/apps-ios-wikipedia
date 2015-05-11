@@ -2,41 +2,39 @@
 
 #import "WMFShareCardImageContainer.h"
 #import "UIImage+WMFFocalImageDrawing.h"
-#import "WMFFaceDetector.h"
+#import "WMFGeometry.h"
 
 @interface WMFShareCardImageContainer ()
 
-@property(nonatomic, strong) WMFFaceDetector* faceDetector;
 @property(nonatomic) CGRect faceBounds;
 
 @end
 
 @implementation WMFShareCardImageContainer
 
-- (instancetype)initWithCoder:(NSCoder*)coder {
-    self = [super initWithCoder:coder];
-    if (self) {
-        self.faceDetector = [[WMFFaceDetector alloc] init];
+- (CGRect)getPrimaryFocalRectFromCanonicalLeadImage {
+    // Focal rect info is parked on the article.image which is the originally retrieved lead image.
+    // self.image is potentially a larger variant, which is why here the focal rect unit coords are
+    // sought on self.image.article.image
+    CGRect focalBounds  = CGRectZero;
+    NSArray* focalRects = [self.image.article.image focalRectsInUnitCoordinatesAsStrings];
+    if (focalRects.count > 0) {
+        focalBounds = WMFRectFromUnitRectForReferenceSize(CGRectFromString([focalRects firstObject]), self.image.size);
     }
-    return self;
-}
-
-- (void)setImage:(UIImage*)image {
-    _image = image;
-    [self.faceDetector setImageWithUIImage:image];
-    [self.faceDetector detectFaces];
-    self.faceBounds = [[[self.faceDetector allFaces] firstObject] bounds];
+    return focalBounds;
 }
 
 - (void)drawRect:(CGRect)rect {
     [super drawRect:rect];
     [self drawGradientBackground];
 
-    [self.image wmf_drawInRect:rect
-                   focalBounds:self.faceBounds
-                focalHighlight:NO
-                     blendMode:kCGBlendModeMultiply
-                         alpha:1.0];
+    CGRect focalBounds = [self getPrimaryFocalRectFromCanonicalLeadImage];
+
+    [[self.image asUIImage] wmf_drawInRect:rect
+                               focalBounds:focalBounds
+                            focalHighlight:NO
+                                 blendMode:kCGBlendModeMultiply
+                                     alpha:1.0];
 }
 
 // TODO: in follow-up patch, factor drawGradientBackground from
