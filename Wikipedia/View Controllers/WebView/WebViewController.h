@@ -34,9 +34,8 @@ extern NSString* const WebViewControllerShareSelectedText;
 
 - (void)reloadCurrentArticle;
 
-- (void)  navigateToPage:(MWKTitle*)title
-         discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod
-    showLoadingIndicator:(BOOL)showLoadingIndicator;
+- (void)navigateToPage:(MWKTitle*)title
+       discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod;
 
 - (void)tocScrollWebViewToSectionWithElementId:(NSString*)elementId
                                       duration:(CGFloat)duration

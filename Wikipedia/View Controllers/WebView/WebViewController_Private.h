@@ -67,9 +67,10 @@
 #import "UIScrollView+WMFScrollsToTop.h"
 #import "UIColor+WMFHexColor.h"
 
-#import "WMFLoadingIndicatorOverlay.h"
-
 #import "URLCache.h"
+
+#import "WMFProgressLineView.h"
+#import <Masonry/Masonry.h>
 
 //#import "UIView+Debugging.h"
 
@@ -148,8 +149,6 @@ static int const kMinimumTextSelectionLength = 2;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint* bottomNavHeightConstraint;
 
-@property (strong, nonatomic) WMFLoadingIndicatorOverlay* loadingIndicatorOverlay;
-
 @property (strong, nonatomic) WMFWebViewFooterContainerView* footerContainer;
 @property (strong, nonatomic) WMFWebViewFooterViewController* footerViewController;
 
@@ -158,6 +157,8 @@ static int const kMinimumTextSelectionLength = 2;
 @property (nonatomic) BOOL isCurrentArticleMain;
 
 @property (nonatomic) BOOL keyboardIsVisible;
+
+@property (strong, nonatomic) WMFProgressLineView* progressView;
 
 /**
  * Designated initializer.
