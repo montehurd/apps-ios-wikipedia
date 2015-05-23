@@ -278,3 +278,10 @@
 "hockeyapp-alert-privacy" = "Alert dialog button text for HockeyApp privacy policy. $1 will be replaced programmatically with the constant string 'HockeyApp'";
 "page-issues" = "Label for the button that shows the \"Page issues\" dialog, where information about the imperfections of the current page is provided (by displaying the warning/cleanup templates).\n{{Identical|Page issue}}";
 "page-similar-titles" = "Label for button that shows a list of similar titles (disambiguation) for the current page";
+"description-editor-prompt" = "Label prompting user to add or edit a short description of the current article";
+"description-editor-tip-title" = "Title for tip label.";
+"description-editor-tip-details" = "Tip explaining that descriptions should be fairly short.";
+"description-editor-example-title" = "Title for example label.";
+"description-editor-example-details" = "Title for label giving an example of a short description.";
+"description-editor-saving-message" = "Message displayed when user saves a description.";
+"description-editor-saved-message" = "Message displayed when saving a description has completed.";

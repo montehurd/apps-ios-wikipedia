@@ -93,6 +93,10 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
         });
     }];
 
+    [self.bridge addListener:@"edit_wikidata_description" withBlock:^(NSString* type, NSDictionary* payload) {
+        [weakSelf showWikiDataDescriptionEditor];
+    }];
+
     self.unsafeToScroll    = NO;
     self.unsafeToToggleTOC = NO;
     self.lastScrollOffset  = CGPointZero;
@@ -171,6 +175,12 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
     self.webView.scrollView.layer.anchorPoint = CGPointMake((isRTL ? 1.0 : 0.0), 0.0);
 
     [self tocUpdateViewLayout];
+}
+
+- (void)showWikiDataDescriptionEditor {
+    [self performModalSequeWithID:@"modal_segue_show_descriptioneditor"
+                  transitionStyle:UIModalTransitionStyleCoverVertical
+                            block:nil];
 }
 
 - (void)jumpToFragmentIfNecessary {
@@ -1563,12 +1573,16 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         [NSString stringWithFormat:
          @"<div id='lead_image_div' class='lead_image_div' style=\"%@\">"
          "<div id='lead_image_text_container'>"
-         "<div id='lead_image_title' style='%@'>%@</div>"
+         "<div id='lead_image_title' style='%@'>"
+         "%@"
+         "%@"
+         "</div>"
          "<div id='lead_image_description' style='%@'>%@</div>"
          "</div>"
          "</div>",
          leadImageDivStyleOverrides,
          [NSString stringWithFormat:@"font-size:%.02fpx;", 34.0f * fontMultiplier],
+         [self isArticleDescriptionEditingEnabled] ? @"<a class='edit_section_button' data-action='edit_wikidata_description'></a>" : @"",
          title,
          [NSString stringWithFormat:@"font-size:%.02fpx;", 17.0f],
          description
@@ -1579,6 +1593,16 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     }
 
     return leadImageHtml;
+}
+
+- (BOOL)isArticleDescriptionEditingEnabled {
+    WMFAssetsFile* iOSConfig                   = [[WMFAssetsFile alloc] initWithFileType:WMFAssetsFileTypeConfig];
+    NSDictionary* iOSConfigDict                = iOSConfig.dictionary;
+    NSNumber* disableArticleDescriptionEditing = iOSConfigDict[@"disableArticleDescriptionEditing"];
+    if ([disableArticleDescriptionEditing isEqualToNumber:@(1)]) {
+        return NO;
+    }
+    return YES;
 }
 
 - (CGFloat)leadImageGetSizeReductionMultiplierForTitleOfLength:(NSUInteger)length {
@@ -1703,7 +1727,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         }
 
         if (!html) {
-            html = MWLocalizedString(@"article-unable-to-load-section", nil);;
+            html = MWLocalizedString(@"article-unable-to-load-section", nil);
         }
 
         // Structural html added around section html just before display.

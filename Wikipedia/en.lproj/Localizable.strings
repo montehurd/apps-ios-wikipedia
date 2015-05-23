@@ -307,3 +307,11 @@
 
 "page-issues" = "Page issues";
 "page-similar-titles" = "Similar pages";
+
+"description-editor-prompt" = "Add or edit description for '$1'";
+"description-editor-tip-title" = "Tip";
+"description-editor-tip-details" = "Aim for one line between 2 and 12 words.";
+"description-editor-example-title" = "Example for 'Unicorn'";
+"description-editor-example-details" = "mythical creature, horse-like with horn on its head";
+"description-editor-saving-message" = "Saving description...";
+"description-editor-saved-message" = "Description saved";
