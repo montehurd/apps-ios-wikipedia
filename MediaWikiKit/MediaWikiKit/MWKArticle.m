@@ -25,8 +25,6 @@
 @property (readwrite, strong, nonatomic) MWKProtectionStatus* protection;     // required
 @property (readwrite, assign, nonatomic) BOOL editable;                       // required
 
-@property (readwrite, copy, nonatomic) NSString* entityDescription;            // optional; currently pulled separately via wikidata
-
 @property (readwrite, strong, nonatomic) MWKSectionList* sections;
 
 @property (readwrite, strong, nonatomic) MWKImageList* images;

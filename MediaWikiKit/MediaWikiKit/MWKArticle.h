@@ -42,7 +42,7 @@ static const NSInteger kMWKArticleSectionNone = -1;
 @property (readwrite, copy, nonatomic) NSString* thumbnailURL;   // optional; pulled separately via search
 @property (readwrite, copy, nonatomic) NSString* imageURL;       // optional; pulled in article request
 
-@property (readonly, copy, nonatomic) NSString* entityDescription;            // optional; currently pulled separately via wikidata
+@property (readwrite, copy, nonatomic) NSString* entityDescription;            // optional; currently pulled separately via wikidata
 
 @property (readonly, strong, nonatomic) MWKSectionList* sections;
 
