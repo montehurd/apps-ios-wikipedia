@@ -70,6 +70,7 @@
 #import "URLCache.h"
 
 #import "WMFProgressLineView.h"
+#import "WikidataDescriptionUploader.h"
 
 //#import "UIView+Debugging.h"
 

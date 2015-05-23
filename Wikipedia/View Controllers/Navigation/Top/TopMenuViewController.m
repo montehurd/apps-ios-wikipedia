@@ -497,6 +497,11 @@
             self.navBarSubViewsHorizontalVFLString =
                 @"H:|[NAVBAR_BUTTON_LOGO_W(66)][NAVBAR_BUTTON_MAGNIFY(36)][NAVBAR_BUTTON_BLANK]-(10)-[NAVBAR_BUTTON_TOC(62)]|";
             break;
+        case NAVBAR_MODE_EDIT_ARTICLE_DESCRIPTION:
+            //self.label.text = MWLocalizedString(@"navbar-title-mode-edit-wikitext-warning", nil);
+            self.navBarSubViewsHorizontalVFLString =
+                @"H:|-(4)-[NAVBAR_BUTTON_X(50)]-(16)-[NAVBAR_LABEL]-(10)-[NAVBAR_BUTTON_SAVE(50@250)]|";
+            break;
         default: //NAVBAR_MODE_DEFAULT
             self.navBarSubViewsHorizontalVFLString =
                 @"H:|[NAVBAR_BUTTON_LOGO_W(66)][NAVBAR_BUTTON_MAGNIFY(36)][NAVBAR_BUTTON_BLANK]-(10)-|";

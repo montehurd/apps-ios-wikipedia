@@ -93,6 +93,21 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
         });
     }];
 
+
+
+
+
+
+    [self.bridge addListener:@"edit_wikidata_description" withBlock:^(NSString* type, NSDictionary* payload) {
+        NSLog(@"edit_wikidata_description!!!!!");
+        NSLog(@"current description = %@", [weakSelf.session.currentArticle.entityDescription wmf_stringByCapitalizingFirstCharacter]);
+
+        [weakSelf showWikiDataDescriptionEditor];
+    }];
+
+
+
+
     self.unsafeToScroll    = NO;
     self.unsafeToToggleTOC = NO;
     self.lastScrollOffset  = CGPointZero;
@@ -171,6 +186,94 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
     self.webView.scrollView.layer.anchorPoint = CGPointMake((isRTL ? 1.0 : 0.0), 0.0);
 
     [self tocUpdateViewLayout];
+}
+
+- (void)showWikiDataDescriptionEditor {
+//WikiDataDescriptionEditor *editor = [[[NSBundle mainBundle] loadNibNamed:@"WikiDataDescriptionEditor" owner:self options:nil] lastObject];
+//[self.view addSubview:editor];
+//[editor mas_makeConstraints:^(MASConstraintMaker* make) {
+//    make.edges.equalTo(self.view);
+//}];
+//return;
+
+
+    [self performModalSequeWithID:@"modal_segue_show_descriptioneditor"
+                  transitionStyle:UIModalTransitionStyleCoverVertical
+                            block:nil];
+
+    return;
+
+
+    UIView* v = [[UIView alloc] init];
+    v.backgroundColor = [UIColor redColor];
+    v.alpha           = 0.7;
+    [self.view addSubview:v];
+
+    UITextView* t = [[UITextView alloc] init];
+    t.text = [self.session.currentArticle.entityDescription wmf_stringByCapitalizingFirstCharacter];
+    [v addSubview:t];
+
+    [t mas_makeConstraints:^(MASConstraintMaker* make) {
+        UIEdgeInsets padding = UIEdgeInsetsMake(10, 10, 10, 10);
+        make.top.equalTo(v.mas_top).with.offset(padding.top);
+        make.left.equalTo(v.mas_left).with.offset(padding.left);
+        make.right.equalTo(v.mas_right).with.offset(-padding.right);
+        make.height.equalTo(@50);
+    }];
+
+
+
+
+
+    UILabel* save = [[UILabel alloc] init];
+    save.text            = @"Save";
+    save.backgroundColor = [UIColor whiteColor];
+    UILabel* cancel = [[UILabel alloc] init];
+    cancel.text            = @"Cancel";
+    cancel.backgroundColor = [UIColor whiteColor];
+
+    [v addSubview:save];
+    [v addSubview:cancel];
+
+
+    [save mas_makeConstraints:^(MASConstraintMaker* make) {
+        UIEdgeInsets padding = UIEdgeInsetsMake(10, 10, 10, 10);
+        make.top.equalTo(t.mas_bottom).with.offset(padding.top);
+        make.centerX.equalTo(v.mas_centerX);
+        make.height.equalTo(@30);
+    }];
+
+    [cancel mas_makeConstraints:^(MASConstraintMaker* make) {
+        UIEdgeInsets padding = UIEdgeInsetsMake(10, 10, 10, 10);
+        make.top.equalTo(save.mas_bottom).with.offset(padding.top);
+        make.centerX.equalTo(v.mas_centerX);
+        make.height.equalTo(@30);
+    }];
+
+
+
+
+
+
+
+    [v mas_makeConstraints:^(MASConstraintMaker* make) {
+        make.edges.equalTo(self.view);
+    }];
+
+
+
+
+    save.userInteractionEnabled   = YES;
+    cancel.userInteractionEnabled = YES;
+
+    [save addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(saveWikiDataDescription)]];
+    [cancel addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideWikiDataDescriptionEditor)]];
+}
+
+- (void)hideWikiDataDescriptionEditor {
+}
+
+- (void)saveWikiDataDescription {
 }
 
 - (void)jumpToFragmentIfNecessary {
@@ -1229,6 +1332,37 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 
+
+
+
+
+
+
+/*
+   - must do:
+    - initially hook up to long press so we don't have to worry about interface button.
+   - nice to have:
+    - try using edit token if user is logged in and see if the edit is credited to the user.
+
+   (void)[[WikidataDescriptionUploader alloc] initAndUploadWikidataDescription: @"A town in Aitkin County, Minnesota, USA"
+                                                               forPageTitle: self.currentTitle
+                                                                      token: nil
+                                                                withManager: [QueuesSingleton sharedInstance].articleFetchManager
+                                                         thenNotifyDelegate: self];
+
+ */
+//document.getElementById('lead_image_description').innerHTML = '<textarea style="color:inherit;height:auto" id="text">A small town in Aitkin County, Minnesota</textarea>'
+
+
+
+
+
+
+
+
+
+
+
     //[self downloadAssetsFilesIfNecessary];
 
     /*
@@ -1563,7 +1697,10 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         [NSString stringWithFormat:
          @"<div id='lead_image_div' class='lead_image_div' style=\"%@\">"
          "<div id='lead_image_text_container'>"
-         "<div id='lead_image_title' style='%@'>%@</div>"
+         "<div id='lead_image_title' style='%@'>"
+         "<a class='edit_section_button' data-action='edit_wikidata_description'></a>"
+         "%@"
+         "</div>"
          "<div id='lead_image_description' style='%@'>%@</div>"
          "</div>"
          "</div>",

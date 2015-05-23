@@ -261,6 +261,10 @@ function maybeSendMessageForTarget(event, hrefTarget){
     var hrefClass = hrefTarget.getAttribute('class');
     if (hrefTarget.getAttribute( "data-action" ) === "edit_section") {
         bridge.sendMessage( 'editClicked', { sectionId: hrefTarget.getAttribute( "data-id" ) });
+
+} else if (hrefTarget.getAttribute( "data-action" ) === "edit_wikidata_description") {
+    bridge.sendMessage( 'edit_wikidata_description', {});
+
     } else if (href && refs.isReference(href)) {
         // Handle reference links with a popup view instead of scrolling about!
         refs.sendNearbyReferences( hrefTarget );
