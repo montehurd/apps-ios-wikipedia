@@ -1638,15 +1638,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
             [NSString stringWithFormat:@"document.getElementById('lead_image_div').style.backgroundPosition = '100%% %d%%';", [self leadImageFocalOffsetYPercentageFromTopOfRect:rect]];
     }
 
-    static NSString* animationCss = nil;
-    if (!animationCss) {
-        #warning FIXME: abstract away "get lead image div" logic
-        animationCss =
-            @"document.getElementById('lead_image_div').style.transition = 'background-position 0.8s';";
-    }
-    [self.webView stringByEvaluatingJavaScriptFromString:[@[animationCss,
-                                                            [WebViewController hidePlaceholderJS],
-                                                            applyFocalOffsetJS] componentsJoinedByString : @""]];
+    [self.webView stringByEvaluatingJavaScriptFromString:[@[[WebViewController hidePlaceholderJS], applyFocalOffsetJS] componentsJoinedByString : @""]];
 }
 
 #pragma mark Display article from data store
