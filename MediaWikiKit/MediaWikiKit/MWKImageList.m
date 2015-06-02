@@ -88,7 +88,12 @@
 }
 
 - (BOOL)hasImageURL:(NSString*)imageURL {
-    return [self imageWithURL:imageURL] != nil;
+    imageURL = [imageURL wmf_schemelessURL];
+    if (imageURL && imageURL.length > 0 && [self.entries containsObject:imageURL]) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 - (MWKImage*)imageWithURL:(NSString*)imageURL {
@@ -185,6 +190,7 @@
 }
 
 - (BOOL)addImageURLIfAbsent:(NSString*)imageURL {
+    imageURL = [imageURL wmf_schemelessURL];
     if (imageURL && imageURL.length > 0 && ![self.entries containsObject:imageURL]) {
         [self addImageURL:imageURL];
         return YES;

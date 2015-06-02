@@ -145,7 +145,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
     [self tocSetupSwipeGestureRecognizers];
 
-    [self reloadCurrentArticle];
+    [self reloadCurrentArticleFromCache];
 
     // Restrict the web view from scrolling horizonally.
     [self.webView.scrollView addObserver:self
@@ -1364,9 +1364,14 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
      */
 }
 
-- (void)reloadCurrentArticle {
+- (void)reloadCurrentArticleFromNetwork {
     [self navigateToPage:self.session.currentArticle.title
          discoveryMethod:MWKHistoryDiscoveryMethodReload];
+}
+
+- (void)reloadCurrentArticleFromCache {
+    [self navigateToPage:self.session.currentArticle.title
+         discoveryMethod:MWKHistoryDiscoveryMethodSaved];
 }
 
 - (void)cancelArticleLoading {
@@ -1882,7 +1887,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 }
 
 - (void)refreshWasPulled {
-    [self reloadCurrentArticle];
+    [self reloadCurrentArticleFromNetwork];
 }
 
 - (BOOL)refreshShouldShow {

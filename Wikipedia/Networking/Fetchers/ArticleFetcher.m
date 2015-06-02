@@ -224,6 +224,10 @@
     if (title) {
         NSString* thumbURL = map[title];
         if (thumbURL) {
+            if ([self.article.images hasImageURL:thumbURL]) {
+                return;
+            }
+
             // Associate Search/Nearby thumb url with article.thumbnailURL.
             if (thumbURL) {
                 self.article.thumbnailURL = thumbURL;
