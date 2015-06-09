@@ -1554,25 +1554,19 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         }
     }
 
-    NSString* leadImageDivStyleOverrides =
-        !hasImage ? @"" : [NSString stringWithFormat:
-                           @"background-image:-webkit-linear-gradient(top, rgba(0,0,0,0.0) 0%%, rgba(0,0,0,0.5) 100%%),"
-                           @"url('%@')"
-                           @"%@;"
-                           "background-position: 50%% %ld%%;",
-                           article.imageURL,
-                           [article.image isCached] ? @"" : @",url('wmf://bundledImage/lead-default.png')",
-                           offsetY];
-
     NSString* leadImageHtml =
         [NSString stringWithFormat:
          @"<div id='lead_image_div' class='lead_image_div' style=\"%@\">"
+         "%@"
+         "%@"
          "<div id='lead_image_text_container'>"
          "<div id='lead_image_title' style='%@'>%@</div>"
          "<div id='lead_image_description' style='%@'>%@</div>"
          "</div>"
          "</div>",
-         leadImageDivStyleOverrides,
+         hasImage ? [NSString stringWithFormat : @"background-image:url('%@');background-position: 50%% %ld%%;", article.imageURL, offsetY]:@"",
+         (hasImage && ![article.image isCached]) ? @"<div id='lead_image_placeholder'></div>" : @"",
+         hasImage ? @"<div id='lead_image_gradient'></div>" : @"",
          [NSString stringWithFormat:@"font-size:%.02fpx;", 34.0f * fontMultiplier],
          title,
          [NSString stringWithFormat:@"font-size:%.02fpx;", 17.0f],
@@ -1625,9 +1619,8 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     return @(MAX(0, MIN(100, percentFromTop))).integerValue;
 }
 
-+ (NSString*)hidePlaceholderJS {
-    #warning FIXME: abstract away "get lead image div" logic
-    return @"document.getElementById('lead_image_div').style.backgroundImage = document.getElementById('lead_image_div').style.backgroundImage.replace('wmf://bundledImage/lead-default.png', 'wmf://bundledImage/empty.png');";
+- (NSString*)hidePlaceholderJS {
+    return @"document.getElementById('lead_image_placeholder').style.opacity = 0;";
 }
 
 - (void)leadImageHidePlaceHolderAndCenterOnFaceIfNeeded:(CGRect)rect {
@@ -1638,14 +1631,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
             [NSString stringWithFormat:@"document.getElementById('lead_image_div').style.backgroundPosition = '100%% %d%%';", [self leadImageFocalOffsetYPercentageFromTopOfRect:rect]];
     }
 
-    static NSString* animationCss = nil;
-    if (!animationCss) {
-        #warning FIXME: abstract away "get lead image div" logic
-        animationCss =
-            @"document.getElementById('lead_image_div').style.transition = 'background-position 0.8s';";
-    }
-    [self.webView stringByEvaluatingJavaScriptFromString:[@[animationCss,
-                                                            [WebViewController hidePlaceholderJS],
+    [self.webView stringByEvaluatingJavaScriptFromString:[@[[self hidePlaceholderJS],
                                                             applyFocalOffsetJS] componentsJoinedByString : @""]];
 }
 
