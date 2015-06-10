@@ -194,6 +194,8 @@
 		0EBC56681AD3656900E82CDD /* WMFAsyncTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7ACB631AB34C9C00791497 /* WMFAsyncTestCase.m */; };
 		0EBC567F1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EBC567E1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.m */; };
 		0EBC56971AD5B69300E82CDD /* BITHockeyManager+WMFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EBC567E1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.m */; };
+		0ED44D5A1B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED44D591B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m */; };
+		0ED44D751B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED44D741B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m */; };
 		0EE7687B1AF982C100A5D046 /* WMFArticleProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7687A1AF982C100A5D046 /* WMFArticleProtocol.m */; };
 		0EE768811AFD25CC00A5D046 /* WMFSearchFunnel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE768801AFD25CC00A5D046 /* WMFSearchFunnel.m */; };
 		701FF5EE601DEA3FCAB7EFD3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D82982ED992F47428037BDF2 /* libPods.a */; };
@@ -750,7 +752,11 @@
 		0EA4402D1AA6281200B09DBA /* NSDateFormatter+WMFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDateFormatter+WMFExtensions.m"; path = "Wikipedia/Categories/NSDateFormatter+WMFExtensions.m"; sourceTree = SOURCE_ROOT; };
 		0EBC567D1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "BITHockeyManager+WMFExtensions.h"; path = "Wikipedia/Categories/BITHockeyManager+WMFExtensions.h"; sourceTree = SOURCE_ROOT; };
 		0EBC567E1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "BITHockeyManager+WMFExtensions.m"; path = "Wikipedia/Categories/BITHockeyManager+WMFExtensions.m"; sourceTree = SOURCE_ROOT; };
+		0ED44D581B277C7300F284BA /* WMFVerticalOverlapFlowLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFVerticalOverlapFlowLayout.h; sourceTree = "<group>"; };
+		0ED44D591B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMFVerticalOverlapFlowLayout.m; sourceTree = "<group>"; };
 		0ED44D6E1B2893C500F284BA /* Global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Global.h; sourceTree = "<group>"; };
+		0ED44D731B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFArticleViewControllerContainerCell.h; sourceTree = "<group>"; };
+		0ED44D741B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMFArticleViewControllerContainerCell.m; sourceTree = "<group>"; };
 		0EE768791AF982C100A5D046 /* WMFArticleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFArticleProtocol.h; path = Wikipedia/Protocols/WMFArticleProtocol.h; sourceTree = SOURCE_ROOT; };
 		0EE7687A1AF982C100A5D046 /* WMFArticleProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WMFArticleProtocol.m; path = Wikipedia/Protocols/WMFArticleProtocol.m; sourceTree = SOURCE_ROOT; };
 		0EE7687F1AFD25CC00A5D046 /* WMFSearchFunnel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFSearchFunnel.h; sourceTree = "<group>"; };
@@ -935,6 +941,7 @@
 		BCC185E71A9FA498005378F8 /* UICollectionViewFlowLayout+AttributeUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionViewFlowLayout+AttributeUtils.m"; sourceTree = "<group>"; };
 		BCCED2CF1AE03BE20094EB7E /* MWKSectionListTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MWKSectionListTests.m; sourceTree = "<group>"; };
 		BCCED2D21AE041BD0094EB7E /* MWKSectionList_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MWKSectionList_Private.h; sourceTree = "<group>"; };
+		BCD41DD41B1079A600231BB1 /* Wikipedia-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wikipedia-Bridging-Header.h"; sourceTree = "<group>"; };
 		BCD41DDE1B11CC5800231BB1 /* golden-gate.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "golden-gate.jpg"; sourceTree = "<group>"; };
 		BCD41DDF1B11CC5800231BB1 /* MainPageMobileView.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = MainPageMobileView.json; sourceTree = "<group>"; };
 		BCD41DE01B11CC5800231BB1 /* Obama.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Obama.json; sourceTree = "<group>"; };
@@ -951,7 +958,6 @@
 		BCD41DFE1B11D17100231BB1 /* XCTestCase+MWKFixtures.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+MWKFixtures.m"; sourceTree = "<group>"; };
 		BCDA2F411B17A02A002FEB6A /* WMFComparison.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WMFComparison.h; sourceTree = "<group>"; };
 		BCDA2F421B17A056002FEB6A /* WMFHashing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WMFHashing.h; sourceTree = "<group>"; };
-		BCD41DD41B1079A600231BB1 /* Wikipedia-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Wikipedia-Bridging-Header.h"; sourceTree = "<group>"; };
 		BCDB75BC1AB0D3DE0005593F /* WMFImageInfoController_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFImageInfoController_Private.h; path = "Image Gallery/WMFImageInfoController_Private.h"; sourceTree = "<group>"; };
 		BCDB75BD1AB0DFC40005593F /* WMFRangeUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFRangeUtils.h; sourceTree = "<group>"; };
 		BCDB75C31AB0E8300005593F /* WMFSubstringUtilsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMFSubstringUtilsTests.m; sourceTree = "<group>"; };
@@ -2078,6 +2084,10 @@
 				0E94AFEC1B20976A000BC5EA /* WMFAppViewController.m */,
 				0E94AFEE1B209792000BC5EA /* WMFArticleListCollectionViewController.h */,
 				0E94AFEF1B209792000BC5EA /* WMFArticleListCollectionViewController.m */,
+				0ED44D731B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.h */,
+				0ED44D741B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m */,
+				0ED44D581B277C7300F284BA /* WMFVerticalOverlapFlowLayout.h */,
+				0ED44D591B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m */,
 				0E94AFF11B209857000BC5EA /* WMFSearchViewController.h */,
 				0E94AFF21B209857000BC5EA /* WMFSearchViewController.m */,
 				0E94AFF41B209882000BC5EA /* WMFArticleViewController.h */,
@@ -3135,6 +3145,7 @@
 				043DAC4B1901C3EE001CD17C /* CreditsViewController.m in Sources */,
 				D42E75EB18D11237002EA7E5 /* MWLanguageInfo.m in Sources */,
 				043F8BF21A11699A00D1AE44 /* UIView+WMFRoundCorners.m in Sources */,
+				0ED44D751B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m in Sources */,
 				0487048019F8262600B7D307 /* AccountLogin.m in Sources */,
 				BC8340551B2233BE00A083DB /* LanguagesSectionHeaderView.m in Sources */,
 				04D149DD18877343006B4104 /* AlertLabel.m in Sources */,
@@ -3247,6 +3258,7 @@
 				04292FF8185FBB0B002A13FC /* SearchResultsController.m in Sources */,
 				BCAFC5D31AFD5F7E004615BA /* MWKArticle+WMFSharing.m in Sources */,
 				04478633185145090050563B /* HistoryViewController.m in Sources */,
+				0ED44D5A1B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m in Sources */,
 				BCB669B21A83F6C400C7B1FE /* MWKImageInfo.m in Sources */,
 				BCB848781AAAABF80077EC24 /* WMFRoundingUtilities.c in Sources */,
 				D4B0AE051936604700F0AC90 /* EditFunnel.m in Sources */,
