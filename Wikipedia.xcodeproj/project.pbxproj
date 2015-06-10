@@ -196,6 +196,7 @@
 		0EBC56971AD5B69300E82CDD /* BITHockeyManager+WMFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EBC567E1AD442CC00E82CDD /* BITHockeyManager+WMFExtensions.m */; };
 		0ED44D5A1B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED44D591B277C7300F284BA /* WMFVerticalOverlapFlowLayout.m */; };
 		0ED44D751B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED44D741B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m */; };
+		0ED44D781B28DA4D00F284BA /* UICollectionView+WMFEnumeration.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED44D771B28DA4D00F284BA /* UICollectionView+WMFEnumeration.m */; };
 		0EE7687B1AF982C100A5D046 /* WMFArticleProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7687A1AF982C100A5D046 /* WMFArticleProtocol.m */; };
 		0EE768811AFD25CC00A5D046 /* WMFSearchFunnel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE768801AFD25CC00A5D046 /* WMFSearchFunnel.m */; };
 		701FF5EE601DEA3FCAB7EFD3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D82982ED992F47428037BDF2 /* libPods.a */; };
@@ -757,6 +758,8 @@
 		0ED44D6E1B2893C500F284BA /* Global.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Global.h; sourceTree = "<group>"; };
 		0ED44D731B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFArticleViewControllerContainerCell.h; sourceTree = "<group>"; };
 		0ED44D741B28AC1E00F284BA /* WMFArticleViewControllerContainerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMFArticleViewControllerContainerCell.m; sourceTree = "<group>"; };
+		0ED44D761B28DA4D00F284BA /* UICollectionView+WMFEnumeration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionView+WMFEnumeration.h"; sourceTree = "<group>"; };
+		0ED44D771B28DA4D00F284BA /* UICollectionView+WMFEnumeration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionView+WMFEnumeration.m"; sourceTree = "<group>"; };
 		0EE768791AF982C100A5D046 /* WMFArticleProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFArticleProtocol.h; path = Wikipedia/Protocols/WMFArticleProtocol.h; sourceTree = SOURCE_ROOT; };
 		0EE7687A1AF982C100A5D046 /* WMFArticleProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WMFArticleProtocol.m; path = Wikipedia/Protocols/WMFArticleProtocol.m; sourceTree = SOURCE_ROOT; };
 		0EE7687F1AFD25CC00A5D046 /* WMFSearchFunnel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFSearchFunnel.h; sourceTree = "<group>"; };
@@ -2095,6 +2098,8 @@
 				0E94AFF71B209E0A000BC5EA /* WMFArticleViewController.xib */,
 				0E94AFF91B20A22C000BC5EA /* WMFStyleManager.h */,
 				0E94AFFA1B20A22C000BC5EA /* WMFStyleManager.m */,
+				0ED44D761B28DA4D00F284BA /* UICollectionView+WMFEnumeration.h */,
+				0ED44D771B28DA4D00F284BA /* UICollectionView+WMFEnumeration.m */,
 			);
 			path = "UI-V5";
 			sourceTree = "<group>";
@@ -3189,6 +3194,7 @@
 				BCB58F631A8A9F1000465627 /* MWKLicense.m in Sources */,
 				041C55D21950B27D006CE0EF /* EditSummaryViewController.m in Sources */,
 				04CCA0C01983086D000E982A /* ReferencesVC.m in Sources */,
+				0ED44D781B28DA4D00F284BA /* UICollectionView+WMFEnumeration.m in Sources */,
 				BC839B441B25AE15002DF67C /* LanguagesTableSectionViewModel.m in Sources */,
 				043B6E8E1ACDE0CF0005C60B /* NSAttributedString+WMFSavedPagesAttributedStrings.m in Sources */,
 				04C43ABE183442FC006C643B /* NSRunLoop+TimeOutAndFlag.m in Sources */,

@@ -6,7 +6,7 @@
 #import "WMFArticleViewControllerContainerCell.h"
 #import "WMFArticleViewController.h"
 
-@interface WMFArticleListCollectionViewController ()
+@interface WMFArticleListCollectionViewController ()<WMFVerticalOverlapFlowLayoutDelegate>
 
 @property (nonatomic, assign, readwrite) WMFArticleListType listType;
 
@@ -47,12 +47,33 @@
     return [self.userDataStore.dataStore articleWithTitle:savedEntry.title];
 }
 
+- (void)deleteSavedPageForIndexPath:(NSIndexPath*)indexPath {
+    MWKSavedPageEntry* savedEntry = [self.savedPages entryAtIndex:indexPath.row];
+    if (savedEntry) {
+        
+        // Delete the saved record.
+        [self.savedPages removeEntry:savedEntry];
+        [self.userDataStore save];
+    
+        [self.collectionView performBatchUpdates:^{
+            
+            [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
+            
+        } completion:^(BOOL finished) {
+            
+            
+        }];
+    }
+}
+
+
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     self.title = [self titleForListType:self.listType];
+    [self verticalOverlapLayout].delegate = self;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -87,7 +108,8 @@
 
 // iOS 8+ Rotation Support
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
-    [coordinator animateAlongsideTransition:^(id < UIViewControllerTransitionCoordinatorContext > context)
+
+    [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
     {
         [self verticalOverlapLayout].itemSize = CGSizeMake(size.width, 200);
     }                            completion:NULL];
@@ -128,5 +150,19 @@
     [containerCell.viewController willMoveToParentViewController:nil];
     [containerCell.viewController removeFromParentViewController];
 }
+
+#pragma mark - <WMFVerticalOverlapFlowLayoutDelegate>
+
+- (BOOL)layout:(WMFVerticalOverlapFlowLayout*)layout canDeleteItemAtIndexPath:(NSIndexPath*)indexPath{
+    
+    return YES;
+}
+
+- (void)layout:(WMFVerticalOverlapFlowLayout*)layout didDeleteItemAtIndexPath:(NSIndexPath*)indexPath{
+    
+    [self deleteSavedPageForIndexPath:indexPath];
+}
+
+
 
 @end
