@@ -5,6 +5,7 @@
 #import "WMFVerticalOverlapFlowLayout.h"
 #import "WMFArticleViewControllerContainerCell.h"
 #import "WMFArticleViewController.h"
+#import "WebViewController.h"
 
 @interface WMFArticleListCollectionViewController ()<WMFVerticalOverlapFlowLayoutDelegate>
 
@@ -50,29 +51,23 @@
 - (void)deleteSavedPageForIndexPath:(NSIndexPath*)indexPath {
     MWKSavedPageEntry* savedEntry = [self.savedPages entryAtIndex:indexPath.row];
     if (savedEntry) {
-        
         // Delete the saved record.
         [self.savedPages removeEntry:savedEntry];
         [self.userDataStore save];
-    
+
         [self.collectionView performBatchUpdates:^{
-            
             [self.collectionView deleteItemsAtIndexPaths:@[indexPath]];
-            
         } completion:^(BOOL finished) {
-            
-            
         }];
     }
 }
-
 
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.title = [self titleForListType:self.listType];
+    self.title                            = [self titleForListType:self.listType];
     [self verticalOverlapLayout].delegate = self;
 }
 
@@ -83,6 +78,13 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self verticalOverlapLayout].itemSize = CGSizeMake(self.view.bounds.size.width, 200);
+
+    WebViewController* vc = [[WebViewController alloc] init];
+
+    UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+    [self presentViewController:nc animated:YES completion:^{
+        [vc navigateToPage:[self articleForIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].title discoveryMethod:MWKHistoryDiscoveryMethodLink];
+    }];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -108,8 +110,7 @@
 
 // iOS 8+ Rotation Support
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
-
-    [coordinator animateAlongsideTransition:^(id <UIViewControllerTransitionCoordinatorContext> context)
+    [coordinator animateAlongsideTransition:^(id < UIViewControllerTransitionCoordinatorContext > context)
     {
         [self verticalOverlapLayout].itemSize = CGSizeMake(size.width, 200);
     }                            completion:NULL];
@@ -153,16 +154,12 @@
 
 #pragma mark - <WMFVerticalOverlapFlowLayoutDelegate>
 
-- (BOOL)layout:(WMFVerticalOverlapFlowLayout*)layout canDeleteItemAtIndexPath:(NSIndexPath*)indexPath{
-    
+- (BOOL)layout:(WMFVerticalOverlapFlowLayout*)layout canDeleteItemAtIndexPath:(NSIndexPath*)indexPath {
     return YES;
 }
 
-- (void)layout:(WMFVerticalOverlapFlowLayout*)layout didDeleteItemAtIndexPath:(NSIndexPath*)indexPath{
-    
+- (void)layout:(WMFVerticalOverlapFlowLayout*)layout didDeleteItemAtIndexPath:(NSIndexPath*)indexPath {
     [self deleteSavedPageForIndexPath:indexPath];
 }
-
-
 
 @end
