@@ -5,11 +5,20 @@
 #import <Masonry/Masonry.h>
 #import "NSString+WMFHTMLParsing.h"
 
+#import "PrimaryMenuViewController.h"
+#import "WMFBarButtonItem.h"
+
 NSString* const WebViewControllerTextWasHighlighted    = @"textWasSelected";
 NSString* const WebViewControllerWillShareNotification = @"SelectionShare";
 NSString* const WebViewControllerShareBegin            = @"beginShare";
 NSString* const WebViewControllerShareSelectedText     = @"selectedText";
 NSString* const kSelectedStringJS                      = @"window.getSelection().toString()";
+
+@interface WebViewController ()
+
+@property (nonatomic, strong) WMFBarButtonItem* tocButtonItem;
+@property (nonatomic) BOOL isAnimatingTopAndBottomMenuHidden;
+@end
 
 @implementation WebViewController
 
@@ -55,10 +64,113 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
     return UIStatusBarAnimationFade;
 }
 
++ (WebViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFWebView" bundle:nil] instantiateInitialViewController];
+}
+
 #pragma mark View lifecycle methods
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+   go into view did load
+    and try adding uibar button items to top and bottom toolbar (self.navigationItem.leftBarButtonItems self.navigationItem.rightBarButtonItems)
+    "self.toolbarItems" is what's in the bottom bar
+    to show bottom toolbar self.navigationController.toolbarHidden = NO;
+
+
+    autohide nav on scroll - UINavigationController "hides bar" methods
+
+
+    re-hook up native tracking footer? do same copy trick with main story board to strip it down?
+ */
+
+
+//@"H:|[NAVBAR_BUTTON_LOGO_W(66)][NAVBAR_BUTTON_MAGNIFY(36)][NAVBAR_BUTTON_BLANK]-(10)-[NAVBAR_BUTTON_TOC(62)]|";
+
+
+    self.navigationItem.leftBarButtonItems = @[
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_W handler:^(id sender){
+        UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:[PrimaryMenuViewController initialViewControllerFromStoryBoard]];
+        [nc.navigationBar setBarTintColor:[UIColor blackColor]];
+        [nc.navigationBar setTranslucent:NO];
+        [self presentViewController:nc animated:YES completion:nil];
+    }],
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_MAGNIFY handler:^(id sender){
+        NSLog(@"TODO: hook this up to search somehow...");
+    }]
+    ];
+
+    self.tocButtonItem = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_TOC_COLLAPSED
+                                                               handler:^(id sender){
+        [self tocToggle];
+    }];
+
+    self.tocButtonItem.selectedType = WMF_BUTTON_TOC_EXPANDED;
+
+    self.navigationItem.rightBarButtonItems = @[self.tocButtonItem];
+
+
+
+    self.navigationController.toolbarHidden = NO;
+    self.toolbarItems                       = @[
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_BACKWARD handler:^(id sender){
+        NSLog(@"TEST 4");
+    }],
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_FORWARD handler:^(id sender){
+        NSLog(@"TEST 5");
+    }],
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_TRANSLATE handler:^(id sender){
+        NSLog(@"TEST 6");
+    }],
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+        [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_SHARE handler:^(id sender){
+        NSLog(@"TEST 7");
+    }]
+    ];
+
+//IOS 8 only!
+//    self.navigationController.hidesBarsOnSwipe = YES;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [self setupTrackingFooter];
 
@@ -270,11 +382,15 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 
     [super viewWillAppear:animated];
 
-    self.bottomMenuHidden = ROOT.topMenuHidden;
+//    self.bottomMenuHidden = ROOT.topMenuHidden;
     self.referencesHidden = YES;
 
-    ROOT.topMenuViewController.navBarMode = NAVBAR_MODE_DEFAULT;
-    [ROOT.topMenuViewController updateTOCButtonVisibility];
+//    ROOT.topMenuViewController.navBarMode = NAVBAR_MODE_DEFAULT;
+    [self updateTOCButtonVisibility];
+}
+
+- (void)updateTOCButtonVisibility {
+    self.tocButtonItem.disabled = [SessionSingleton sharedInstance].currentArticle.isMain;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -290,6 +406,7 @@ NSString* const kSelectedStringJS                      = @"window.getSelection()
 static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
 - (void)scrollIndicatorSetup {
+    return;
     self.scrollIndicatorView                                           = [[UIView alloc] init];
     self.scrollIndicatorView.opaque                                    = NO;
     self.scrollIndicatorView.backgroundColor                           = [UIColor wmf_colorWithHex:kScrollIndicatorBackgroundColor alpha:kScrollIndicatorAlpha];
@@ -394,12 +511,10 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 #pragma mark Edit section
 
 - (void)showSectionEditor {
-    SectionEditorViewController* sectionEditVC =
-        [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"SectionEditorViewController"];
-
+    SectionEditorViewController* sectionEditVC = [SectionEditorViewController initialViewControllerFromStoryBoard];
     sectionEditVC.section = self.session.currentArticle.sections[self.sectionToEditId];
-
-    [ROOT pushViewController:sectionEditVC animated:YES];
+    UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:sectionEditVC];
+    [self presentViewController:nc animated:YES completion:nil];
 }
 
 - (void)searchFieldBecameFirstResponder {
@@ -434,6 +549,8 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
 - (void)tocHideWithDuration:(NSNumber*)duration {
     if ([self tocDrawerIsOpen]) {
+//        self.navigationController.hidesBarsOnSwipe = YES;
+
         // Note: don't put this on the mainQueue. It can cause problems
         // if the toc needs to be hidden with 0 duration, such as when
         // the device is rotated. (could wrap this in a block and add
@@ -455,13 +572,13 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
                          animations:^{
             self.scrollIndicatorView.alpha = 1.0;
             // If the top menu isn't hidden, reveal the bottom menu.
-            self.bottomMenuHidden = ROOT.topMenuHidden;
+//            self.bottomMenuHidden = ROOT.topMenuHidden;
 
             self.webView.scrollView.transform = CGAffineTransformIdentity;
 
             self.referencesContainerView.transform = CGAffineTransformIdentity;
 
-            self.bottomBarView.transform = CGAffineTransformIdentity;
+//            self.bottomBarView.transform = CGAffineTransformIdentity;
 
             self.tocViewLeadingConstraint.constant = 0;
 
@@ -473,11 +590,14 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
             self.footerContainer.userInteractionEnabled = YES;
 
-            WikiGlyphButton* tocButton = [ROOT.topMenuViewController getNavBarItem:NAVBAR_BUTTON_TOC];
-            [tocButton.label setWikiText:WIKIGLYPH_TOC_COLLAPSED
-                                   color:tocButton.label.color
-                                    size:tocButton.label.size
-                          baselineOffset:tocButton.label.baselineOffset];
+//            WikiGlyphButton* tocButton = [ROOT.topMenuViewController getNavBarItem:NAVBAR_BUTTON_TOC];
+//            [tocButton.label setWikiText:WIKIGLYPH_TOC_COLLAPSED
+//                                   color:tocButton.label.color
+//                                    size:tocButton.label.size
+//                          baselineOffset:tocButton.label.baselineOffset];
+
+            self.tocButtonItem.selected = NO;
+
 
             self.webViewBottomConstraint.constant = 0;
         }];
@@ -510,6 +630,8 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         return;
     }
 
+//    self.navigationController.hidesBarsOnSwipe = NO;
+
     self.footerContainer.userInteractionEnabled = NO;
 
     self.webViewBottomConstraint.constant = [self tocGetWebViewBottomConstraintConstant];
@@ -537,7 +659,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
         self.webView.scrollView.transform = xf;
         self.referencesContainerView.transform = xf;
-        self.bottomBarView.transform = xf;
+//        self.bottomBarView.transform = xf;
 
         CGFloat tocWidth = [self tocGetWidthForWebViewScale:webViewScale];
         self.tocViewLeadingConstraint.constant = -tocWidth;
@@ -545,12 +667,15 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         [self.view layoutIfNeeded];
     } completion:^(BOOL done) {
         self.unsafeToToggleTOC = NO;
-
+/*
         WikiGlyphButton* tocButton = [ROOT.topMenuViewController getNavBarItem:NAVBAR_BUTTON_TOC];
         [tocButton.label setWikiText:WIKIGLYPH_TOC_EXPANDED
                                color:tocButton.label.color
                                 size:tocButton.label.size
                       baselineOffset:tocButton.label.baselineOffset];
+ */
+
+        self.tocButtonItem.selected = YES;
     }];
 }
 
@@ -1198,18 +1323,38 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         if (fabs(distanceScrolled) < minPixelsScrolled) {
             return;
         }
-        [ROOT animateTopAndBottomMenuHidden:((distanceScrolled > 0) ? NO : YES)];
+        [self animateTopAndBottomMenuHidden:((distanceScrolled > 0) ? NO : YES)];
 
         [self referencesHide];
     }
 }
 
+- (void)animateTopAndBottomMenuHidden:(BOOL)hidden {
+    // Don't toggle if hidden state isn't different or if it's already toggling.
+    if ((self.navigationController.isNavigationBarHidden == hidden) || self.isAnimatingTopAndBottomMenuHidden) {
+        return;
+    }
+
+    self.isAnimatingTopAndBottomMenuHidden = YES;
+
+    // Queue it up so web view doesn't get blanked out.
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIView animateWithDuration:0.12f delay:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+            // Not using the animated variant intentionally!
+            [self.navigationController setNavigationBarHidden:hidden];
+            [self.navigationController setToolbarHidden:hidden];
+        } completion:^(BOOL done){
+            self.isAnimatingTopAndBottomMenuHidden = NO;
+        }];
+    }];
+}
+
 - (void)animateTopAndBottomMenuReveal {
     // Toggle the menus closed on tap (only if they were showing).
     if (![self tocDrawerIsOpen]) {
-        if (ROOT.topMenuViewController.navBarMode != NAVBAR_MODE_SEARCH) {
-            [ROOT animateTopAndBottomMenuHidden:NO];
-        }
+//        if (ROOT.topMenuViewController.navBarMode != NAVBAR_MODE_SEARCH) {
+        [self animateTopAndBottomMenuHidden:NO];
+//        }
     }
 }
 
@@ -1227,6 +1372,9 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+
+    //self.tocButtonItem.disabled = !self.tocButtonItem.disabled;
+    //self.tocButtonItem.disabledColor = [UIColor redColor];
 
     //[self downloadAssetsFilesIfNecessary];
 
@@ -1672,7 +1820,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 
     [self.bottomMenuViewController updateBottomBarButtonsEnabledState];
 
-    [ROOT.topMenuViewController updateTOCButtonVisibility];
+    [self updateTOCButtonVisibility];
 
     NSMutableArray* sectionTextArray = [[NSMutableArray alloc] init];
 
@@ -1763,7 +1911,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateProgress:0.85 animated:YES completion:NULL];
+//        [self updateProgress:0.85 animated:YES completion:NULL];
     });
 }
 
@@ -1869,6 +2017,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 }
 
 - (BOOL)refreshShouldShow {
+    return YES;
     return (![self tocDrawerIsOpen])
            &&
            (self.session.currentArticle != nil)
@@ -1890,6 +2039,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 }
 
 - (void)setBottomMenuHidden:(BOOL)bottomMenuHidden {
+    return;
     if (self.bottomMenuHidden == bottomMenuHidden) {
         return;
     }
@@ -1903,6 +2053,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 }
 
 - (void)constrainBottomMenu {
+    return;
     // If visible, constrain bottom of bottomNavBar to bottom of superview.
     // If hidden, constrain top of bottomNavBar to bottom of superview.
 
@@ -2007,7 +2158,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
         return;
     }
 
-    self.referencesVC = [self.navigationController.storyboard instantiateViewControllerWithIdentifier:@"ReferencesVC"];
+    self.referencesVC = [ReferencesVC initialViewControllerFromStoryBoard];
 
     self.referencesVC.webVC = self;
     [self addChildViewController:self.referencesVC];
@@ -2086,6 +2237,7 @@ static CGFloat const kScrollIndicatorMinYMargin = 4.0f;
 }
 
 - (void)_showProgressView {
+    return;
     self.progressView.alpha = 1.0;
 
     if (!self.progressView.superview) {

@@ -45,4 +45,6 @@ extern NSString* const WebViewControllerShareSelectedText;
 - (void)tocToggle;
 - (void)saveWebViewScrollOffset;
 
++ (WebViewController*)initialViewControllerFromStoryBoard;
+
 @end

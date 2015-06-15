@@ -3,7 +3,6 @@
 
 #import "AccountCreationViewController.h"
 #import "WikipediaAppUtils.h"
-#import "CenterNavController.h"
 #import "QueuesSingleton.h"
 #import "SessionSingleton.h"
 #import "UIViewController+Alert.h"
@@ -12,21 +11,15 @@
 #import "CaptchaResetter.h"
 #import "UIScrollView+ScrollSubviewToLocation.h"
 #import "LoginViewController.h"
-#import "WMF_Colors.h"
-#import "MenuButton.h"
-#import "PaddedLabel.h"
-#import "RootViewController.h"
-#import "TopMenuViewController.h"
 #import "PreviewAndSaveViewController.h"
 #import "OnboardingViewController.h"
-#import "ModalMenuAndContentViewController.h"
-#import "ModalContentViewController.h"
-#import "UIViewController+ModalPresent.h"
 #import "UIViewController+ModalsSearch.h"
-#import "UIViewController+ModalPop.h"
 #import "Defines.h"
 #import "UIView+Debugging.h"
 #import "NSObject+ConstraintsScale.h"
+#import "WMFBarButtonItem.h"
+#import <BlocksKit/BlocksKit+UIKit.h>
+#import "UIViewController+WMFChildViewController.h"
 
 @interface AccountCreationViewController ()
 
@@ -48,17 +41,21 @@
 
 @property (strong, nonatomic) LoginViewController* detachedloginVC;
 
+@property (strong, nonatomic) UIBarButtonItem* rightButton;
+
 @end
 
 @implementation AccountCreationViewController
 
-- (NavBarMode)navBarMode {
-    return NAVBAR_MODE_CREATE_ACCOUNT;
++ (AccountCreationViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFCreateAccount" bundle:nil] instantiateInitialViewController];
 }
 
-- (BOOL)prefersStatusBarHidden {
+/*
+   - (BOOL)prefersStatusBarHidden {
     return NAV.isEditorOnNavstack;
-}
+   }
+ */
 
 - (void)scrollViewDidScroll:(UIScrollView*)scrollView {
     // Disable horizontal scrolling.
@@ -96,6 +93,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        if (self.showCaptchaContainer) {
+            self.showCaptchaContainer = NO;
+        } else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
+
+    self.rightButton = [[UIBarButtonItem alloc] bk_initWithTitle:MWLocalizedString(@"button-next", nil) style:UIBarButtonItemStylePlain handler:^(id sender){
+        [self save];
+    }];
+    self.navigationItem.rightBarButtonItem = self.rightButton;
 
     self.titleLabel.font          = [UIFont boldSystemFontOfSize:23.0f * MENUS_SCALE_MULTIPLIER];
     self.usernameField.font       = [UIFont boldSystemFontOfSize:18.0f * MENUS_SCALE_MULTIPLIER];
@@ -162,9 +173,6 @@
 
     self.titleLabel.text = MWLocalizedString(@"navbar-title-mode-create-account", nil);
 
-    ((MenuButton*)[self.topMenuViewController getNavBarItem:NAVBAR_BUTTON_NEXT]).color = WMF_COLOR_GREEN;
-    ((MenuButton*)[self.topMenuViewController getNavBarItem:NAVBAR_BUTTON_DONE]).color = WMF_COLOR_GREEN;
-
     self.usernameField.textAlignment       = NSTextAlignmentNatural;
     self.passwordField.textAlignment       = NSTextAlignmentNatural;
     self.passwordRepeatField.textAlignment = NSTextAlignmentNatural;
@@ -175,9 +183,10 @@
 
 - (void)loginButtonPushed:(UITapGestureRecognizer*)recognizer {
     if (recognizer.state == UIGestureRecognizerStateEnded) {
-        [self performModalSequeWithID:@"modal_segue_show_login"
-                      transitionStyle:UIModalTransitionStyleCoverVertical
-                                block:nil];
+        UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:[LoginViewController initialViewControllerFromStoryBoard]];
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+            [self.presentingViewController presentViewController:nc animated:NO completion:nil];
+        }];
     }
 }
 
@@ -191,9 +200,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    self.showCaptchaContainer = NO;
+    self.captchaViewController = [CaptchaViewController initialViewControllerFromStoryBoard];
+    [self wmf_addChildController:self.captchaViewController andConstrainToEdgesOfContainerView:self.captchaContainer];
 
-    self.topMenuViewController.navBarMode = NAVBAR_MODE_CREATE_ACCOUNT;
+    self.showCaptchaContainer = NO;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(textFieldDidChange:)
@@ -205,9 +215,6 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-
-    // Listen for nav bar taps.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(navItemTappedNotification:) name:@"NavItemTapped" object:nil];
 
     [self.usernameField becomeFirstResponder];
 
@@ -252,8 +259,7 @@
 }
 
 - (void)setAllProgressiveButtonsEnabled:(BOOL)enabled {
-    ((MenuButton*)[self.topMenuViewController getNavBarItem:NAVBAR_BUTTON_DONE]).enabled = enabled;
-    ((MenuButton*)[self.topMenuViewController getNavBarItem:NAVBAR_BUTTON_NEXT]).enabled = enabled;
+    self.navigationItem.rightBarButtonItem.enabled = enabled;
 }
 
 - (void)prepopulateTextFieldsForDebugging {
@@ -266,8 +272,6 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NavItemTapped" object:nil];
-
     [self setAllProgressiveButtonsEnabled:NO];
 
     [self fadeAlert];
@@ -279,16 +283,10 @@
     [super viewWillDisappear:animated];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue*)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"AccountCreation_Captcha_Embed"]) {
-        self.captchaViewController = (CaptchaViewController*)[segue destinationViewController];
-    }
-}
-
 - (void)setShowCaptchaContainer:(BOOL)showCaptchaContainer {
     _showCaptchaContainer = showCaptchaContainer;
 
-    self.topMenuViewController.navBarMode = showCaptchaContainer ? NAVBAR_MODE_CREATE_ACCOUNT_CAPTCHA : NAVBAR_MODE_CREATE_ACCOUNT;
+    self.rightButton.title = showCaptchaContainer ? MWLocalizedString(@"button-done", nil) : MWLocalizedString(@"button-next", nil);
 
     CGFloat duration = 0.5;
 
@@ -366,31 +364,6 @@
                                              thenNotifyDelegate:self];
 }
 
-// Handle nav bar taps.
-- (void)navItemTappedNotification:(NSNotification*)notification {
-    NSDictionary* userInfo = [notification userInfo];
-    UIView* tappedItem     = userInfo[@"tappedItem"];
-
-    switch (tappedItem.tag) {
-        case NAVBAR_BUTTON_NEXT:
-        case NAVBAR_BUTTON_DONE:
-            [self save];
-            break;
-        case NAVBAR_BUTTON_X:
-        case NAVBAR_BUTTON_ARROW_LEFT:
-        {
-            if (self.showCaptchaContainer) {
-                self.showCaptchaContainer = NO;
-            } else {
-                [self popModal];
-            }
-        }
-        break;
-        default:
-            break;
-    }
-}
-
 - (void)login {
     // Create detached loginVC just for logging in.
     self.detachedloginVC = [[LoginViewController alloc] init];
@@ -406,13 +379,17 @@
         id onboardingVC = [self searchModalsForViewControllerOfClass:[OnboardingViewController class]];
 
         if (onboardingVC) {
-            [self popModalToRoot];
+            [onboardingVC dismissViewControllerAnimated:YES completion:nil];
         } else {
-            [self.truePresentingVC popModal];
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         }
     } onFail:^(){
-        [self performSelector:@selector(popModal) withObject:nil afterDelay:0.5f];
+        [self performSelector:@selector(dismissSelf) withObject:nil afterDelay:0.5f];
     }];
+}
+
+- (void)dismissSelf {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)fetchFinished:(id)sender

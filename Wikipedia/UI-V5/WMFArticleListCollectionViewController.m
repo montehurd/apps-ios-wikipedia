@@ -79,12 +79,33 @@
     [super viewDidAppear:animated];
     [self verticalOverlapLayout].itemSize = CGSizeMake(self.view.bounds.size.width, 200);
 
-    WebViewController* vc = [[WebViewController alloc] init];
 
+
+
+
+
+
+
+
+/*
+    go into view did load
+    and try adding uibar button items to top and bottom toolbar (self.navigationItem.leftBarButtonItems self.navigationItem.rightBarButtonItems)
+    "self.toolbarItems" is what's in the bottom bar
+    to show bottom toolbar self.navigationController.toolbarHidden = NO;
+
+
+   -make a new enum for the web view modes
+   -punt on search, not going to be in WebVC
+ */
+    WebViewController* vc      = [WebViewController initialViewControllerFromStoryBoard];
     UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nc animated:YES completion:^{
-        [vc navigateToPage:[self articleForIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]].title discoveryMethod:MWKHistoryDiscoveryMethodLink];
+        [vc navigateToPage:[self articleForIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]].title discoveryMethod:MWKHistoryDiscoveryMethodLink];
     }];
+}
+
+- (void)didReceiveMemoryWarning {
+    //[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewDidLayoutSubviews {

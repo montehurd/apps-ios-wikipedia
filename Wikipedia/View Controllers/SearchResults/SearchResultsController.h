@@ -41,4 +41,6 @@
 - (void)saveSearchTermToRecentList;
 - (void)doneTapped;
 
++ (SearchResultsController*)initialViewControllerFromStoryBoard;
+
 @end

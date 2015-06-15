@@ -10,4 +10,6 @@
 
 @property (weak, nonatomic) id truePresentingVC;
 
++ (SecondaryMenuViewController*)initialViewControllerFromStoryBoard;
+
 @end

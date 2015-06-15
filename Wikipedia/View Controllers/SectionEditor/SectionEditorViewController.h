@@ -14,4 +14,6 @@
 @property (strong, nonatomic) EditFunnel* funnel;
 @property (strong, nonatomic) SavedPagesFunnel* savedPagesFunnel;
 
++ (SectionEditorViewController*)initialViewControllerFromStoryBoard;
+
 @end

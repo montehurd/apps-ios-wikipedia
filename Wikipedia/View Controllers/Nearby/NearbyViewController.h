@@ -4,12 +4,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import "PullToRefreshViewController.h"
-#import "TopMenuViewController.h"
-#import "FetcherBase.h"
 
 @interface NearbyViewController : PullToRefreshViewController <UICollectionViewDataSource, UICollectionViewDelegate, CLLocationManagerDelegate, UIActionSheetDelegate, FetchFinishedDelegate>
 
-@property (nonatomic) NavBarMode navBarMode;
-@property (weak, nonatomic) id truePresentingVC;
++ (NearbyViewController*)initialViewControllerFromStoryBoard;
 
 @end

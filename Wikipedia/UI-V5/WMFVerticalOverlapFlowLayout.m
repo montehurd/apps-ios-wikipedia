@@ -51,25 +51,24 @@
 
 - (void)prepareLayout {
     [super prepareLayout];
-    
-    if(!self.deletePanGesture){
-        
-        self.deletePanGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPanWithGesture:)];
+
+    if (!self.deletePanGesture) {
+        self.deletePanGesture                        = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(didPanWithGesture:)];
         self.deletePanGesture.maximumNumberOfTouches = 1;
-        self.deletePanGesture.delegate = self;
+        self.deletePanGesture.delegate               = self;
         [self.collectionView addGestureRecognizer:self.deletePanGesture];
         [self.collectionView.panGestureRecognizer requireGestureRecognizerToFail:self.deletePanGesture];
     }
-    
+
 
     NSUInteger count = [self.collectionView.dataSource collectionView:self.collectionView numberOfItemsInSection:0];
     self.itemCount = count;
-    
+
     CGSize s = [super collectionViewContentSize];
     s.width = self.itemSize.width;
-    
-    UICollectionViewLayoutAttributes* lastItem = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:count-1 inSection:0]];
-    s.height = CGRectGetMaxY(lastItem.frame);
+
+    UICollectionViewLayoutAttributes* lastItem = [self layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:count - 1 inSection:0]];
+    s.height            = CGRectGetMaxY(lastItem.frame);
     self.calculatedSize = s;
 }
 
@@ -85,13 +84,12 @@
 }
 
 - (NSArray*)layoutAttributesForElementsInRect:(CGRect)rect {
-
     CGSize contentSize = [super collectionViewContentSize];
-    NSArray* items = [super layoutAttributesForElementsInRect:CGRectMake(0, 0, contentSize.width, contentSize.height)];
+    NSArray* items     = [super layoutAttributesForElementsInRect:CGRectMake(0, 0, contentSize.width, contentSize.height)];
 
     [items enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes* item, NSUInteger idx, BOOL* stop) {
         [self updateAttributesWithOverlapSpacing:item];
-        if([self.panningIndexPath isEqual:item.indexPath]){
+        if ([self.panningIndexPath isEqual:item.indexPath]) {
             [self updateAttibutesWithPanTranslation:item];
         }
     }];
@@ -100,169 +98,145 @@
 }
 
 - (UICollectionViewLayoutAttributes*)layoutAttributesForItemAtIndexPath:(NSIndexPath*)indexPath {
-    
     UICollectionViewLayoutAttributes* item = [super layoutAttributesForItemAtIndexPath:indexPath];
     [self updateAttributesWithOverlapSpacing:item];
-    if([self.panningIndexPath isEqual:indexPath]){
+    if ([self.panningIndexPath isEqual:indexPath]) {
         [self updateAttibutesWithPanTranslation:item];
     }
 
     return item;
 }
 
-
-- (UICollectionViewLayoutAttributes *)finalLayoutAttributesForDisappearingItemAtIndexPath:(NSIndexPath *)itemIndexPath{
-    
+- (UICollectionViewLayoutAttributes*)finalLayoutAttributesForDisappearingItemAtIndexPath:(NSIndexPath*)itemIndexPath {
     UICollectionViewLayoutAttributes* item = [self layoutAttributesForItemAtIndexPath:itemIndexPath];
     [self updateAttibutesForDeletion:item];
     return item;
 }
 
-
 #pragma mark - Update Attributes
 
 - (void)updateAttributesWithOverlapSpacing:(UICollectionViewLayoutAttributes*)item {
-    
     CGFloat yAdjustment = self.itemSize.height - self.overlapSpacing;
 
     CGRect frame = item.frame;
     frame.origin.y -= (yAdjustment * (item.indexPath.row));
     item.zIndex     = item.indexPath.row;
-    item.frame = frame;
+    item.frame      = frame;
 }
 
-- (void)updateAttibutesWithPanTranslation:(UICollectionViewLayoutAttributes*)item{
-    
+- (void)updateAttibutesWithPanTranslation:(UICollectionViewLayoutAttributes*)item {
     CGPoint translation = [self.deletePanGesture translationInView:self.collectionView];
-    
+
     CGRect frame = item.frame;
     frame.origin.x += translation.x;
-    item.frame = frame;
+    item.frame      = frame;
 }
 
-- (void)updateAttibutesForDeletion:(UICollectionViewLayoutAttributes*)item{
-    
+- (void)updateAttibutesForDeletion:(UICollectionViewLayoutAttributes*)item {
     CGRect frame = item.frame;
-    frame.origin.x += self.collectionView.bounds.size.width*2;
-    item.frame = frame;
+    frame.origin.x += self.collectionView.bounds.size.width * 2;
+    item.frame      = frame;
 }
-
 
 #pragma mark - UIGestureRecognizer
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
-    
-    if(![gestureRecognizer isEqual:self.deletePanGesture]){
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer*)gestureRecognizer {
+    if (![gestureRecognizer isEqual:self.deletePanGesture]) {
         return YES;
     }
-    
-    CGPoint attachmentPoint = [gestureRecognizer locationInView:self.collectionView];
+
+    CGPoint attachmentPoint       = [gestureRecognizer locationInView:self.collectionView];
     NSIndexPath* touchedIndexPath = [self.collectionView indexPathForItemAtPoint:attachmentPoint];
-    
-    if(!touchedIndexPath){
+
+    if (!touchedIndexPath) {
         return NO;
     }
-    
-    if(![self.delegate layout:self canDeleteItemAtIndexPath:touchedIndexPath]){
+
+    if (![self.delegate layout:self canDeleteItemAtIndexPath:touchedIndexPath]) {
         return NO;
     }
-    
+
     CGPoint velocity = [(UIPanGestureRecognizer*)gestureRecognizer velocityInView:self.collectionView];
-    if(velocity.y > 0 || velocity.y < 0){
+    if (velocity.y > 0 || velocity.y < 0) {
         return NO;
     }
-    
+
     return YES;
 }
 
-- (void)didPanWithGesture:(UIPanGestureRecognizer*)pan{
-    
+- (void)didPanWithGesture:(UIPanGestureRecognizer*)pan {
     switch (pan.state) {
         case UIGestureRecognizerStateBegan:
         {
-            
             CGPoint attachmentPoint = [pan locationInView:self.collectionView];
 
             NSIndexPath* touchedIndexPath = [self.collectionView indexPathForItemAtPoint:attachmentPoint];
-            if(!touchedIndexPath){
+            if (!touchedIndexPath) {
                 [self cancelTouchesInGestureRecognizer:pan];
                 return;
             }
-            
+
             UICollectionViewLayoutAttributes* attributes = [self layoutAttributesForItemAtIndexPath:touchedIndexPath];
-            
-            if(!attributes){
+
+            if (!attributes) {
                 [self cancelTouchesInGestureRecognizer:pan];
                 return;
             }
-            
+
             self.panningIndexPath = touchedIndexPath;
             [self invalidateLayout];
-            
         }
-            break;
-            
+        break;
+
         case UIGestureRecognizerStateChanged:
         {
             [self invalidateLayout];
         }
-            break;
-            
+        break;
+
         case UIGestureRecognizerStateEnded:
         case UIGestureRecognizerStateCancelled:
         {
-            
             CGPoint translation = [pan translationInView:self.collectionView];
-            CGFloat originalX = [super layoutAttributesForItemAtIndexPath:self.panningIndexPath].frame.origin.x;
-            
-            if(translation.x >= (originalX + self.collectionView.bounds.size.width/2)){
+            CGFloat originalX   = [super layoutAttributesForItemAtIndexPath:self.panningIndexPath].frame.origin.x;
+
+            if (translation.x >= (originalX + self.collectionView.bounds.size.width / 2)) {
                 [self completeDeletionPanAnimation];
                 return;
             }
-            
+
             CGPoint velocity = [pan velocityInView:self.collectionView];
-            if(velocity.x > 500){
+            if (velocity.x > 500) {
                 [self completeDeletionPanAnimation];
                 return;
             }
-            
+
             [self cancelDeletionPanAnimation];
-            
         }
-            break;
-            
+        break;
+
         default:
             break;
     }
 }
 
-- (void)cancelTouchesInGestureRecognizer:(UIGestureRecognizer*)gesture{
+- (void)cancelTouchesInGestureRecognizer:(UIGestureRecognizer*)gesture {
     gesture.enabled = NO;
     gesture.enabled = YES;
 }
 
-- (void)completeDeletionPanAnimation{
-
+- (void)completeDeletionPanAnimation {
     NSIndexPath* indexpath = self.panningIndexPath;
     self.panningIndexPath = nil;
     [self.delegate layout:self didDeleteItemAtIndexPath:indexpath];
 }
 
-- (void)cancelDeletionPanAnimation{
-    
+- (void)cancelDeletionPanAnimation {
     self.panningIndexPath = nil;
-    
-    [self.collectionView performBatchUpdates:^{
-        
-        [self invalidateLayout];
 
+    [self.collectionView performBatchUpdates:^{
+        [self invalidateLayout];
     } completion:nil];
 }
-
-
-
-
-
-
 
 @end

@@ -25,6 +25,7 @@
 #import <HockeySDK/HockeySDK.h>
 #import "UIFont+WMFStyle.h"
 #import "NSBundle+WMFInfoUtils.h"
+#import "WMFBarButtonItem.h"
 
 #pragma mark - Defines
 
@@ -81,6 +82,10 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
 
 @implementation SecondaryMenuViewController
 
++ (SecondaryMenuViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFSecondaryMenu" bundle:nil] instantiateInitialViewController];
+}
+
 - (NavBarMode)navBarMode {
     return NAVBAR_MODE_X_WITH_LABEL;
 }
@@ -116,6 +121,11 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
 
     self.highlightedTextAttributes = @{ NSFontAttributeName: [UIFont italicSystemFontOfSize:MENU_TITLE_FONT_SIZE] };
 

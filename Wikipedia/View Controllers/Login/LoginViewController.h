@@ -17,7 +17,6 @@
 
 @property (strong, nonatomic) LoginFunnel* funnel;
 
-@property (weak, nonatomic) id truePresentingVC;
-@property (weak, nonatomic) TopMenuViewController* topMenuViewController;
++ (LoginViewController*)initialViewControllerFromStoryBoard;
 
 @end
