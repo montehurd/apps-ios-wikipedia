@@ -8,16 +8,16 @@
 #import "QueuesSingleton.h"
 #import "PaddedLabel.h"
 #import "WikipediaAppUtils.h"
-#import "UIViewController+ModalPop.h"
 #import "SessionSingleton.h"
-#import "RootViewController.h"
-#import "CenterNavController.h"
 #import "UIViewController+Alert.h"
 #import "NSString+Extras.h"
 #import <MapKit/MapKit.h>
 #import "Defines.h"
 #import "NSString+Extras.h"
 #import "UICollectionViewCell+DynamicCellHeight.h"
+#import "WMFBarButtonItem.h"
+#import "WebViewController.h"
+#import "UIViewController+ModalsSearch.h"
 
 #define TABLE_CELL_ID @"NearbyResultCollectionCell"
 
@@ -76,15 +76,16 @@
 
 @implementation NearbyViewController
 
-- (void)collectionView:(UICollectionView*)collectionView didSelectItemAtIndexPath:(NSIndexPath*)indexPath {
-    NSDictionary* rowData = [self getRowDataForIndexPath:indexPath];
-    NSString* title       = rowData[@"title"];
-    [NAV loadArticleWithTitle:[[SessionSingleton sharedInstance].searchSite titleWithString:title]
-                     animated:YES
-              discoveryMethod:MWKHistoryDiscoveryMethodSearch
-                   popToWebVC:NO];
++ (NearbyViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFNearby" bundle:nil] instantiateInitialViewController];
+}
 
-    [self popModalToRoot];
+- (void)collectionView:(UICollectionView*)collectionView didSelectItemAtIndexPath:(NSIndexPath*)indexPath {
+    NSDictionary* rowData    = [self getRowDataForIndexPath:indexPath];
+    WebViewController* webVC = [self searchModalsForViewControllerOfClass:[WebViewController class]];
+    [webVC navigateToPage:[[SessionSingleton sharedInstance].searchSite titleWithString:rowData[@"title"]]
+          discoveryMethod:MWKHistoryDiscoveryMethodSearch];
+    [webVC.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (instancetype)initWithCoder:(NSCoder*)coder {
@@ -117,22 +118,6 @@
     return self;
 }
 
-// Handle nav bar taps. (same way as any other view controller would)
-- (void)navItemTappedNotification:(NSNotification*)notification {
-    NSDictionary* userInfo = [notification userInfo];
-    UIView* tappedItem     = userInfo[@"tappedItem"];
-
-    switch (tappedItem.tag) {
-        case NAVBAR_BUTTON_X:
-        case NAVBAR_LABEL:
-            [self popModal];
-
-            break;
-        default:
-            break;
-    }
-}
-
 - (BOOL)prefersStatusBarHidden {
     return NO;
 }
@@ -147,24 +132,6 @@
     [[QueuesSingleton sharedInstance].nearbyFetchManager.operationQueue cancelAllOperations];
 
     [super viewWillDisappear:animated];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"NavItemTapped"
-                                                  object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    // Listen for nav bar taps.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(navItemTappedNotification:)
-                                                 name:@"NavItemTapped"
-                                               object:nil];
-}
-
-- (NavBarMode)navBarMode {
-    return NAVBAR_MODE_X_WITH_LABEL;
 }
 
 - (NSString*)title {
@@ -365,6 +332,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
+
     self.locationManager.delegate = self;
 
     self.locationManager.headingFilter  = 1.5;
@@ -376,11 +348,6 @@
     if (self.headingAvailable) {
         [self.locationManager startUpdatingHeading];
     }
-
-    UICollectionViewFlowLayout* layout =
-        (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
-    CGFloat topAndBottomMargin = 19.0f * MENUS_SCALE_MULTIPLIER;
-    layout.sectionInset = UIEdgeInsetsMake(topAndBottomMargin, 0, topAndBottomMargin, 0);
 
     [self.collectionView registerNib:[UINib nibWithNibName:TABLE_CELL_ID bundle:nil] forCellWithReuseIdentifier:TABLE_CELL_ID];
 

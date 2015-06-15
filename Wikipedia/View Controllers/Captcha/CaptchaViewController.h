@@ -17,4 +17,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView* captchaImageView;
 @property (weak, nonatomic) IBOutlet UITextField* captchaTextBox;
 
++ (CaptchaViewController*)initialViewControllerFromStoryBoard;
+
 @end

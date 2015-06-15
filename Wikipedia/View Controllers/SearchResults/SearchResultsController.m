@@ -80,8 +80,12 @@ static NSUInteger const kWMFReadMoreNumberOfArticles           = 3;
 
 @implementation SearchResultsController
 
++ (SearchResultsController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFSearchResults" bundle:nil] instantiateInitialViewController];
+}
+
 + (SearchResultsController*)standardSearchResultsController {
-    SearchResultsController* vc = [ROOT.storyboard instantiateViewControllerWithIdentifier:@"SearchResultsController"];
+    SearchResultsController* vc = [SearchResultsController initialViewControllerFromStoryBoard];
     vc.type                                  = WMFSearchResultsControllerTypeStandard;
     vc.maxResults                            = SEARCH_MAX_RESULTS;
     vc.minResultsBeforeRunningFullTextSearch = kWMFMinResultsBeforeAutoFullTextSearch;

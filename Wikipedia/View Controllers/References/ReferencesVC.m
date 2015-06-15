@@ -40,6 +40,10 @@
 
 @implementation ReferencesVC
 
++ (ReferencesVC*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFReferences" bundle:nil] instantiateInitialViewController];
+}
+
 - (void)reset {
     // Load a fake blank set of data.
     self.payload = @{

@@ -9,6 +9,8 @@
 #import "TGLStackedLayout.h"
 #import "WMFArticleCardTranstion.h"
 
+#import "WebViewController.h"
+
 @interface WMFArticleListCollectionViewController ()<TGLStackedLayoutDelegate>
 
 @property (nonatomic, assign, readwrite) WMFArticleListType listType;
@@ -69,8 +71,6 @@
 
     self.title = [self titleForListType:self.listType];
 
-    self.transitioningDelegate = self;
-
     self.stackedLayout.fillHeight   = YES;
     self.stackedLayout.alwaysBounce = YES;
     self.stackedLayout.delegate     = self;
@@ -83,6 +83,22 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self updateCellSizeBasedOnViewFrame];
+
+
+
+
+
+
+
+
+
+
+    WebViewController* vc      = [WebViewController initialViewControllerFromStoryBoard];
+    UINavigationController* nc = [[UINavigationController alloc] initWithRootViewController:vc];
+    [self presentViewController:nc animated:YES completion:^{
+//        [vc navigateToPage:[self articleForIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]].title
+//           discoveryMethod:MWKHistoryDiscoveryMethodLink];
+    }];
 }
 
 - (void)viewDidLayoutSubviews {

@@ -16,4 +16,6 @@
 
 - (void)reset;
 
++ (ReferencesVC*)initialViewControllerFromStoryBoard;
+
 @end

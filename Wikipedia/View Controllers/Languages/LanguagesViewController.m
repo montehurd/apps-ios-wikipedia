@@ -10,12 +10,12 @@
 #import "Defines.h"
 #import "WMFAssetsFile.h"
 #import "UIViewController+Alert.h"
-#import "UIViewController+ModalPop.h"
 #import "UIView+ConstraintsScale.h"
 #import "NSString+Extras.h"
 #import "LanguagesSectionHeaderView.h"
 #import "UIView+WMFDefaultNib.h"
 #import "LanguagesTableSectionViewModel.h"
+#import "WMFBarButtonItem.h"
 
 #import <BlocksKit/BlocksKit.h>
 #import <Masonry/Masonry.h>
@@ -31,11 +31,15 @@
 @property (copy, nonatomic) NSArray* sections;
 
 @property (strong, nonatomic) NSString* filterString;
-@property (strong, nonatomic) UITextField* filterTextField;
+@property (strong, nonatomic) IBOutlet UITextField* filterTextField;
 
 @end
 
 @implementation LanguagesViewController
+
++ (LanguagesViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFLanguages" bundle:nil] instantiateInitialViewController];
+}
 
 - (instancetype)initWithCoder:(NSCoder*)coder {
     self = [super initWithCoder:coder];
@@ -45,24 +49,29 @@
     return self;
 }
 
-- (NavBarMode)navBarMode {
-    return NAVBAR_MODE_X_WITH_TEXT_FIELD;
-}
-
 - (NSString*)title {
-    return MWLocalizedString(@"article-languages-filter-placeholder", nil);
+    return MWLocalizedString(@"article-languages-label", nil);
 }
 
 #pragma mark - View lifecycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
+
     [self.tableView registerClass:[LanguagesSectionHeaderView class]
      forHeaderFooterViewReuseIdentifier:[LanguagesSectionHeaderView wmf_nibName]];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor     = [UIColor whiteColor];
-//    self.tableView.contentInset   = UIEdgeInsetsMake(15.0 * MENUS_SCALE_MULTIPLIER, 0, 0, 0);
-    self.filterString = @"";
+    self.filterString             = @"";
+
+    self.filterTextField.font        = SEARCH_TEXT_FIELD_FONT;
+    self.filterTextField.textColor   = SEARCH_TEXT_FIELD_HIGHLIGHTED_COLOR;
+    self.filterTextField.placeholder = MWLocalizedString(@"article-languages-filter-placeholder", nil);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -81,62 +90,18 @@
     [self.filterTextField resignFirstResponder];
 
     [[QueuesSingleton sharedInstance].languageLinksFetcher.operationQueue cancelAllOperations];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"NavItemTapped"
-                                                  object:nil];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"NavTextFieldTextChanged"
-                                                  object:nil];
-
     [super viewWillDisappear:animated];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    // Listen for nav bar taps.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(navItemTappedNotification:)
-                                                 name:@"NavItemTapped"
-                                               object:nil];
-
-    // Listen for nav text field text changes.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(navTextFieldTextChangedNotification:)
-                                                 name:@"NavTextFieldTextChanged"
-                                               object:nil];
-}
-
 #pragma mark - Top menu
-
-// Handle nav bar taps. (same way as any other view controller would)
-- (void)navItemTappedNotification:(NSNotification*)notification {
-    NSDictionary* userInfo = [notification userInfo];
-    UIView* tappedItem     = userInfo[@"tappedItem"];
-
-    switch (tappedItem.tag) {
-        case NAVBAR_BUTTON_X:
-            [self popModal];
-
-            break;
-
-        default:
-            break;
-    }
-}
 
 - (BOOL)prefersStatusBarHidden {
     return NO;
 }
 
 // Handle nav bar taps. (same way as any other view controller would)
-- (void)navTextFieldTextChangedNotification:(NSNotification*)notification {
-    NSDictionary* userInfo = [notification userInfo];
-    NSString* text         = userInfo[@"text"];
-
-    self.filterString = text;
+- (IBAction)navTextFieldTextChangedNotification {
+    self.filterString = self.filterTextField.text;
     [self reloadTableDataFiltered];
 }
 

@@ -25,6 +25,9 @@
 #import <HockeySDK/HockeySDK.h>
 #import "UIFont+WMFStyle.h"
 #import "NSBundle+WMFInfoUtils.h"
+#import "WMFBarButtonItem.h"
+#import "WebViewController.h"
+#import "UIViewController+ModalsSearch.h"
 
 #pragma mark - Defines
 
@@ -81,6 +84,10 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
 
 @implementation SecondaryMenuViewController
 
++ (SecondaryMenuViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFSecondaryMenu" bundle:nil] instantiateInitialViewController];
+}
+
 - (NavBarMode)navBarMode {
     return NAVBAR_MODE_X_WITH_LABEL;
 }
@@ -116,6 +123,11 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
 
     self.highlightedTextAttributes = @{ NSFontAttributeName: [UIFont italicSystemFontOfSize:MENU_TITLE_FONT_SIZE] };
 
@@ -650,19 +662,22 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
 }
 
 - (void)showLanguages {
-    [self performModalSequeWithID:@"modal_segue_show_languages"
-                  transitionStyle:UIModalTransitionStyleCoverVertical
-                            block:^(LanguagesViewController* languagesVC) {
-        languagesVC.languageSelectionDelegate = self;
-    }];
+    LanguagesViewController* languagesVC = [LanguagesViewController initialViewControllerFromStoryBoard];
+    languagesVC.languageSelectionDelegate = self;
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:languagesVC] animated:YES completion:nil];
 }
 
 - (void)languageSelected:(NSDictionary*)langData sender:(LanguagesViewController*)sender {
     [self showAlert:MWLocalizedString(@"main-menu-language-selection-saved", nil) type:ALERT_TYPE_TOP duration:1];
 
-    [NAV switchPreferredLanguageToId:langData[@"code"]];
+    [self switchPreferredLanguageToId:langData[@"code"]];
 
-    [self popModalToRoot];
+    [self.presentingViewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)switchPreferredLanguageToId:(NSString*)languageId {
+    [[SessionSingleton sharedInstance] setSearchLanguage:languageId];
+    [[self searchModalsForViewControllerOfClass:[WebViewController class]] loadTodaysArticle];
 }
 
 #pragma mark - Animation

@@ -14,6 +14,10 @@
 
 @implementation CaptchaViewController
 
++ (CaptchaViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFCaptcha" bundle:nil] instantiateInitialViewController];
+}
+
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }

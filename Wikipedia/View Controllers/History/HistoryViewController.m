@@ -7,20 +7,15 @@
 #import "WebViewController.h"
 #import "HistoryResultCell.h"
 #import "Defines.h"
-#import "CenterNavController.h"
 #import "NSString+Extras.h"
 #import "WikiGlyph_Chars.h"
-#import "TopMenuContainerView.h"
-#import "TopMenuViewController.h"
-#import "UIViewController+StatusBarHeight.h"
-#import "UIViewController+ModalPop.h"
 #import "PaddedLabel.h"
-#import "MenuButton.h"
-#import "TopMenuViewController.h"
 #import "DataHousekeeping.h"
 #import "NSObject+ConstraintsScale.h"
 #import "SessionSingleton.h"
 #import "UIFont+WMFStyle.h"
+#import "WMFBarButtonItem.h"
+#import "UIViewController+ModalsSearch.h"
 
 #define HISTORY_RESULT_HEIGHT (80.0 * MENUS_SCALE_MULTIPLIER)
 #define HISTORY_TEXT_COLOR [UIColor colorWithWhite:0.0f alpha:0.7f]
@@ -47,12 +42,14 @@
 
 @property (strong, nonatomic) UIImage* placeholderThumbnailImage;
 
+@property (strong, nonatomic) WMFBarButtonItem* deleteButtonItem;
+
 @end
 
 @implementation HistoryViewController
 
-- (NavBarMode)navBarMode {
-    return NAVBAR_MODE_PAGES_HISTORY;
++ (HistoryViewController*)initialViewControllerFromStoryBoard {
+    return [[UIStoryboard storyboardWithName:@"WMFHistory" bundle:nil] instantiateInitialViewController];
 }
 
 - (NSString*)title {
@@ -68,25 +65,6 @@
 
 #pragma mark - Top menu
 
-// Handle nav bar taps. (same way as any other view controller would)
-- (void)navItemTappedNotification:(NSNotification*)notification {
-    NSDictionary* userInfo = [notification userInfo];
-    UIView* tappedItem     = userInfo[@"tappedItem"];
-
-    switch (tappedItem.tag) {
-        case NAVBAR_BUTTON_X:
-        case NAVBAR_LABEL:
-            [self popModal];
-
-            break;
-        case NAVBAR_BUTTON_TRASH:
-            [self showDeleteAllDialog];
-            break;
-        default:
-            break;
-    }
-}
-
 - (BOOL)prefersStatusBarHidden {
     return NO;
 }
@@ -95,25 +73,27 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"NavItemTapped"
-                                                  object:nil];
     self.tableView.editing = NO;
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    // Listen for nav bar taps.
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(navItemTappedNotification:)
-                                                 name:@"NavItemTapped"
-                                               object:nil];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+
+    WMFBarButtonItem* xButton = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_X handler:^(id sender){
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    self.navigationItem.leftBarButtonItems = @[xButton];
+
+
+
+    self.deleteButtonItem = [[WMFBarButtonItem alloc] initBarButtonOfType:WMF_BUTTON_TRASH
+                                                                  handler:^(id sender){
+        [self showDeleteAllDialog];
+    }];
+    self.navigationItem.rightBarButtonItems = @[self.deleteButtonItem];
+
+
 
     self.dateFormatter = [[NSDateFormatter alloc] init];
     [self.dateFormatter setLocale:[NSLocale currentLocale]];
@@ -251,7 +231,7 @@
     DataHousekeeping* dataHouseKeeping = [[DataHousekeeping alloc] init];
     [dataHouseKeeping performHouseKeeping];
 
-    [NAV loadTodaysArticle];
+    [[self searchModalsForViewControllerOfClass:[WebViewController class]] loadTodaysArticle];
 }
 
 #pragma mark - History section titles
@@ -362,12 +342,10 @@
     NSArray* array                = dict[@"data"];
     MWKHistoryEntry* historyEntry = array[indexPath.row];
 
-    [NAV loadArticleWithTitle:historyEntry.title
-                     animated:YES
-              discoveryMethod:MWKHistoryDiscoveryMethodBackForward
-                   popToWebVC:NO];
-
-    [self popModalToRoot];
+    WebViewController* webVC = [self searchModalsForViewControllerOfClass:[WebViewController class]];
+    [webVC navigateToPage:historyEntry.title
+          discoveryMethod:historyEntry.discoveryMethod];
+    [webVC.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (CGFloat)tableView:(UITableView*)tableView heightForRowAtIndexPath:(NSIndexPath*)indexPath {
@@ -458,8 +436,6 @@
     // Remove any orphaned images.
     DataHousekeeping* dataHouseKeeping = [[DataHousekeeping alloc] init];
     [dataHouseKeeping performHouseKeeping];
-
-    [NAV loadTodaysArticle];
 }
 
 #pragma mark - Discovery method icons
@@ -504,7 +480,7 @@
 
     [self setEmptyOverlayAndTrashIconVisibility];
 
-    [NAV loadTodaysArticle];
+    [[self searchModalsForViewControllerOfClass:[WebViewController class]] loadTodaysArticle];
 }
 
 - (void)setEmptyOverlayAndTrashIconVisibility {
@@ -512,8 +488,7 @@
 
     self.emptyOverlay.hidden = historyItemFound;
 
-    MenuButton* trashButton = (MenuButton*)[self.topMenuViewController getNavBarItem:NAVBAR_BUTTON_TRASH];
-    trashButton.alpha = historyItemFound ? 1.0 : 0.0;
+    self.deleteButtonItem.disabled = !historyItemFound;
 }
 
 - (void)alertView:(UIAlertView*)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {

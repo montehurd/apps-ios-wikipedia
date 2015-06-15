@@ -12,9 +12,6 @@
 #import "TopMenuViewController.h"
 #import "TopMenuContainerView.h"
 #import "QueuesSingleton.h"
-#import "RandomArticleFetcher.h"
-#import "MWKSiteInfo.h"
-#import "MWKSiteInfoFetcher.h"
 #import "UIViewController+ModalPresent.h"
 #import "LanguagesViewController.h"
 #import "UIViewController+ModalPop.h"
@@ -22,31 +19,10 @@
 #import "QueuesSingleton.h"
 
 @interface CenterNavController ()
-<LanguageSelectionDelegate>
 @property (strong, nonatomic) NSString* wikipediaZeroLearnMoreExternalUrl;
-
-@property (readonly, strong, nonatomic) MWKSiteInfoFetcher* siteInfoFetcher;
-
 @end
 
 @implementation CenterNavController
-@synthesize siteInfoFetcher = _siteInfoFetcher;
-
-- (MWKSiteInfoFetcher*)siteInfoFetcher {
-    if (!_siteInfoFetcher) {
-        _siteInfoFetcher = [MWKSiteInfoFetcher new];
-        /*
-           HAX: Force this particular site info fetcher to share the article operation queue. This allows for the
-           cancellation of site info requests when going to the main page, e.g. when clicking a link after clicking
-           "Today" in the main menu.
-
-           This is done here and not for all site info fetchers to prevent unintended side effects.
-         */
-        _siteInfoFetcher.requestManager.operationQueue =
-            [[[QueuesSingleton sharedInstance] articleFetchManager] operationQueue];
-    }
-    return _siteInfoFetcher;
-}
 
 #pragma mark View lifecycle
 
@@ -159,80 +135,6 @@
         NSURL* url = [NSURL URLWithString:self.wikipediaZeroLearnMoreExternalUrl];
         [[UIApplication sharedApplication] openURL:url];
     }
-}
-
-- (BOOL)isTopViewControllerAWebviewController {
-    return [[self topViewController] isMemberOfClass:[WebViewController class]];
-}
-
-- (void)loadTodaysArticle {
-    [self.siteInfoFetcher fetchInfoForSite:[[SessionSingleton sharedInstance] searchSite]
-                                   success:^(MWKSiteInfo* siteInfo) {
-        [self loadArticleWithTitle:siteInfo.mainPageTitle
-                          animated:YES
-                   discoveryMethod:MWKHistoryDiscoveryMethodSearch
-                        popToWebVC:NO];
-    }
-                                   failure:^(NSError* error) {
-        if ([error.domain isEqual:NSURLErrorDomain]
-            && error.code == NSURLErrorCannotFindHost) {
-            [self showLanguages];
-        } else {
-            [[self webViewController] showAlert:error.localizedDescription type:ALERT_TYPE_TOP duration:2.0];
-        }
-    }];
-}
-
-- (void)loadRandomArticle {
-    [[QueuesSingleton sharedInstance].articleFetchManager.operationQueue cancelAllOperations];
-
-    (void)[[RandomArticleFetcher alloc] initAndFetchRandomArticleForDomain:[SessionSingleton sharedInstance].currentArticleSite.language
-                                                               withManager:[QueuesSingleton sharedInstance].articleFetchManager
-                                                        thenNotifyDelegate:self];
-}
-
-- (void)showLanguages {
-    [self performModalSequeWithID:@"modal_segue_show_languages"
-                  transitionStyle:UIModalTransitionStyleCoverVertical
-                            block:^(LanguagesViewController* languagesVC) {
-        languagesVC.languageSelectionDelegate = self;
-    }];
-}
-
-- (void)languageSelected:(NSDictionary*)langData sender:(LanguagesViewController*)sender {
-    [NAV switchPreferredLanguageToId:langData[@"code"]];
-    [self popModalToRoot];
-}
-
-- (void)fetchFinished:(id)sender
-          fetchedData:(id)fetchedData
-               status:(FetchFinalStatus)status
-                error:(NSError*)error {
-    if ([sender isKindOfClass:[RandomArticleFetcher class]]) {
-        switch (status) {
-            case FETCH_FINAL_STATUS_SUCCEEDED: {
-                NSString* title = (NSString*)fetchedData;
-                if (title) {
-                    MWKTitle* pageTitle = [[SessionSingleton sharedInstance].currentArticleSite titleWithString:title];
-                    [self loadArticleWithTitle:pageTitle
-                                      animated:YES
-                               discoveryMethod:MWKHistoryDiscoveryMethodRandom
-                                    popToWebVC:NO]; // Don't pop - popModal has already been called.
-                }
-            }
-            break;
-            case FETCH_FINAL_STATUS_CANCELLED:
-                break;
-            case FETCH_FINAL_STATUS_FAILED:
-                //[self showAlert:error.localizedDescription type:ALERT_TYPE_TOP duration:-1];
-                break;
-        }
-    }
-}
-
-- (void)switchPreferredLanguageToId:(NSString*)languageId {
-    [[SessionSingleton sharedInstance] setSearchLanguage:languageId];
-    [self loadTodaysArticle];
 }
 
 @end
