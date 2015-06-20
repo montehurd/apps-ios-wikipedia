@@ -37,37 +37,37 @@
 
 - (void)presentArticleWithTitle:(MWKTitle*)title
                 discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod
-                           then:(void (^)())block {
+                           then:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC navigateToPage:title discoveryMethod:discoveryMethod];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentRandomArticleThen:(void (^)())block {
+- (void)presentRandomArticleThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC loadRandomArticle];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentTodaysArticleThen:(void (^)())block {
+- (void)presentTodaysArticleThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC loadTodaysArticle];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentWebViewThen:(void (^)())block {
+- (void)presentWebViewThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }

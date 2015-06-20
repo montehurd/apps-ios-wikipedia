@@ -75,11 +75,6 @@
 
 #pragma mark Is editing
 
-- (BOOL)isEditorOnNavstack {
-    id editVC = [self searchNavStackForViewControllerOfClass:[SectionEditorViewController class]];
-    return editVC ? YES : NO;
-}
-
 - (SectionEditorViewController*)editor {
     id editVC = [self searchNavStackForViewControllerOfClass:[SectionEditorViewController class]];
     return editVC;

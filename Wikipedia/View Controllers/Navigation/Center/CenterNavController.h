@@ -7,7 +7,6 @@
 
 @interface CenterNavController : UINavigationController <UINavigationControllerDelegate>
 
-@property (nonatomic, readonly) BOOL isEditorOnNavstack;
 @property (nonatomic, readonly) SectionEditorViewController* editor;
 
 - (void)promptFirstTimeZeroOnWithTitleIfAppropriate:(NSString*)title;

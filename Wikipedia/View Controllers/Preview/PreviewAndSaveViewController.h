@@ -14,7 +14,6 @@
 @property (strong, nonatomic) NSString* wikiText;
 @property (strong, nonatomic) EditFunnel* funnel;
 @property (strong, nonatomic) SavedPagesFunnel* savedPagesFunnel;
-@property (strong, nonatomic) NSString* abuseFilterCode;
 
 - (void)reloadCaptchaPushed:(id)sender;
 
