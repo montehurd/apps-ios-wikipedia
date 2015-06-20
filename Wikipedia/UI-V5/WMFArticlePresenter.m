@@ -37,37 +37,37 @@
 
 - (void)presentArticleWithTitle:(MWKTitle*)title
                 discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod
-                           then:(void (^)())block {
+                           then:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC navigateToPage:title discoveryMethod:discoveryMethod];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentRandomArticleThen:(void (^)())block {
+- (void)presentRandomArticleThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC loadRandomArticle];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentTodaysArticleThen:(void (^)())block {
+- (void)presentTodaysArticleThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         [webVC loadTodaysArticle];
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
 
-- (void)presentWebViewThen:(void (^)())block {
+- (void)presentWebViewThen:(void (^)(WebViewController* webVC))block {
     [self presentWebViewControllerThenPerformBlock:^(WebViewController* webVC){
         if (block) {
-            block();
+            block(webVC);
         }
     }];
 }
@@ -85,16 +85,9 @@
         if (vc.presentedViewController) {
             [vc dismissViewControllerAnimated:YES completion:nil];
         }
-        if ([vc.presentingViewController isKindOfClass:[UINavigationController class]]) {
-            UINavigationController* navVC = (UINavigationController*)vc.presentingViewController;
-
+        if (vc.navigationController) {
             // Pop vc to top of navigation controller stack.
-            [navVC popToViewController:vc animated:NO];
-
-            // Dismiss any view controllers presented by the vc's navigation controller.
-            if (navVC.presentedViewController) {
-                [navVC dismissViewControllerAnimated:YES completion:nil];
-            }
+            [vc.navigationController popToViewController:vc animated:YES];
         }
     }
     return vc;

@@ -1,3 +1,4 @@
+@class WebViewController;
 
 @interface WMFArticlePresenter : NSObject
 
@@ -6,16 +7,16 @@
 // Loads article and ensures the web view is foremost. Adds web view to nav stack if none found.
 - (void)presentArticleWithTitle:(MWKTitle*)title
                 discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod
-                           then:(void (^)())block;
+                           then:(void (^)(WebViewController* webVC))block;
 
 // Loads random article and ensures the web view is foremost. Adds web view to nav stack if none found.
-- (void)presentRandomArticleThen:(void (^)())block;
+- (void)presentRandomArticleThen:(void (^)(WebViewController* webVC))block;
 
 // Loads todays article and ensures the web view is foremost. Adds web view to nav stack if none found.
-- (void)presentTodaysArticleThen:(void (^)())block;
+- (void)presentTodaysArticleThen:(void (^)(WebViewController* webVC))block;
 
 // Ensures the web view is foremost. Adds web view to nav stack if none found.
-- (void)presentWebViewThen:(void (^)())block;
+- (void)presentWebViewThen:(void (^)(WebViewController* webVC))block;
 
 // Loads todays article without moving the web view to the front. Does not add web view to nav stack if none found.
 - (void)loadTodaysArticle;
