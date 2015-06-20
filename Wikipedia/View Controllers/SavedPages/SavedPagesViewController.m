@@ -133,8 +133,6 @@ static NSString* const kSavedPagesCellID                    = @"SavedPagesResult
 
     self.funnel = [[SavedPagesFunnel alloc] init];
 
-    self.navigationItem.hidesBackButton = YES;
-
     self.tableView.contentInset = UIEdgeInsetsMake(4.0f * MENUS_SCALE_MULTIPLIER, 0, 4.0f * MENUS_SCALE_MULTIPLIER, 0);
 
     // Register the Saved Pages results cell for reuse

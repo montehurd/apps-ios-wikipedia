@@ -14,9 +14,7 @@
 #import "TabularScrollView.h"
 #import "SecondaryMenuRowView.h"
 #import "WikiGlyph_Chars.h"
-#import "UIViewController+StatusBarHeight.h"
 #import "Defines.h"
-#import "UIViewController+ModalPresent.h"
 #import "LoginViewController.h"
 #import "PaddedLabel.h"
 #import <HockeySDK/HockeySDK.h>
@@ -102,8 +100,6 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = { SE
     self.navigationItem.leftBarButtonItems = @[xButton];
 
     self.highlightedTextAttributes = @{ NSFontAttributeName: [UIFont italicSystemFontOfSize:MENU_TITLE_FONT_SIZE] };
-
-    self.navigationItem.hidesBackButton = YES;
 
     self.view.backgroundColor = CHROME_COLOR;
 
