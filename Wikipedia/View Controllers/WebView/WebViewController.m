@@ -18,6 +18,8 @@
 #import "WMFShareOptionsViewController.h"
 #import "UIWebView+WMFSuppressSelection.h"
 #import "WMFArticlePresenter.h"
+#import "UINavigationBar+WMFRTLMirror.h"
+#import "UIToolbar+WMFRTLMirror.h"
 
 typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     WMFWebViewAlertZeroWebPage,
@@ -165,6 +167,9 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self.navigationController.navigationBar wmf_mirrorIfDeviceRTL];
+    [self.navigationController.toolbar wmf_mirrorIfDeviceRTL];
 
     [self setupTopMenuButtons];
     [self setupBottomMenuButtons];

@@ -22,6 +22,7 @@
 #import "UIBarButtonItem+WMFButtonConvenience.h"
 #import <BlocksKit/BlocksKit+UIKit.h>
 #import "UIViewController+WMFStoryboardUtilities.h"
+#import "UINavigationBar+WMFRTLMirror.h"
 
 @interface LoginViewController (){
 }
@@ -57,6 +58,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+
+    [self.navigationController.navigationBar wmf_mirrorIfDeviceRTL];
 
     @weakify(self)
     UIBarButtonItem * xButton = [UIBarButtonItem wmf_buttonType:WMF_BUTTON_X handler:^(id sender){

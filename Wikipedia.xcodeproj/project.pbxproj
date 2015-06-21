@@ -67,6 +67,9 @@
 		04616DFC1AE706C600815BCE /* WMFLocalizationProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 04616DFB1AE706C600815BCE /* WMFLocalizationProtocol.m */; };
 		0462A6D11A1FE016009412D4 /* SearchResultAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 0462A6D01A1FE016009412D4 /* SearchResultAttributedString.m */; };
 		0463639818A844570049EE4F /* KeychainCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 0463639718A844570049EE4F /* KeychainCredentials.m */; };
+		046A4B941B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.m in Sources */ = {isa = PBXBuildFile; fileRef = 046A4B931B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.m */; };
+		046A4B971B36894900440F67 /* UINavigationBar+WMFRTLMirror.m in Sources */ = {isa = PBXBuildFile; fileRef = 046A4B961B36894900440F67 /* UINavigationBar+WMFRTLMirror.m */; };
+		046A4B9A1B368CFF00440F67 /* UIToolbar+WMFRTLMirror.m in Sources */ = {isa = PBXBuildFile; fileRef = 046A4B991B368CFF00440F67 /* UIToolbar+WMFRTLMirror.m */; };
 		046E2B6B1B31ED94008A99A6 /* UIButton+WMFButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 046E2B6A1B31ED94008A99A6 /* UIButton+WMFButton.m */; };
 		046E2B6F1B3213BE008A99A6 /* UIBarButtonItem+WMFButtonConvenience.m in Sources */ = {isa = PBXBuildFile; fileRef = 046E2B6E1B3213BE008A99A6 /* UIBarButtonItem+WMFButtonConvenience.m */; };
 		0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */ = {isa = PBXBuildFile; fileRef = 0472BC17193AD88C00C40BDA /* MWKSection+DisplayHtml.m */; };
@@ -505,6 +508,12 @@
 		0463639618A844570049EE4F /* KeychainCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainCredentials.h; sourceTree = "<group>"; };
 		0463639718A844570049EE4F /* KeychainCredentials.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainCredentials.m; sourceTree = "<group>"; };
 		04649CA619F72B360071E8FA /* libPods.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPods.a; path = "Pods/build/Debug-iphoneos/libPods.a"; sourceTree = "<group>"; };
+		046A4B921B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+WMFRecursivelyMirrorLabelSubviews.h"; sourceTree = "<group>"; };
+		046A4B931B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+WMFRecursivelyMirrorLabelSubviews.m"; sourceTree = "<group>"; };
+		046A4B951B36894900440F67 /* UINavigationBar+WMFRTLMirror.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationBar+WMFRTLMirror.h"; sourceTree = "<group>"; };
+		046A4B961B36894900440F67 /* UINavigationBar+WMFRTLMirror.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationBar+WMFRTLMirror.m"; sourceTree = "<group>"; };
+		046A4B981B368CFF00440F67 /* UIToolbar+WMFRTLMirror.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIToolbar+WMFRTLMirror.h"; sourceTree = "<group>"; };
+		046A4B991B368CFF00440F67 /* UIToolbar+WMFRTLMirror.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIToolbar+WMFRTLMirror.m"; sourceTree = "<group>"; };
 		046E2B691B31ED94008A99A6 /* UIButton+WMFButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+WMFButton.h"; sourceTree = "<group>"; };
 		046E2B6A1B31ED94008A99A6 /* UIButton+WMFButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+WMFButton.m"; sourceTree = "<group>"; };
 		046E2B6D1B3213BE008A99A6 /* UIBarButtonItem+WMFButtonConvenience.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+WMFButtonConvenience.h"; sourceTree = "<group>"; };
@@ -1969,6 +1978,12 @@
 				04016E191B3264C700D732FE /* UIViewController+WMFStoryboardUtilities.m */,
 				04016E221B335F0200D732FE /* WMFArticlePresenter.h */,
 				04016E231B335F0200D732FE /* WMFArticlePresenter.m */,
+				046A4B921B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.h */,
+				046A4B931B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.m */,
+				046A4B951B36894900440F67 /* UINavigationBar+WMFRTLMirror.h */,
+				046A4B961B36894900440F67 /* UINavigationBar+WMFRTLMirror.m */,
+				046A4B981B368CFF00440F67 /* UIToolbar+WMFRTLMirror.h */,
+				046A4B991B368CFF00440F67 /* UIToolbar+WMFRTLMirror.m */,
 			);
 			path = "UI-V5";
 			sourceTree = "<group>";
@@ -3069,6 +3084,7 @@
 				BC92A7711AFA841C003C4212 /* MWKSection+WMFSharing.m in Sources */,
 				0E94AFF31B209857000BC5EA /* WMFSearchViewController.m in Sources */,
 				047801BE18AE987900DBB747 /* UIButton+ColorMask.m in Sources */,
+				046A4B9A1B368CFF00440F67 /* UIToolbar+WMFRTLMirror.m in Sources */,
 				BC092B9C1B18F8D700093C59 /* MWKSiteInfo.m in Sources */,
 				BC86B93D1A929CC500B4C039 /* UICollectionViewFlowLayout+NSCopying.m in Sources */,
 				0EFB0F261B31EE2D00D05C08 /* SectionImage.m in Sources */,
@@ -3085,6 +3101,7 @@
 				0472BC18193AD88C00C40BDA /* MWKSection+DisplayHtml.m in Sources */,
 				047ED63918C13E4900442BE3 /* PreviewWebView.m in Sources */,
 				0480AEA01AA4F4DA00A9950C /* WMFIntrinsicContentSizeAwareTableView.m in Sources */,
+				046A4B971B36894900440F67 /* UINavigationBar+WMFRTLMirror.m in Sources */,
 				0484B9061ABB50FA00874073 /* WMFArticleParsing.m in Sources */,
 				04B6925018E77B2A00F88D8A /* UIWebView+HideScrollGradient.m in Sources */,
 				048830D21AB775E3005BF3A1 /* UIScrollView+WMFScrollsToTop.m in Sources */,
@@ -3196,6 +3213,7 @@
 				D4991445181D51DE00E6073C /* main.m in Sources */,
 				0EFB0F1C1B31EE2D00D05C08 /* NSManagedObject+WMFModelFactory.m in Sources */,
 				0480AE9C1AA4F01600A9950C /* WMFWebViewFooterContainerView.m in Sources */,
+				046A4B941B36892600440F67 /* UIView+WMFRecursivelyMirrorLabelSubviews.m in Sources */,
 				D47BF5D4197870390067C3BC /* SavedPagesFunnel.m in Sources */,
 				04616DFC1AE706C600815BCE /* WMFLocalizationProtocol.m in Sources */,
 				04C43AC0183442FC006C643B /* NSString+Extras.m in Sources */,
