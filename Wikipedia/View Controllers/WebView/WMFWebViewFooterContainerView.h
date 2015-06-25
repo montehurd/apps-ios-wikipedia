@@ -5,8 +5,4 @@
 
 @interface WMFWebViewFooterContainerView : UIView
 
-@property (nonatomic, readonly) CGFloat height;
-
-- (id)initWithHeight:(CGFloat)height;
-
 @end

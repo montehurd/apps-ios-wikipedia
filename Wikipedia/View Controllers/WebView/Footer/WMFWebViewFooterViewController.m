@@ -73,4 +73,8 @@
     [super didReceiveMemoryWarning];
 }
 
+- (void)viewDidLayoutSubviews {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"WMFFooterViewControllerViewHeightChanged" object:self userInfo:nil];
+}
+
 @end
