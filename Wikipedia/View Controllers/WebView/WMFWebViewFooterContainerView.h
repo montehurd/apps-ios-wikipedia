@@ -3,10 +3,15 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol WMFWebViewFooterContainerHeightChanged <NSObject>
+
+- (void)nativeFooterContainerHeightChanged:(id)sender
+                                 newHeight:(CGFloat)height;
+
+@end
+
 @interface WMFWebViewFooterContainerView : UIView
 
-@property (nonatomic, readonly) CGFloat height;
-
-- (id)initWithHeight:(CGFloat)height;
+@property (nonatomic, weak) id <WMFWebViewFooterContainerHeightChanged> heightChangedDelegate;
 
 @end
