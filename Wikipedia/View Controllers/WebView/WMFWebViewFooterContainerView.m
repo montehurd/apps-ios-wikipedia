@@ -9,7 +9,7 @@
     [super layoutSubviews];
     static CGFloat lastHeight = -1;
     if (self.frame.size.height != lastHeight) {
-        [self.delegate footerContainer:self heightChanged:self.frame.size.height];
+//        [self.delegate footerContainer:self heightChanged:self.frame.size.height];
         lastHeight = self.frame.size.height;
     }
 }

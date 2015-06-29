@@ -2171,6 +2171,8 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     if (!self.footerContainer) {
         self.footerContainer = [[WMFWebViewFooterContainerView alloc] init];
 
+        self.footerContainer.alpha = 0.5;
+
         self.footerContainer.delegate = self;
 
         [self.webView wmf_addTrackingView:self.footerContainer
@@ -2193,6 +2195,15 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     (void)[[RandomArticleFetcher alloc] initAndFetchRandomArticleForDomain:[SessionSingleton sharedInstance].currentArticleSite.language
                                                                withManager:[QueuesSingleton sharedInstance].articleFetchManager
                                                         thenNotifyDelegate:self];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+
+    NSLog(@"LAYOUT!!!");
+
+    [self.footerContainer layoutIfNeeded];
+    [self updateFooterPlaceholderDivHeight:self.footerContainer.frame.size.height];
 }
 
 - (void)loadTodaysArticle {

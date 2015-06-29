@@ -702,8 +702,8 @@ static NSUInteger const kWMFReadMoreNumberOfArticles           = 3;
     [super didReceiveMemoryWarning];
 
     // Quick debugging snippet for making Read More fetch a random number of items:
-    //self.maxResults = 3 + arc4random_uniform(15 - 3 + 1);
-    //[self searchAfterDelay:@0.05f reason:SEARCH_REASON_VIEW_APPEARED];
+    self.maxResults = 3 + arc4random_uniform(15 - 3 + 1);
+    [self searchAfterDelay:@0.05f reason:SEARCH_REASON_VIEW_APPEARED];
 
     // Dispose of any resources that can be recreated.
 }
