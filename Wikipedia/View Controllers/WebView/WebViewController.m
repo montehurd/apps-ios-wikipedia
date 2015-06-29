@@ -176,7 +176,7 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     [self setupTopMenuButtons];
     [self setupBottomMenuButtons];
 
-    [self setupTrackingFooter];
+//    [self setupTrackingFooter];
 
     self.scrollingToTop = NO;
 
@@ -1638,6 +1638,14 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     }
 
     [sectionTextArray addObject:[self getFooterPlaceholderDiv]];
+
+
+
+// Proof-of-concept injection of 3 Read More results w/o native tracking nonsense.
+    [sectionTextArray addObject:@"<h1>Read More</h1><script src='wmf://readmore/3'></script>"];
+
+
+
 
     // Join article sections text
     NSString* joint   = @"";     //@"<div style=\"height:20px;\"></div>";
