@@ -206,14 +206,14 @@ NSArray* indexPathsWithIndexSet(NSIndexSet* indexes, NSInteger section) {
     WMFArticleViewControllerContainerCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([WMFArticleViewControllerContainerCell class]) forIndexPath:indexPath];
 
     if (cell.viewController == nil) {
-        WMFArticleViewController* vc = [self.storyboard instantiateViewControllerWithIdentifier:NSStringFromClass([WMFArticleViewController class])];
+        WMFArticleViewController* vc = [WMFArticleViewController wmf_initialViewControllerFromClassStoryboard];
         [cell setViewControllerAndAddViewToContentView:vc];
     }
 
     [self addChildViewController:cell.viewController];
 
     cell.viewController.savedPages = self.savedPages;
-    cell.viewController.article    = [self.dataSource articleForIndexPath:indexPath];;
+    cell.viewController.article    = [self.dataSource articleForIndexPath:indexPath];
 
     return cell;
 }
@@ -234,16 +234,14 @@ NSArray* indexPathsWithIndexSet(NSIndexSet* indexes, NSInteger section) {
 - (void)collectionView:(UICollectionView*)collectionView didSelectItemAtIndexPath:(NSIndexPath*)indexPath {
     WMFArticleViewControllerContainerCell* cell = (WMFArticleViewControllerContainerCell*)[collectionView cellForItemAtIndexPath:indexPath];
 
-    WMFArticleViewController* vc = [self.storyboard instantiateViewControllerWithIdentifier:NSStringFromClass([WMFArticleViewController class])];
-    vc.savedPages      = self.savedPages;
-    vc.article         = cell.viewController.article;
-    vc.contentTopInset = 64.0;
+    WMFArticleViewController* vc = [WMFArticleViewController wmf_initialViewControllerFromClassStoryboard];
+    vc.savedPages = self.savedPages;
+    vc.article    = cell.viewController.article;
 
     self.cardTransition                             = [WMFArticleCardTranstion new];
     self.cardTransition.nonInteractiveDuration      = 0.5;
     self.cardTransition.offsetOfNextOverlappingCard = self.stackedLayout.topReveal;
     self.cardTransition.movingCardView              = cell;
-    self.cardTransition.presentCardOffset           = vc.contentTopInset;
     vc.transitioningDelegate                        = self.cardTransition;
     vc.modalPresentationStyle                       = UIModalPresentationCustom;
 

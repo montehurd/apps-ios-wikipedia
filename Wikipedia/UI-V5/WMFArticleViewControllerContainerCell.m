@@ -20,7 +20,7 @@
     [self.contentView addSubview:viewController.view];
 
     [viewController.view mas_makeConstraints:^(MASConstraintMaker* make) {
-        make.edges.equalTo(self.contentView);
+        make.leading.trailing.top.and.bottom.equalTo(self.contentView);
     }];
 }
 
