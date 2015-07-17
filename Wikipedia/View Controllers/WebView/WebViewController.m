@@ -1205,7 +1205,7 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         [self updateHistoryDateVisitedForArticleBeingNavigatedFrom];
     }
 
-    MWKArticle* article = [self.session.dataStore articleWithTitle:self.currentTitle];
+    MWKArticle* article = [self.session.dataStore articleWithTitle:title];
 
     self.jumpToFragment                        = title.fragment;
     self.currentTitle                          = title;

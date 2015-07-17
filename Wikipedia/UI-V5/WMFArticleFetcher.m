@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readwrite) MWKDataStore* dataStore;
 @property (nonatomic, strong) AFHTTPRequestOperationManager* operationManager;
 @property (nonatomic, strong) ArticleFetcher* fetcher;
+@property (nonatomic) BOOL fetchLeadSectionOnly;
 
 @end
 
@@ -41,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
         AFHTTPRequestOperation* operation =
             [self.fetcher fetchSectionsForTitle:pageTitle
                                     inDataStore:self.dataStore
+                           fetchLeadSectionOnly:self.fetchLeadSectionOnly
                                     withManager:self.operationManager
                                   progressBlock:progress
                                 completionBlock:resolve
@@ -49,6 +51,11 @@ NS_ASSUME_NONNULL_BEGIN
             resolve([NSError wmf_errorWithType:WMFErrorTypeStringMissingParameter userInfo:nil]);
         }
     }];
+}
+
+- (AnyPromise*)fetchSectionTitlesAndFirstSectionForPageTitle:(MWKTitle*)pageTitle progress:(WMFProgressHandler __nullable)progress {
+    self.fetchLeadSectionOnly = YES;
+    return [self fetchArticleForPageTitle:pageTitle progress:progress];
 }
 
 @end
