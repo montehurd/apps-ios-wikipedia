@@ -21,6 +21,8 @@ extern NSString* const WMFArticleFetchedKey;
 
 - (AnyPromise*)fetchArticleForPageTitle:(MWKTitle*)pageTitle progress:(WMFProgressHandler)progress;
 
+- (AnyPromise*)fetchSectionTitlesAndFirstSectionForPageTitle:(MWKTitle*)pageTitle progress:(WMFProgressHandler)progress;
+
 @end
 
 NS_ASSUME_NONNULL_END

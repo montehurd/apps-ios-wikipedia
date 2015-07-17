@@ -155,7 +155,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)fetchArticleForTitle:(MWKTitle*)title {
     [self unobserveArticleUpdates];
-    [self.articleFetcher fetchArticleForPageTitle:title progress:^(CGFloat progress){
+    [self.articleFetcher fetchSectionTitlesAndFirstSectionForPageTitle:title progress:^(CGFloat progress){
     }].then(^(MWKArticle* article){
         self.article = article;
     }).catch(^(NSError* error){
@@ -396,19 +396,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)presentArticleScrolledToSectionForIndexPath:(NSIndexPath*)indexPath {
     WebViewController* webVC = [WebViewController wmf_initialViewControllerFromClassStoryboard];
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webVC] animated:YES completion:^{
-        [webVC navigateToPage:[self titleForSelectedIndexPath:indexPath] discoveryMethod:MWKHistoryDiscoveryMethodUnknown];
+        [webVC navigateToPage:[self titleForSelectedIndexPath:indexPath] discoveryMethod:MWKHistoryDiscoveryMethodReloadFromCache];
     }];
 }
 
 - (MWKTitle*)titleForSelectedIndexPath:(NSIndexPath*)indexPath {
     switch ((WMFArticleSectionType)indexPath.section) {
         case WMFArticleSectionTypeSummary:
-            return [[MWKTitle alloc] initWithSite:self.article.title.site normalizedTitle:self.article.title.text fragment:@""];
+            return [[MWKTitle alloc] initWithSite:self.article.title.site normalizedTitle:self.article.title.text fragment:nil];
         case WMFArticleSectionTypeTOC:
             return [[MWKTitle alloc] initWithSite:self.article.title.site normalizedTitle:self.article.title.text fragment:self.article.sections[indexPath.row + 1].anchor];
         case WMFArticleSectionTypeReadMore: {
             MWKArticle* readMoreArticle = ((MWKArticle*)self.readMoreResults.articles[indexPath.row]);
-            return [[MWKTitle alloc] initWithSite:readMoreArticle.site normalizedTitle:readMoreArticle.title.text fragment:@""];
+            return [[MWKTitle alloc] initWithSite:readMoreArticle.site normalizedTitle:readMoreArticle.title.text fragment:nil];
         }
     }
 }

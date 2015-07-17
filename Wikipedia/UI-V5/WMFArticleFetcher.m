@@ -15,6 +15,7 @@ NSString* const WMFArticleFetchedKey          = @"WMFArticleFetchedKey";
 @property (nonatomic, strong, readwrite) MWKDataStore* dataStore;
 @property (nonatomic, strong) AFHTTPRequestOperationManager* operationManager;
 @property (nonatomic, strong) ArticleFetcher* fetcher;
+@property (nonatomic) BOOL fetchLeadSectionOnly;
 
 @end
 
@@ -39,9 +40,14 @@ NSString* const WMFArticleFetchedKey          = @"WMFArticleFetchedKey";
     return _fetcher;
 }
 
+- (AnyPromise*)fetchSectionTitlesAndFirstSectionForPageTitle:(MWKTitle*)pageTitle progress:(WMFProgressHandler)progress {
+    self.fetchLeadSectionOnly = YES;
+    return [self fetchArticleForPageTitle:pageTitle progress:progress];
+}
+
 - (AnyPromise*)fetchArticleForPageTitle:(MWKTitle*)pageTitle progress:(WMFProgressHandler)progress {
     return [AnyPromise promiseWithResolverBlock:^(PMKResolver resolve) {
-        AFHTTPRequestOperation* operation = [self.fetcher fetchSectionsForTitle:pageTitle inDataStore:self.dataStore withManager:self.operationManager progressBlock:^(CGFloat completionProgress) {
+        AFHTTPRequestOperation* operation = [self.fetcher fetchSectionsForTitle:pageTitle inDataStore:self.dataStore fetchLeadSectionOnly:self.fetchLeadSectionOnly withManager:self.operationManager progressBlock:^(CGFloat completionProgress) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (progress) {
                     progress(completionProgress);
