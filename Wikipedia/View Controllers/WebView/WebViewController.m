@@ -27,6 +27,10 @@
 #import "WMFArticleViewController.h"
 #import "PageHistoryViewController.h"
 
+#import "UIView+WMFSearchSubviews.h"
+#import "MWKSection+TOC.h"
+#import "MWKSection+DisplayHtml.h"
+
 typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     WMFWebViewAlertZeroWebPage,
     WMFWebViewAlertZeroCharged,
@@ -51,6 +55,19 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
 
 @property (strong, nonatomic) WMFArticlePopupTransition* popupTransition;
 
+
+
+@property (nonatomic, strong) NSMutableArray* testConstraintArray;
+@property (nonatomic, strong) NSMutableArray* testAnchorArray;
+@property (nonatomic, strong) NSMutableArray* testTitleArray;
+@property (nonatomic, strong) NSMutableArray* testConstraintOffsets;
+@property (nonatomic, strong) NSNumber* indexOfTopHeader;
+@property (nonatomic, strong) PaddedLabel* topLabel;
+@property (nonatomic, strong) NSLayoutConstraint* topLabelTopConstraint;
+
+
+
+
 @end
 
 @implementation WebViewController
@@ -60,7 +77,12 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
 - (instancetype)initWithCoder:(NSCoder*)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        self.session = [SessionSingleton sharedInstance];
+        self.session               = [SessionSingleton sharedInstance];
+        self.testConstraintArray   = @[].mutableCopy;
+        self.testAnchorArray       = @[].mutableCopy;
+        self.testTitleArray        = @[].mutableCopy;
+        self.testConstraintOffsets = @[].mutableCopy;
+        self.indexOfTopHeader      = @0;
     }
     return self;
 }
@@ -185,6 +207,8 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf.tocVC updateTocForArticle:[SessionSingleton sharedInstance].currentArticle];
             [weakSelf updateTOCScrollPositionWithoutAnimationIfHidden];
+
+            [weakSelf labelTest];
         });
     }];
 
@@ -215,6 +239,63 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification object:nil];
+
+
+
+
+
+
+
+    [self addObserver:self
+           forKeyPath:@"indexOfTopHeader"
+              options:NSKeyValueObservingOptionNew
+              context:nil];
+
+
+
+
+
+
+    self.topLabel               = [[PaddedLabel alloc] init];
+    self.topLabel.alpha         = 0;
+    self.topLabel.font          = [UIFont fontWithName:@"Times New Roman" size:30];
+    self.topLabel.padding       = UIEdgeInsetsMake(14, 18, 14, 18);
+    self.topLabel.numberOfLines = 0;
+    self.topLabel.lineBreakMode = NSLineBreakByWordWrapping;
+//            self.topLabel.textColor         = [UIColor redColor];
+//            self.topLabel.layer.borderColor = [UIColor redColor].CGColor;
+//            self.topLabel.layer.borderWidth = 1.0f;
+
+
+
+
+//self.topLabel.text = @"TEST";
+    self.topLabel.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.topLabel];
+    [self.topLabel mas_makeConstraints:^(MASConstraintMaker* make) {
+//        make.top.equalTo(self.mas_topLayoutGuide);
+        make.left.equalTo(self.view.mas_left);
+        make.right.equalTo(self.view.mas_right);
+    }];
+
+    self.topLabelTopConstraint = [NSLayoutConstraint constraintWithItem:self.topLabel
+                                                              attribute:NSLayoutAttributeTop
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:self.topLayoutGuide
+                                                              attribute:NSLayoutAttributeBottom
+                                                             multiplier:1.0
+                                                               constant:0];
+
+    [self.view addConstraint:self.topLabelTopConstraint];
+
+
+
+
+
+
+
+
+
 
     [self fadeAlert];
 
@@ -257,6 +338,134 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     self.webView.scrollView.layer.anchorPoint = CGPointMake((isRTL ? 1.0 : 0.0), 0.0);
 
     [self tocUpdateViewLayout];
+}
+
+- (void)labelTest {
+    [self.testAnchorArray removeAllObjects];
+    [self.testConstraintArray removeAllObjects];
+    [self.testTitleArray removeAllObjects];
+    [self.testConstraintOffsets removeAllObjects];
+
+    [self.testConstraintOffsets addObject:@(0)];
+
+/*
+
+   blockers?
+
+   -need to reflow on *every* html reflow, including but not limited to
+     -all tranforms affecting any layout sizes/positioning
+     -tables open/close
+     -late image arrival
+     -rotation
+     -text size change
+
+   -fragile reliance on "UIWebBrowserView" introspection hack
+
+   instead of spending all the effort to cover these edges, instead do this:
+    -go full native w text & links and images (no js transforms needed!)
+    -tables are collapsed anyway so just replace them w native buttons
+        which when tapped load the table in web view in table cell
+        (expands when toggled open, contracts when togged closed)
+
+ */
+    UIView* browserView = [self.webView.scrollView wmf_firstSubviewOfClass:NSClassFromString(@"UIWebBrowserView")];
+
+    for (MWKSection* section in self.session.currentArticle.sections) {
+        NSString* title = section.line;
+        if (title) {
+            title = [title wmf_stringByRemovingHTML];
+            //NSLog(@"\n\ndisplay title = %@", title);
+            //NSLog(@"\tline = %@", section.line);
+            //CGRect r = [self.webView getScreenRectForHtmlElementWithId:section.anchor];
+            //NSLog(@"\tr = %@", NSStringFromCGRect(r));
+            CGRect r2 = [self.webView getWebViewRectForHtmlElementWithId:section.anchor];
+            //NSLog(@"\tr2 = %@", NSStringFromCGRect(r2));
+
+
+            PaddedLabel* testLabel = [[PaddedLabel alloc] init];
+            //testLabel.alpha             = 0.5;
+            //testLabel.layer.borderWidth = 1.0f;
+
+            testLabel.backgroundColor = [UIColor whiteColor];
+
+
+/*
+   try frame & onscroll limiting y
+
+   if that doesn't work just do the persistent label at top idea
+ */
+
+//            CGFloat baseFontSize              = 26.0f;
+//            CGFloat fontSizeReductionPerLevel = 3.2;
+//            CGFloat levelReductionMultiplier  = MAX(0, [section getHeadingTagSize] - 2);
+//
+//            NSLog(@"%@, %f", title, levelReductionMultiplier);
+//
+//            CGFloat fontSizeReductionForThisSectionLevel = levelReductionMultiplier * fontSizeReductionPerLevel;
+//            CGFloat reducedFontSize                      = baseFontSize - fontSizeReductionForThisSectionLevel;
+//
+//            CGFloat paddingReductionPerLevel            = 3.0;
+//            CGFloat paddingReductionForThisSectionLevel = levelReductionMultiplier * paddingReductionPerLevel;
+
+
+
+            testLabel.font = [UIFont fontWithName:@"Times New Roman" size:30];
+//            testLabel.padding                                   = UIEdgeInsetsMake(14 - paddingReductionForThisSectionLevel, 18, 14 - paddingReductionForThisSectionLevel, 18);
+            testLabel.padding                                   = UIEdgeInsetsMake(14, 18, 14, 18);
+            testLabel.translatesAutoresizingMaskIntoConstraints = NO;
+            testLabel.numberOfLines                             = 0;
+            testLabel.lineBreakMode                             = NSLineBreakByWordWrapping;
+            testLabel.text                                      = title;
+
+//            testLabel.textColor         = [UIColor redColor];
+//            testLabel.layer.borderColor = [UIColor redColor].CGColor;
+//            testLabel.layer.borderWidth = 1.0f;
+
+
+            [self.webView.scrollView addSubview:testLabel];
+
+            NSLayoutConstraint* (^ constrainEqually)(NSLayoutAttribute, CGFloat) = ^NSLayoutConstraint*(NSLayoutAttribute attr, CGFloat constant) {
+                NSLayoutConstraint* c =
+                    [NSLayoutConstraint constraintWithItem:testLabel
+                                                 attribute:attr
+                                                 relatedBy:NSLayoutRelationEqual
+                                                    toItem:browserView
+                                                 attribute:attr
+                                                multiplier:1.0
+                                                  constant:constant];
+
+                [self.webView.scrollView addConstraint:c];
+
+                return c;
+            };
+
+            [self.testAnchorArray addObject:section.anchor.copy];
+            [self.testTitleArray addObject:title];
+
+            constrainEqually(NSLayoutAttributeTrailing, 0);
+            constrainEqually(NSLayoutAttributeLeading, 0);
+            NSLayoutConstraint* c = constrainEqually(NSLayoutAttributeTop, r2.origin.y);
+            [self.testConstraintArray addObject:c];
+
+            [self.testConstraintOffsets addObject:@(c.constant)];
+
+            //        NSDictionary* sectionDict =
+            //            @{
+            //            @"id": @(section.sectionId),
+            //            @"isLead": @([section isLeadSection]),
+            //            @"level": section.toclevel ? section.toclevel : @0,
+            //            @"title": title
+            //        };
+            //
+            //        [allSectionData addObject:sectionDict];
+        }
+    }
+
+    [self.testConstraintOffsets addObject:@(100000000)];
+
+    NSLog(@"testAnchorArray count = %ld", self.testAnchorArray.count);
+    NSLog(@"testConstraintArray count = %ld", self.testConstraintArray.count);
+    NSLog(@"testConstraintOffsets count = %ld", self.testConstraintOffsets.count);
 }
 
 - (void)jumpToFragmentIfNecessary {
@@ -481,6 +690,10 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
 
     [self tocUpdateViewLayout];
     [self.view layoutIfNeeded];
+
+
+    self.topLabel.alpha = 0;
+
 
     [UIView animateWithDuration:duration.floatValue
                           delay:0.0f
@@ -747,7 +960,34 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         &&
         [keyPath isEqual:@"contentSize"]
         ) {
+        [self.testConstraintOffsets removeAllObjects];
+        [self.testConstraintOffsets addObject:@(0)];
+        for (NSUInteger i = 0; i < self.testAnchorArray.count; i++) {
+            NSString* a           = self.testAnchorArray[i];
+            NSLayoutConstraint* c = self.testConstraintArray[i];
+            if (a && c) {
+                CGRect r2 = [self.webView getWebViewRectForHtmlElementWithId:a];
+                c.constant = r2.origin.y;
+                [self.testConstraintOffsets addObject:@(c.constant)];
+            }
+        }
+        [self.testConstraintOffsets addObject:@(100000000)];
+
         [object preventHorizontalScrolling];
+    }
+
+
+    if ([keyPath isEqualToString:@"indexOfTopHeader"]) {
+        NSLog(@"indexOfTopHeader = %@", self.indexOfTopHeader);
+
+
+        if ([self.indexOfTopHeader isEqualToNumber:@1]) {
+            self.topLabel.text  = @"";
+            self.topLabel.alpha = 0;
+        } else {
+            self.topLabel.alpha = 1.0;
+            self.topLabel.text  = self.testTitleArray[self.indexOfTopHeader.integerValue - 2];
+        }
     }
 }
 
@@ -1058,6 +1298,61 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     // reason, from causing the keyboard to hide when the user is typing on it!
     CGFloat distanceScrolled     = self.scrollViewDragBeganVerticalOffset - scrollView.contentOffset.y;
     CGFloat fabsDistanceScrolled = fabs(distanceScrolled);
+
+
+
+
+
+
+
+
+
+
+
+
+//NSNumber *n = [self.testConstraintOffsets bk_match:^BOOL (NSNumber* number) {
+//    return [subview isKindOfClass:aClass];
+//}];
+    if (![self tocDrawerIsOpen]) {
+        NSNumber* lastOffset = @0;
+        for (NSUInteger thisIndex = 0; thisIndex < self.testConstraintOffsets.count; thisIndex++) {
+            NSNumber* thisOffset = self.testConstraintOffsets[thisIndex];
+
+//NSLog(@"y %f lastOffset %@ thisOffset %@", scrollView.contentOffset.y, lastOffset, thisOffset);
+
+            if (
+                (
+                    scrollView.contentOffset.y > lastOffset.floatValue
+                    &&
+                    scrollView.contentOffset.y <= thisOffset.floatValue
+                )
+                ) {
+                if (![@(thisIndex)isEqualToNumber:self.indexOfTopHeader]) {
+                    self.indexOfTopHeader = @(thisIndex);
+                }
+                break;
+            }
+            lastOffset = thisOffset;
+        }
+
+
+
+        CGFloat pushY = 0;
+        if (self.topLabel.alpha != 0) {
+            NSNumber* topmostHeaderOffsetY = self.testConstraintOffsets[self.indexOfTopHeader.integerValue];
+            CGRect r1                      = CGRectMake(0, 0, 1, self.topLabel.frame.size.height);
+            CGRect r2                      = CGRectMake(0, topmostHeaderOffsetY.floatValue - scrollView.contentOffset.y, 1, 1);
+            if (CGRectIntersectsRect(r1, r2)) {
+                pushY = r1.size.height - r2.origin.y;
+//        NSLog(@"INTERSECTING = %f", pushY);
+            }
+        }
+        self.topLabelTopConstraint.constant = -pushY;
+    }
+
+
+
+
 
     if (self.keyboardIsVisible && fabsDistanceScrolled > HIDE_KEYBOARD_ON_SCROLL_THRESHOLD) {
         [self hideKeyboard];
@@ -1455,11 +1750,13 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         self.lastScrollOffset = scrollOffset;
     }
 
+/*
     if (!self.session.currentArticle.isMain) {
         // Add target div for TOC "read more" entry so it can use existing
         // TOC scrolling mechanism.
         [sectionTextArray addObject:@"<div id='section_heading_and_content_block_100000'></div>"];
     }
+ */
 
     // Join article sections text
     NSString* joint   = @"";     //@"<div style=\"height:20px;\"></div>";
