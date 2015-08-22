@@ -48,7 +48,7 @@
 @property (nonatomic, strong) UIImage* placeholderImage;
 @property (nonatomic, strong) NSString* cachePath;
 @property (nonatomic) BOOL headingAvailable;
-@property (strong, nonatomic) NearbyResultCollectionCell* offScreenSizingCell;
+//@property (strong, nonatomic) NearbyResultCollectionCell* offScreenSizingCell;
 
 @property (strong, nonatomic) WMFArticlePopupTransition* popupTransition;
 
@@ -292,12 +292,23 @@
     }
 }
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    [self drawOnscreenCells];
-}
+/*
+   - (void)didReceiveMemoryWarning {
+    static BOOL toggle = NO;
 
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    CGFloat width = toggle ? 240 : 500;
+
+    UICollectionViewFlowLayout* flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
+    flowLayout.estimatedItemSize = CGSizeMake(width, 100);
     [self.collectionView.collectionViewLayout invalidateLayout];
+
+    toggle = !toggle;
+   }
+ */
+
+- (void)viewWillLayoutSubviews {
+    UICollectionViewFlowLayout* flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
+    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 100);
 }
 
 - (void)locationManager:(CLLocationManager*)manager
@@ -364,14 +375,20 @@
 
     [self.collectionView registerNib:[UINib nibWithNibName:TABLE_CELL_ID bundle:nil] forCellWithReuseIdentifier:TABLE_CELL_ID];
 
-    // Single off-screen cell for determining dynamic cell height.
-    self.offScreenSizingCell =
-        [[[NSBundle mainBundle] loadNibNamed:@"NearbyResultCollectionCell" owner:self options:nil] lastObject];
-}
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+//2015-08-21 22:52:32.470 Wikipedia Debug[10375:4231640] the item width must be less than the width of the UICollectionView minus the section insets left and right values.
+//2015-08-21 22:52:32.470 Wikipedia Debug[10375:4231640] Please check the values return by t
+// - flowLayout.sectionInset.left - flowLayout.sectionInset.right
+    UICollectionViewFlowLayout* flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
+    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 100);
+
+//since we're controlling any insets
+//flowLayout.sectionInset = UIEdgeInsetsMake(flowLayout.sectionInset.top, 0, flowLayout.sectionInset.bottom, 0);
+
+
+    // Single off-screen cell for determining dynamic cell height.
+//    self.offScreenSizingCell =
+//        [[[NSBundle mainBundle] loadNibNamed:@"NearbyResultCollectionCell" owner:self options:nil] lastObject];
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -472,7 +489,8 @@
     [self updateDistancesAndAnglesOfCell:cell atIndexPath:indexPath];
 }
 
-- (CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath*)indexPath {
+/*
+   - (CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath*)indexPath {
     // Update the sizing cell with any data which could change the cell height.
     [self updateViewsInCell:self.offScreenSizingCell forIndexPath:indexPath];
 
@@ -481,7 +499,8 @@
     // Determine height for the current configuration of the sizing cell.
     CGFloat height = [self.offScreenSizingCell heightForSizingCellOfWidth:width];
     return CGSizeMake(width, height);
-}
+   }
+ */
 
 - (void)longPressHappened:(UILongPressGestureRecognizer*)gestureRecognizer {
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {

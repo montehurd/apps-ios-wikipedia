@@ -59,7 +59,7 @@
         [str appendAttributedString:newline];
         [str appendAttributedString:attributedDesc];
     }
-
+    [self randomlyColorSubviews];
     return str;
 }
 
@@ -158,6 +158,31 @@
 - (void)setHeadingAvailable:(BOOL)headingAvailable {
     _headingAvailable               = headingAvailable;
     self.thumbView.headingAvailable = headingAvailable;
+}
+
+- (UICollectionViewLayoutAttributes*)preferredLayoutAttributesFittingAttributes:(UICollectionViewLayoutAttributes*)layoutAttributes {
+    [super preferredLayoutAttributesFittingAttributes:layoutAttributes];
+
+    UICollectionViewLayoutAttributes* preferredAttributes = [layoutAttributes copy];
+
+    CGSize preHeightAdjustmentSize = CGSizeMake(preferredAttributes.size.width, 50);//UILayoutFittingCompressedSize;//layoutAttributes.size;
+
+    CGSize heightAdjustedSize = [self systemLayoutSizeFittingSize:preHeightAdjustmentSize withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+
+
+
+    CGSize s = CGSizeMake(layoutAttributes.size.width, heightAdjustedSize.height);
+    preferredAttributes.size  = s;
+    preferredAttributes.frame = (CGRect){{0, 0}, s};
+
+
+    //    CGRect newFrame = preferredAttributes.frame;
+    //    newFrame.origin      = (CGPoint){0, 0};
+    //    newFrame.size.height = heightAdjustedSize.height;
+    //    preferredAttributes.frame = newFrame;
+
+
+    return preferredAttributes;
 }
 
 @end
