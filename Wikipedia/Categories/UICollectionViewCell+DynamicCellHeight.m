@@ -8,10 +8,24 @@
 - (CGFloat)heightForSizingCellOfWidth:(CGFloat)width {
     [self setNeedsUpdateConstraints];
     [self updateConstraintsIfNeeded];
+
     self.bounds = CGRectMake(0.0f, 0.0f, width, CGRectGetHeight(self.bounds));
     [self setNeedsLayout];
+
+
+
+CGSize newSize = [self systemLayoutSizeFittingSize:CGSizeMake(width, CGRectGetHeight(self.bounds)) withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+CGFloat newHeight = newSize.height;
+NSLog(@"newHeight = %f", newHeight);
+
+
+
     [self layoutIfNeeded];
-    return [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+    CGFloat oldNewHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+NSLog(@"oldNewHeight = %f", oldNewHeight);
+
+    return oldNewHeight;
 }
 
 @end
