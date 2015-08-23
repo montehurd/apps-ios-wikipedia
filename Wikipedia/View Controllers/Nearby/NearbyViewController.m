@@ -308,7 +308,7 @@
 
 - (void)viewWillLayoutSubviews {
     UICollectionViewFlowLayout* flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
-    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 100);
+    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 50);
 }
 
 - (void)locationManager:(CLLocationManager*)manager
@@ -376,11 +376,9 @@
     [self.collectionView registerNib:[UINib nibWithNibName:TABLE_CELL_ID bundle:nil] forCellWithReuseIdentifier:TABLE_CELL_ID];
 
 
-//2015-08-21 22:52:32.470 Wikipedia Debug[10375:4231640] the item width must be less than the width of the UICollectionView minus the section insets left and right values.
-//2015-08-21 22:52:32.470 Wikipedia Debug[10375:4231640] Please check the values return by t
-// - flowLayout.sectionInset.left - flowLayout.sectionInset.right
+
     UICollectionViewFlowLayout* flowLayout = (UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
-    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 100);
+    flowLayout.estimatedItemSize = CGSizeMake(self.view.frame.size.width, 50);
 
 //since we're controlling any insets
 //flowLayout.sectionInset = UIEdgeInsetsMake(flowLayout.sectionInset.top, 0, flowLayout.sectionInset.bottom, 0);
@@ -484,10 +482,23 @@
 - (void)updateViewsInCell:(NearbyResultCollectionCell*)cell forIndexPath:(NSIndexPath*)indexPath {
     NSDictionary* rowData = [self getRowDataForIndexPath:indexPath];
 
-    [cell setTitle:rowData[@"title"] description:rowData[@"description"]];
+//cell.widthConstraint.constant = self.collectionView.frame.size.width;
+
+    [cell setTitle:rowData[@"title"] description:[NSString stringWithFormat:@"%@ %@ %@", rowData[@"description"], rowData[@"description"], rowData[@"description"]]];
+
+//[cell setNeedsUpdateConstraints];
+//[cell updateConstraintsIfNeeded];
+//[cell setNeedsLayout];
+
+
 
     [self updateDistancesAndAnglesOfCell:cell atIndexPath:indexPath];
 }
+
+//-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+//    [self drawOnscreenCells];
+//
+//}
 
 /*
    - (CGSize)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath*)indexPath {
