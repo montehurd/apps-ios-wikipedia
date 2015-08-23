@@ -30,6 +30,9 @@
 @property (strong, nonatomic) NSDictionary* attributesTitle;
 @property (strong, nonatomic) NSDictionary* attributesDescription;
 
+@property (nonatomic) BOOL widthConstraintNeeded;
+
+
 @end
 
 @implementation NearbyResultCollectionCell
@@ -84,10 +87,15 @@
 - (instancetype)initWithCoder:(NSCoder*)coder {
     self = [super initWithCoder:coder];
     if (self) {
-        self.longPressRecognizer = nil;
-        self.distance            = nil;
-        self.angle               = 0.0;
-        self.headingAvailable    = NO;
+        //Ensure our width constraint controls width. Otherwise an implicit width constraint is made.
+        self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
+
+
+        self.longPressRecognizer   = nil;
+        self.distance              = nil;
+        self.angle                 = 0.0;
+        self.headingAvailable      = NO;
+        self.widthConstraintNeeded = YES;
     }
     return self;
 }
@@ -160,29 +168,69 @@
     self.thumbView.headingAvailable = headingAvailable;
 }
 
-- (UICollectionViewLayoutAttributes*)preferredLayoutAttributesFittingAttributes:(UICollectionViewLayoutAttributes*)layoutAttributes {
-    [super preferredLayoutAttributesFittingAttributes:layoutAttributes];
-
-    UICollectionViewLayoutAttributes* preferredAttributes = [layoutAttributes copy];
-
-    CGSize preHeightAdjustmentSize = CGSizeMake(preferredAttributes.size.width, 50);//UILayoutFittingCompressedSize;//layoutAttributes.size;
-
-    CGSize heightAdjustedSize = [self systemLayoutSizeFittingSize:preHeightAdjustmentSize withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+//- (UICollectionViewLayoutAttributes*)preferredLayoutAttributesFittingAttributes:(UICollectionViewLayoutAttributes*)layoutAttributes {
+//    [super preferredLayoutAttributesFittingAttributes:layoutAttributes];
+//
+//    UICollectionViewLayoutAttributes* preferredAttributes = [layoutAttributes copy];
 
 
 
-    CGSize s = CGSizeMake(layoutAttributes.size.width, heightAdjustedSize.height);
-    preferredAttributes.size  = s;
-    preferredAttributes.frame = (CGRect){{0, 0}, s};
 
 
-    //    CGRect newFrame = preferredAttributes.frame;
-    //    newFrame.origin      = (CGPoint){0, 0};
-    //    newFrame.size.height = heightAdjustedSize.height;
-    //    preferredAttributes.frame = newFrame;
+
+//    CGSize preHeightAdjustmentSize = CGSizeMake(preferredAttributes.size.width, 50);//UILayoutFittingCompressedSize;//layoutAttributes.size;
+//
+//    CGSize heightAdjustedSize = [self systemLayoutSizeFittingSize:preHeightAdjustmentSize withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+
+//[self setNeedsUpdateConstraints];
+//[self updateConstraintsIfNeeded];
+//
+//self.bounds = CGRectMake(0.0f, 0.0f, preferredAttributes.size.width, CGRectGetHeight(self.bounds));
+//[self setNeedsLayout];
+//
+//
+//CGFloat oldNewHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+//
+//
+//    CGSize s = CGSizeMake(layoutAttributes.size.width, oldNewHeight);
+//    preferredAttributes.size  = s;
+//    preferredAttributes.frame = (CGRect){{0, 0}, s};
 
 
-    return preferredAttributes;
-}
+//    CGRect newFrame = preferredAttributes.frame;
+//    newFrame.origin      = (CGPoint){0, 0};
+//    newFrame.size.height = heightAdjustedSize.height;
+//    preferredAttributes.frame = newFrame;
+
+
+
+
+/*
+
+    [self setNeedsUpdateConstraints];
+    [self updateConstraintsIfNeeded];
+
+    self.bounds = CGRectMake(0.0f, 0.0f, width, CGRectGetHeight(self.bounds));
+    [self setNeedsLayout];
+
+
+
+   CGSize newSize = [self systemLayoutSizeFittingSize:CGSizeMake(width, CGRectGetHeight(self.bounds)) withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+   CGFloat newHeight = newSize.height;
+   NSLog(@"newHeight = %f", newHeight);
+
+
+
+    [self layoutIfNeeded];
+    CGFloat oldNewHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+
+ */
+
+
+
+//
+//    return preferredAttributes;
+//}
 
 @end
