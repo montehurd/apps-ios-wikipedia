@@ -30,6 +30,10 @@
 @property (strong, nonatomic) NSDictionary* attributesTitle;
 @property (strong, nonatomic) NSDictionary* attributesDescription;
 
+//@property (nonatomic) BOOL widthConstraintNeeded;
+
+@property (strong, nonatomic) NSLayoutConstraint* widthConstraint;
+
 @end
 
 @implementation NearbyResultCollectionCell
@@ -84,10 +88,15 @@
 - (instancetype)initWithCoder:(NSCoder*)coder {
     self = [super initWithCoder:coder];
     if (self) {
+        //Ensure our width constraint controls width. Otherwise an implicit width constraint is made.
+        self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
+
+
         self.longPressRecognizer = nil;
         self.distance            = nil;
         self.angle               = 0.0;
         self.headingAvailable    = NO;
+//        self.widthConstraintNeeded = YES;
     }
     return self;
 }
@@ -98,6 +107,20 @@
     self.distanceLabel.layer.cornerRadius = DISTANCE_CORNER_RADIUS;
     self.distanceLabel.padding            = DISTANCE_PADDING;
     self.distanceLabel.font               = DISTANCE_FONT;
+
+
+    if (!self.widthConstraint) {
+        self.widthConstraint = [NSLayoutConstraint constraintWithItem:self.contentView
+                                                            attribute:NSLayoutAttributeWidth
+                                                            relatedBy:NSLayoutRelationEqual
+                                                               toItem:self
+                                                            attribute:NSLayoutAttributeWidth
+                                                           multiplier:1
+                                                             constant:0];
+        [self addConstraint:self.widthConstraint];
+    }
+
+
 
     [self adjustConstraintsScaleForViews:@[self.titleLabel, self.distanceLabel, self.thumbView]];
 
@@ -165,21 +188,91 @@
 
     UICollectionViewLayoutAttributes* preferredAttributes = [layoutAttributes copy];
 
+    NSLog(@"width = %f", preferredAttributes.size.height);
+
+//[cell setNeedsUpdateConstraints];
+//[cell updateConstraintsIfNeeded];
+//[cell setNeedsLayout];
+
+//[self setNeedsUpdateConstraints];
+//[self updateConstraintsIfNeeded];
+//self.bounds = CGRectMake(0.0f, 0.0f, preferredAttributes.size.width, CGRectGetHeight(self.contentView.bounds));
+//[self setNeedsLayout];
+//CGFloat newHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+
+
+
+
+    CGSize preHeightAdjustmentSize =
+        CGSizeMake(preferredAttributes.size.width, preferredAttributes.size.height);
+
+    CGFloat newHeight =
+        [self systemLayoutSizeFittingSize:preHeightAdjustmentSize withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel].height;
+
+    //CGFloat newHeight = [self systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+    //preferredAttributes.size = CGSizeMake(preferredAttributes.size.width, newHeight);
+
+
+    preferredAttributes.frame = CGRectMake(preferredAttributes.frame.origin.x, preferredAttributes.frame.origin.y, preferredAttributes.size.width, newHeight);
+
+
+
+
+
+
+/*
     CGSize preHeightAdjustmentSize = CGSizeMake(preferredAttributes.size.width, 50);//UILayoutFittingCompressedSize;//layoutAttributes.size;
 
     CGSize heightAdjustedSize = [self systemLayoutSizeFittingSize:preHeightAdjustmentSize withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
 
+   [self setNeedsUpdateConstraints];
+   [self updateConstraintsIfNeeded];
+
+   self.bounds = CGRectMake(0.0f, 0.0f, preferredAttributes.size.width, CGRectGetHeight(self.bounds));
+   [self setNeedsLayout];
 
 
-    CGSize s = CGSizeMake(layoutAttributes.size.width, heightAdjustedSize.height);
+   CGFloat oldNewHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+
+    CGSize s = CGSizeMake(layoutAttributes.size.width, oldNewHeight);
     preferredAttributes.size  = s;
     preferredAttributes.frame = (CGRect){{0, 0}, s};
 
 
-    //    CGRect newFrame = preferredAttributes.frame;
-    //    newFrame.origin      = (CGPoint){0, 0};
-    //    newFrame.size.height = heightAdjustedSize.height;
-    //    preferredAttributes.frame = newFrame;
+    CGRect newFrame = preferredAttributes.frame;
+    newFrame.origin      = (CGPoint){0, 0};
+    newFrame.size.height = heightAdjustedSize.height;
+    preferredAttributes.frame = newFrame;
+ */
+
+
+
+/*
+
+    [self setNeedsUpdateConstraints];
+    [self updateConstraintsIfNeeded];
+
+    self.bounds = CGRectMake(0.0f, 0.0f, width, CGRectGetHeight(self.bounds));
+    [self setNeedsLayout];
+
+
+
+   CGSize newSize = [self systemLayoutSizeFittingSize:CGSizeMake(width, CGRectGetHeight(self.bounds)) withHorizontalFittingPriority:UILayoutPriorityRequired verticalFittingPriority:UILayoutPriorityFittingSizeLevel];
+   CGFloat newHeight = newSize.height;
+   NSLog(@"newHeight = %f", newHeight);
+
+
+
+    [self layoutIfNeeded];
+    CGFloat oldNewHeight = [self.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0f;
+
+
+ */
+
+
 
 
     return preferredAttributes;
