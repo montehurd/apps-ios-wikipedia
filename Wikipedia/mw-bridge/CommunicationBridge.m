@@ -3,6 +3,7 @@
 
 #import "CommunicationBridge.h"
 #import "UIWebView+LoadAssetsHtml.h"
+#import "UIWebView+WMFSendMessagesToXCodeConsoleFromJS.h"
 
 @interface CommunicationBridge ()
 
@@ -26,6 +27,10 @@
 
         __weak CommunicationBridge* weakSelf = self;
         [self addListener:@"DOMContentLoaded" withBlock:^(NSString* type, NSDictionary* payload) {
+            // To use "wmf_log" to send debug messages from javascript file to Xcode console you'll need to
+            // temporarily remove 'jshint' from the line in Gruntfile.js which looks like this:
+            //      grunt.registerTask('default', ['jshint', 'browserify', 'less', 'copy']);
+            [weakSelf.webView wmf_enableSendingMessagesToXcodeConsoleFromJavascriptMethodNamed:@"wmf_log"];
             [weakSelf sendQueuedMessages];
         }];
         targetWebView.delegate = self;
