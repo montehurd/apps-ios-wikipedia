@@ -118,7 +118,8 @@
                        @"gpssearch": self.searchTerm,
                        @"gpsnamespace": @0,
                        @"gpslimit": @(self.maxSearchResults),
-                       @"prop": @"pageterms|pageimages",
+                       @"prop": @"pageterms|pageimages|pageprops",
+                       @"ppprop": @"mainpage|disambiguation",
                        @"piprop": @"thumbnail",
                        @"wbptterms": @"description",
                        @"pithumbsize": @(LEAD_IMAGE_WIDTH),
@@ -142,7 +143,8 @@
         case SEARCH_TYPE_IN_ARTICLES:
             return @{
                        @"action": @"query",
-                       @"prop": @"pageterms|pageimages",
+                       @"prop": @"pageterms|pageimages|pageprops",
+                       @"ppprop": @"mainpage|disambiguation",
                        @"wbptterms": @"description",
                        @"generator": @"search",
                        @"gsrsearch": self.searchTerm,
