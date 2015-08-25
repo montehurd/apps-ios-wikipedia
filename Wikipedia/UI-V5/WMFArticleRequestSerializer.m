@@ -31,9 +31,10 @@
         @"sections": @"all",
         @"page": title.text,
         @"thumbwidth": @(LEAD_IMAGE_WIDTH),
-        @"prop": WMFJoinedPropertyParameters(@[@"sections", @"text", @"lastmodified", @"lastmodifiedby",
+        @"prop": WMFJoinedPropertyParameters(@[@"pageprops", @"sections", @"text", @"lastmodified", @"lastmodifiedby",
                                                @"languagecount", @"id", @"protection", @"editable", @"displaytitle",
-                                               @"thumb", @"description", @"image"])
+                                               @"thumb", @"description", @"image"]),
+        @"pageprops": @"mainpage|disambiguation"
     }.mutableCopy;
 
     return params;
