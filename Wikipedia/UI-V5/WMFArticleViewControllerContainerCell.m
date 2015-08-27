@@ -58,8 +58,8 @@
     [viewController.view mas_makeConstraints:^(MASConstraintMaker* make) {
         make.leading.trailing.top.and.bottom.equalTo(self.contentView);
     }];
-
-    self.touchView.viewsToSendTouches = @[[viewController saveButton]];
+// Do we need any of this any more?
+//    self.touchView.viewsToSendTouches = @[[viewController saveButton]];
 }
 
 @end

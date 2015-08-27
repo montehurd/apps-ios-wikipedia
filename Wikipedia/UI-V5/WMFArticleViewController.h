@@ -32,7 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 /*
    Only exposed to allow save & read button to be selectable in popup.
  */
-@property (nonatomic, strong, readonly) UIButton* saveButton;
+//@property (nonatomic, strong, readonly) UIButton* saveButton;
+
+- (void)fetchArticle;
 
 @end
 
