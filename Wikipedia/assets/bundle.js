@@ -110,12 +110,67 @@ var utilities = require("./utilities");
 // See: http://stackoverflow.com/a/3698214/135557
 document.addEventListener("DOMContentLoaded", function() {
 
-    transformer.transform( "moveFirstGoodParagraphUp", document );
-    transformer.transform( "hideRedlinks", document );
-    transformer.transform( "addImageOverflowXContainers", document ); // Needs to happen before "widenImages" transform.
-    transformer.transform( "widenImages", document );
-    transformer.transform( "hideTables", document );
-    transformer.transform( "collapsePageIssuesAndDisambig", document.getElementById( "section_heading_and_content_block_0" ) );
+
+//    transformer.transform( "moveFirstGoodParagraphUp", document );
+//    transformer.transform( "hideRedlinks", document );
+//    transformer.transform( "addImageOverflowXContainers", document ); // Needs to happen before "widenImages" transform.
+//    transformer.transform( "widenImages", document );
+//    transformer.transform( "hideTables", document );
+//    transformer.transform( "collapsePageIssuesAndDisambig", document.getElementById( "section_heading_and_content_block_0" ) );
+
+
+
+
+
+    // Identify 1st good paragraph before detaching
+    // (p tags don't have offsetHeight used to determine "goodness" after detach)
+    transformer.transform( "markFirstGoodParagraph", document );
+
+    // Now detach so we can do dom transforms without layout thrashing
+    var content = document.getElementById("content");
+    var parent = content.parentNode;
+    var detachedContent = parent.removeChild(content);
+    
+    transformer.transform( "moveFirstGoodParagraphUp", detachedContent );
+    transformer.transform( "hideRedlinks", detachedContent );
+    transformer.transform( "disableFilePageEdit", detachedContent );
+    transformer.transform( "addImageOverflowXContainers", detachedContent ); // Needs to happen before "widenImages" transform.
+
+
+
+/*
+
+Needed to finish making the remainder of transforms able to operate on detachedContent:
+
+    - pass them detachedContent not body
+    - make them internally use querySelector and querySelectorAll instead of getElementById and getElementByTagName
+    - widenImages would need to change to set the img tag width and height attributes *before* the image load event fires
+        (would need to determine width to be requested and extrapolate height from the
+        data-file-width/data-file-height ratio)
+
+*/
+
+//    transformer.transform( "widenImages", body );
+//    transformer.transform( "hideTables", body );
+//    transformer.transform( "collapsePageIssuesAndDisambig", document.getElementById( "section_heading_and_content_block_0" ) );
+
+
+
+
+
+
+
+    // Now reattach the dom so we can see our transforms.
+    parent.appendChild(detachedContent);
+
+
+
+
+
+
+
+
+
 
     bridge.sendMessage( "DOMContentLoaded", {} );
 });
@@ -221,7 +276,7 @@ document.addEventListener("touchend", handleTouchEnded, false);
 
 })();
 
-},{"./bridge":1,"./refs":5,"./transformer":8,"./transforms/collapsePageIssuesAndDisambig":11,"./utilities":16}],4:[function(require,module,exports){
+},{"./bridge":1,"./refs":5,"./transformer":8,"./transforms/collapsePageIssuesAndDisambig":11,"./utilities":17}],4:[function(require,module,exports){
 
 var bridge = require("./bridge");
 var elementLocation = require("./elementLocation");
@@ -416,7 +471,7 @@ global.getSectionHeadersArray = getSectionHeadersArray;
 global.getSectionHeaderLocationsArray = getSectionHeaderLocationsArray;
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./utilities":16}],8:[function(require,module,exports){
+},{"./utilities":17}],8:[function(require,module,exports){
 function Transformer() {
 }
 
@@ -442,12 +497,13 @@ module.exports = new Transformer();
 },{}],9:[function(require,module,exports){
 
 require("./transforms/collapseTables");
+require("./transforms/markFirstParagraph");
 require("./transforms/relocateFirstParagraph");
 require("./transforms/hideRedLinks");
 require("./transforms/addImageOverflowContainers");
 require("./transforms/collapsePageIssuesAndDisambig");
 
-},{"./transforms/addImageOverflowContainers":10,"./transforms/collapsePageIssuesAndDisambig":11,"./transforms/collapseTables":12,"./transforms/hideRedLinks":13,"./transforms/relocateFirstParagraph":14}],10:[function(require,module,exports){
+},{"./transforms/addImageOverflowContainers":10,"./transforms/collapsePageIssuesAndDisambig":11,"./transforms/collapseTables":12,"./transforms/hideRedLinks":13,"./transforms/markFirstParagraph":14,"./transforms/relocateFirstParagraph":15}],10:[function(require,module,exports){
 var transformer = require("../transformer");
 var utilities = require("../utilities");
 
@@ -480,7 +536,7 @@ function maybeAddImageOverflowXContainer() {
 transformer.register( "addImageOverflowXContainers", function( content ) {
     // Wrap wide images in a <div style="overflow-x:auto">...</div> so they can scroll
     // side to side if needed without causing the entire section to scroll side to side.
-    var images = content.getElementsByTagName('img');
+    var images = content.querySelectorAll('img');
     for (var i = 0; i < images.length; ++i) {
         // Load event used so images w/o style or inline width/height
         // attributes can still have their size determined reliably.
@@ -488,7 +544,7 @@ transformer.register( "addImageOverflowXContainers", function( content ) {
     }
 } );
 
-},{"../transformer":8,"../utilities":16}],11:[function(require,module,exports){
+},{"../transformer":8,"../utilities":17}],11:[function(require,module,exports){
 var transformer = require("../transformer");
 var utilities = require("../utilities");
 
@@ -671,7 +727,7 @@ exports.issuesClicked = issuesClicked;
 exports.disambigClicked = disambigClicked;
 exports.closeClicked = closeClicked;
 
-},{"../transformer":8,"../utilities":16}],12:[function(require,module,exports){
+},{"../transformer":8,"../utilities":17}],12:[function(require,module,exports){
 var transformer = require("../transformer");
 var utilities = require("../utilities");
 
@@ -834,7 +890,7 @@ transformer.register( "hideTables", function( content ) {
     }
 } );
 
-},{"../transformer":8,"../utilities":16}],13:[function(require,module,exports){
+},{"../transformer":8,"../utilities":17}],13:[function(require,module,exports){
 var transformer = require("../transformer");
 
 transformer.register( "hideRedlinks", function( content ) {
@@ -848,7 +904,7 @@ transformer.register( "hideRedlinks", function( content ) {
 },{"../transformer":8}],14:[function(require,module,exports){
 var transformer = require("../transformer");
 
-transformer.register( "moveFirstGoodParagraphUp", function( content ) {
+transformer.register( "markFirstGoodParagraph", function( content ) {
     /*
     Instead of moving the infobox down beneath the first P tag,
     move the first good looking P tag *up* (as the first child of
@@ -856,12 +912,12 @@ transformer.register( "moveFirstGoodParagraphUp", function( content ) {
     only above infoboxes, but above other tables/images etc too!
     */
 
-    if(content.getElementById( "mainpage" ))return;
+    if(content.querySelector( "#mainpage" ))return;
 
-    var block_0 = content.getElementById( "content_block_0" );
+    var block_0 = content.querySelector( "#content_block_0" );
     if(!block_0) return;
 
-    var allPs = block_0.getElementsByTagName( "p" );
+    var allPs = block_0.querySelectorAll( "p" );
     if(!allPs) return;
 
     for ( var i = 0; i < allPs.length; i++ ) {
@@ -870,6 +926,7 @@ transformer.register( "moveFirstGoodParagraphUp", function( content ) {
         // Narrow down to first P which is direct child of content_block_0 DIV.
         // (Don't want to yank P from somewhere in the middle of a table!)
         if  (p.parentNode != block_0) continue;
+
 
         // Ensure the P being pulled up has at least a couple lines of text.
         // Otherwise silly things like a empty P or P which only contains a
@@ -882,8 +939,7 @@ transformer.register( "moveFirstGoodParagraphUp", function( content ) {
         var pIsTooSmall = (p.offsetHeight < minHeight);
         if(pIsTooSmall) continue;
 
-        // Move the P! Place it just after the lead section edit button.
-        block_0.insertBefore(p, block_0.firstChild);
+        p.setAttribute('isFirstGoodParagraph', 'true');
 
         // But only move one P!
         break;
@@ -891,6 +947,32 @@ transformer.register( "moveFirstGoodParagraphUp", function( content ) {
 });
 
 },{"../transformer":8}],15:[function(require,module,exports){
+var transformer = require("../transformer");
+
+transformer.register( "moveFirstGoodParagraphUp", function( content ) {
+    /*
+    Instead of moving the infobox down beneath the first P tag,
+    move the first good looking P tag *up* (as the first child of
+    the first section div). That way the first P text will appear not
+    only above infoboxes, but above other tables/images etc too!
+    */
+
+    var edit_section_button_0 = content.querySelector( "#edit_section_button_0" );
+    if(!edit_section_button_0) return;
+
+    var p = content.querySelector( '[isFirstGoodParagraph]' );
+
+    if(!p) return;
+
+    function moveAfter(newNode, referenceNode) {
+        // Based on: http://stackoverflow.com/a/4793630/135557
+        referenceNode.parentNode.insertBefore(newNode.parentNode.removeChild(newNode), referenceNode.nextSibling);
+    }
+
+    moveAfter(p, edit_section_button_0);
+});
+
+},{"../transformer":8}],16:[function(require,module,exports){
 var transformer = require("../transformer");
 var utilities = require("../utilities");
 
@@ -998,7 +1080,7 @@ transformer.register( "widenImages", function( content ) {
     }
 } );
 
-},{"../transformer":8,"../utilities":16}],16:[function(require,module,exports){
+},{"../transformer":8,"../utilities":17}],17:[function(require,module,exports){
 
 function getDictionaryFromSrcset(srcset) {
     /*
@@ -1061,7 +1143,7 @@ exports.findClosest = findClosest;
 exports.httpGetSync = httpGetSync;
 exports.isNestedInTable = isNestedInTable;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 
 var _topElement = null;
@@ -1092,4 +1174,4 @@ global.setPreRotationRelativeScrollOffset = setPreRotationRelativeScrollOffset;
 global.getPostRotationScrollOffset = getPostRotationScrollOffset;
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
+},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18])
