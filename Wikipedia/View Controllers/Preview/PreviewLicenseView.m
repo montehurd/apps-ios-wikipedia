@@ -8,6 +8,7 @@
 #import "Defines.h"
 #import "NSObject+ConstraintsScale.h"
 #import "UIFont+WMFStyle.h"
+#import "Wikipedia-Swift.h"
 
 #define PREVIEW_BLUE_COLOR [UIColor colorWithRed:0.2 green:0.4784 blue:1.0 alpha:1.0]
 
@@ -135,10 +136,10 @@ enum {
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     switch (buttonIndex) {
         case BUTTON_TERMS:
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:TERMS_LINK]];
+            [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:TERMS_LINK]];
             break;
         case BUTTON_LICENSE:
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:LICENSE_LINK]];
+            [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:LICENSE_LINK]];
             break;
         default:
             NSLog(@"nooooo");

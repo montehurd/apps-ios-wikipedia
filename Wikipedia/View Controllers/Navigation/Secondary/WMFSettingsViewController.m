@@ -45,6 +45,8 @@
 // Other
 #import "WMFArticlePresenter.h"
 
+#import "Wikipedia-Swift.h"
+
 #pragma mark - Defines
 
 #define MENU_ICON_COLOR [UIColor blackColor]
@@ -532,25 +534,25 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = {
 
             case SECONDARY_MENU_ROW_INDEX_ZERO_FAQ:
             {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_ZERO_FAQ]];
+                [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:URL_ZERO_FAQ]];
             }
             break;
 
             case SECONDARY_MENU_ROW_INDEX_PRIVACY_POLICY:
             {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_PRIVACY_POLICY]];
+                [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:URL_PRIVACY_POLICY]];
             }
             break;
 
             case SECONDARY_MENU_ROW_INDEX_TERMS:
             {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_TERMS]];
+                [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:URL_TERMS]];
             }
             break;
 
             case SECONDARY_MENU_ROW_INDEX_RATE_APP:
             {
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:URL_RATE_APP]];
+                [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:URL_RATE_APP]];
             }
             break;
 
@@ -572,7 +574,7 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = {
 
                 NSURL* url = [NSURL URLWithString:encodedUrlString];
 
-                [[UIApplication sharedApplication] openURL:url];
+                [[UIApplication sharedApplication] wmf_openURL:url];
             }
             break;
             case SECONDARY_MENU_ROW_INDEX_ABOUT:
@@ -585,7 +587,7 @@ static SecondaryMenuRowIndex const WMFDebugSections[WMFDebugSectionCount] = {
                 break;
             }
             case SECONDARY_MENU_ROW_INDEX_FAQ: {
-                [[UIApplication sharedApplication] openURL:
+                [[UIApplication sharedApplication] wmf_openURL:
                  [NSURL URLWithString:@"https://www.mediawiki.org/wiki/Wikimedia_Apps/iOS_FAQ"]];
                 break;
             }

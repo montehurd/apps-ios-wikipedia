@@ -10,6 +10,7 @@
 #import "NSBundle+WMFInfoUtils.h"
 #import "UIBarButtonItem+WMFButtonConvenience.h"
 #import "UIView+WMFRTLMirroring.h"
+#import "Wikipedia-Swift.h"
 
 static NSString* const kWMFAboutHTMLFile  = @"about.html";
 static NSString* const kWMFAboutPlistName = @"AboutViewController";
@@ -279,7 +280,7 @@ static NSString* const kWMFContributorsKey = @"contributors";
 
     if (navigationType == UIWebViewNavigationTypeLinkClicked &&
         [[self class] isExternalURL:requestURL]) {
-        return ![[UIApplication sharedApplication] openURL:requestURL];
+        return ![[UIApplication sharedApplication] wmf_openURL:requestURL];
     }
     return YES;
 }

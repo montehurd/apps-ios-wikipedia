@@ -8,6 +8,7 @@
 
 #import "WMFCrashAlertView.h"
 #import "WikipediaAppUtils.h"
+#import "Wikipedia-Swift.h"
 
 NSString* const WMFHockeyAppServiceName     = @"HockeyApp";
 NSString* const kHockeyAppPrivacyStringsKey = @"hockeyapp-alert-privacy";
@@ -18,7 +19,7 @@ NSString* const kHockyAppPrivacyUrl         = @"http://hockeyapp.net/privacy/";
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated {
     NSString* buttonText = [self buttonTitleAtIndex:buttonIndex];
     if ([buttonText isEqualToString:[WMFCrashAlertView wmf_hockeyAppPrivacyButtonText]]) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kHockyAppPrivacyUrl]];
+        [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:kHockyAppPrivacyUrl]];
         return;
     }
     [super dismissWithClickedButtonIndex:buttonIndex animated:animated];

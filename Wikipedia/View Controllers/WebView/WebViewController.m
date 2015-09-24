@@ -1510,13 +1510,13 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         case WMFWebViewAlertZeroWebPage:
             if (1 == buttonIndex) {
                 NSURL* url = [NSURL URLWithString:self.wikipediaZeroLearnMoreExternalUrl];
-                [[UIApplication sharedApplication] openURL:url];
+                [[UIApplication sharedApplication] wmf_openURL:url];
             }
             break;
         case WMFWebViewAlertZeroInterstitial:
             if (1 == buttonIndex) {
                 NSURL* url = [NSURL URLWithString:self.externalUrl];
-                [[UIApplication sharedApplication] openURL:url];
+                [[UIApplication sharedApplication] wmf_openURL:url];
             }
             break;
     }
