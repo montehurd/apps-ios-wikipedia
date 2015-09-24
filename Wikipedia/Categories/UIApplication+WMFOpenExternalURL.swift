@@ -10,6 +10,7 @@ import Foundation
 
 extension UIApplication {
     public func wmf_openURL(url: NSURL) -> Bool {
-        return openURL(url)
+        UIApplication.sharedApplication().keyWindow?.rootViewController?.presentViewController(SVModalWebViewController(URL: url), animated: true, completion: nil)
+        return true;
     }
 }
