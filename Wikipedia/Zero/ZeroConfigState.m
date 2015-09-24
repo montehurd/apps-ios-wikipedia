@@ -3,6 +3,7 @@
 
 #import "ZeroConfigState.h"
 #import <BlocksKit/BlocksKit+UIKit.h>
+#import "Wikipedia-Swift.h"
 
 @implementation ZeroConfigState
 
@@ -47,11 +48,11 @@
         [zeroAlert bk_setCancelButtonWithTitle:MWLocalizedString(@"zero-interstitial-cancel", nil)
                                        handler:nil];
         [zeroAlert bk_addButtonWithTitle:MWLocalizedString(@"zero-interstitial-continue", nil) handler:^{
-            [[UIApplication sharedApplication] openURL:url];
+            [self.externalLinksOpenerDelegate wmf_externalUrlOpener:url];
         }];
         [zeroAlert show];
     } else {
-        [[UIApplication sharedApplication] openURL:url];
+        [self.externalLinksOpenerDelegate wmf_externalUrlOpener:url];
     }
 }
 

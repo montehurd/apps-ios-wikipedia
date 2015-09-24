@@ -30,6 +30,7 @@
 #import "WMFSectionHeaderEditProtocol.h"
 
 #import "UIWebView+WMFJavascriptContext.h"
+#import "WMFOpenExternalLinkDelegateProtocol.h"
 
 typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     WMFWebViewAlertZeroWebPage,
@@ -37,7 +38,7 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
     WMFWebViewAlertZeroInterstitial
 };
 
-@interface WebViewController () <LanguageSelectionDelegate, FetchFinishedDelegate, WMFSectionHeaderEditDelegate>
+@interface WebViewController () <LanguageSelectionDelegate, FetchFinishedDelegate, WMFSectionHeaderEditDelegate, WMFOpenExternalLinkDelegate>
 
 @property (nonatomic, strong) UIBarButtonItem* buttonTOC;
 @property (nonatomic, strong) UIBarButtonItem* buttonLanguages;
@@ -61,6 +62,10 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
 @synthesize article = _article;
 
 @synthesize siteInfoFetcher = _siteInfoFetcher;
+
+- (void)wmf_externalUrlOpener:(NSURL*)url {
+    [self wmf_openExternalUrl:url];
+}
 
 - (instancetype)initWithCoder:(NSCoder*)aDecoder {
     self = [super initWithCoder:aDecoder];
@@ -773,6 +778,7 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
                 NSURL* url = [NSURL URLWithString:href];
                 NSCAssert(url, @"Failed to from URL from link %@", href);
                 if (url) {
+                    [[SessionSingleton sharedInstance] zeroConfigState].externalLinksOpenerDelegate = weakSelf;
                     [[[SessionSingleton sharedInstance] zeroConfigState] showWarningIfNeededBeforeOpeningURL:url];
                 }
             }
@@ -1510,13 +1516,13 @@ typedef NS_ENUM (NSInteger, WMFWebViewAlertType) {
         case WMFWebViewAlertZeroWebPage:
             if (1 == buttonIndex) {
                 NSURL* url = [NSURL URLWithString:self.wikipediaZeroLearnMoreExternalUrl];
-                [[UIApplication sharedApplication] openURL:url];
+                [self wmf_openExternalUrl:url];
             }
             break;
         case WMFWebViewAlertZeroInterstitial:
             if (1 == buttonIndex) {
                 NSURL* url = [NSURL URLWithString:self.externalUrl];
-                [[UIApplication sharedApplication] openURL:url];
+                [self wmf_openExternalUrl:url];
             }
             break;
     }

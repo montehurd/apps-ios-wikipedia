@@ -13,3 +13,6 @@
 #import "SDImageCache+WMFPersistentCache.h"
 
 #import <KVOController/FBKVOController.h>
+
+#import "SVWebViewController.h"
+#import "SVModalWebViewController.h"
