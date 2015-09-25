@@ -78,7 +78,7 @@
                 ||
                 [scheme isEqualToString:@"mailto"]
                 ) {
-                [[UIApplication sharedApplication] wmf_openURL:requestURL];
+                [self wmf_openExternalUrl:requestURL];
                 return NO;
             }
         }

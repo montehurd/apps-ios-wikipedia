@@ -24,11 +24,13 @@
 // Other
 #import "SessionSingleton.h"
 #import "UIBarButtonItem+WMFButtonConvenience.h"
+#import "WMFOpenExternalLinkProtocol.h"
+#import "Wikipedia-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WMFArticleContainerViewController ()
-<WMFWebViewControllerDelegate, WMFArticleViewControllerDelegate, UINavigationControllerDelegate, WMFPreviewControllerDelegate>
+<WMFWebViewControllerDelegate, WMFArticleViewControllerDelegate, UINavigationControllerDelegate, WMFPreviewControllerDelegate, WMFOpenExternalLinkProtocol>
 @property (nonatomic, strong) MWKSavedPageList* savedPageList;
 @property (nonatomic, strong) MWKDataStore* dataStore;
 
@@ -46,6 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation WMFArticleContainerViewController
 @synthesize article = _article;
+
+- (void)wmf_externalUrlOpener:(NSURL*)url {
+    [self wmf_openExternalUrl:url];
+}
 
 #pragma mark - Setup
 
@@ -248,6 +254,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)articleNavigator:(id<WMFArticleNavigation> __nullable)sender
       didTapExternalLink:(NSURL* __nonnull)externalURL {
+    [[SessionSingleton sharedInstance] zeroConfigState].externalLinksOpenerDelegate = self;
+
     [[[SessionSingleton sharedInstance] zeroConfigState] showWarningIfNeededBeforeOpeningURL:externalURL];
 }
 

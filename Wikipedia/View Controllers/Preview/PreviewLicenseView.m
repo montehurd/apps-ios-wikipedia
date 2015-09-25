@@ -133,13 +133,13 @@ enum {
     return _sheet;
 }
 
-- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)actionSheet:(UIActionSheet*)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
     switch (buttonIndex) {
         case BUTTON_TERMS:
-            [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:TERMS_LINK]];
+            [self.externalLinksOpenerDelegate wmf_externalUrlOpener:[NSURL URLWithString:TERMS_LINK]];
             break;
         case BUTTON_LICENSE:
-            [[UIApplication sharedApplication] wmf_openURL:[NSURL URLWithString:LICENSE_LINK]];
+            [self.externalLinksOpenerDelegate wmf_externalUrlOpener:[NSURL URLWithString:LICENSE_LINK]];
             break;
         default:
             NSLog(@"nooooo");

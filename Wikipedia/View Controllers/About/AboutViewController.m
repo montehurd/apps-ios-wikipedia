@@ -280,7 +280,8 @@ static NSString* const kWMFContributorsKey = @"contributors";
 
     if (navigationType == UIWebViewNavigationTypeLinkClicked &&
         [[self class] isExternalURL:requestURL]) {
-        return ![[UIApplication sharedApplication] wmf_openURL:requestURL];
+        [self wmf_openExternalUrl:requestURL];
+        return NO;
     }
     return YES;
 }

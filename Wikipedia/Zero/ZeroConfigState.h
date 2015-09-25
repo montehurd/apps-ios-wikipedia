@@ -2,6 +2,7 @@
 //  Copyright (c) 2013 Wikimedia Foundation. Provided under MIT-style license; please copy and modify!
 
 #import <Foundation/Foundation.h>
+#import "WMFOpenExternalLinkProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)toggleFakeZeroOn;
 
 - (void)showWarningIfNeededBeforeOpeningURL:(NSURL*)url;
+
+@property (nonatomic, weak) id <WMFOpenExternalLinkProtocol> externalLinksOpenerDelegate;
 
 @end
 

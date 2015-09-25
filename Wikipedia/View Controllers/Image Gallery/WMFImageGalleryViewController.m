@@ -476,7 +476,7 @@ static NSString* const WMFImageGalleryCollectionViewCellReuseId = @"WMFImageGall
         [cell.detailOverlayView setLicense:infoForImage.license owner:ownerOrFallback];
 
         cell.detailOverlayView.ownerTapCallback = ^{
-            [[UIApplication sharedApplication] wmf_openURL:infoForImage.license.URL];
+            [self wmf_openExternalUrl:infoForImage.license.URL];
         };
     }
 
