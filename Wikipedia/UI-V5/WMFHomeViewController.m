@@ -50,7 +50,11 @@ NS_ASSUME_NONNULL_BEGIN
 static NSTimeInterval WMFHomeMinAutomaticReloadTime = 600.0;
 
 @interface WMFHomeViewController ()
-<WMFHomeSectionControllerDelegate, UITextViewDelegate, WMFSearchPresentationDelegate, FBTweakObserver>
+<WMFHomeSectionControllerDelegate,
+ UITextViewDelegate,
+ WMFSearchPresentationDelegate,
+ FBTweakObserver,
+ UIViewControllerPreviewingDelegate>
 
 @property (nonatomic, strong) WMFSectionSchemaManager* schemaManager;
 
@@ -62,9 +66,28 @@ static NSTimeInterval WMFHomeMinAutomaticReloadTime = 600.0;
 
 @property (nonatomic, strong) NSDate* lastReloadDate;
 
+@property (nonatomic, assign) MWKHistoryDiscoveryMethod previewDiscoveryMethod;
+
 @end
 
 @implementation WMFHomeViewController
+
+- (nullable UIViewController*)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
+                      viewControllerForLocation:(CGPoint)location {
+    NSIndexPath* previewIndexPath                  = [(UICollectionView*)previewingContext.sourceView indexPathForItemAtPoint:location];
+    id<WMFHomeSectionController> sectionController = [self sectionControllerForSectionAtIndex:previewIndexPath.section];
+    if (!sectionController) {
+        return nil;
+    }
+    return [[WMFArticleContainerViewController alloc] initWithArticleTitle:[sectionController titleForItemAtIndex:previewIndexPath.item]
+                                                                 dataStore:[self dataStore]];
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
+     commitViewController:(WMFArticleContainerViewController*)viewControllerToCommit {
+    [self wmf_pushArticleViewController:viewControllerToCommit
+                        discoveryMethod:MWKHistoryDiscoveryMethod3dTouchPop];
+}
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -201,6 +224,8 @@ static NSTimeInterval WMFHomeMinAutomaticReloadTime = 600.0;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterForegroundWithNotification:) name:UIApplicationWillEnterForegroundNotification object:nil];
     [self setupHomeTweaks];
+
+    [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

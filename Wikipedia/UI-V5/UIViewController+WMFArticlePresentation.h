@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "MWKHistoryEntry.h"
 
-@class MWKTitle, MWKArticle, MWKSavedPageList, MWKHistoryList, MWKDataStore;
+@class MWKTitle, MWKArticle, MWKSavedPageList, MWKHistoryList, MWKDataStore, WMFArticleContainerViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)wmf_pushArticleViewControllerWithTitle:(MWKTitle*)title
                                discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod
                                      dataStore:(MWKDataStore*)dataStore;
+
+- (void)wmf_pushArticleViewController:(WMFArticleContainerViewController*)articleViewController
+                      discoveryMethod:(MWKHistoryDiscoveryMethod)discoveryMethod;
 
 @end
 

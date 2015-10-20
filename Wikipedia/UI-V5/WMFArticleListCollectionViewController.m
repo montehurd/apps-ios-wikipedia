@@ -28,15 +28,32 @@
 #import <BlocksKit/BlocksKit.h>
 
 @interface WMFArticleListCollectionViewController ()
-<UICollectionViewDelegate, WMFSearchPresentationDelegate, WMFEditingCollectionViewLayoutDelegate>
+<UICollectionViewDelegate,
+ WMFSearchPresentationDelegate,
+ WMFEditingCollectionViewLayoutDelegate,
+ UIViewControllerPreviewingDelegate>
 
 @property (nonatomic, strong) IBOutlet UICollectionView* collectionView;
+@property (nonatomic, assign) MWKHistoryDiscoveryMethod previewDiscoveryMethod;
 
 + (Class)collectionViewClass;
 
 @end
 
 @implementation WMFArticleListCollectionViewController
+
+- (nullable UIViewController*)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
+                      viewControllerForLocation:(CGPoint)location {
+    NSIndexPath* previewIndexPath = [(UICollectionView*)previewingContext.sourceView indexPathForItemAtPoint:location];
+    return [[WMFArticleContainerViewController alloc] initWithArticleTitle:[[self.dataSource articleForIndexPath:previewIndexPath] title]
+                                                                 dataStore:[self dataStore]];
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
+     commitViewController:(WMFArticleContainerViewController*)viewControllerToCommit {
+    [self wmf_pushArticleViewController:viewControllerToCommit
+                        discoveryMethod:MWKHistoryDiscoveryMethod3dTouchPop];
+}
 
 - (instancetype)initWithNibName:(NSString*)nibNameOrNil bundle:(NSBundle*)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -223,6 +240,8 @@
     [self flowLayout].minimumLineSpacing = 1.0;
 
     [self observeArticleUpdates];
+
+    [self registerForPreviewingWithDelegate:self sourceView:self.collectionView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
