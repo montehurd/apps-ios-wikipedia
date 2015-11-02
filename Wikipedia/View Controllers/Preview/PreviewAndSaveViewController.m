@@ -7,7 +7,6 @@
 #import "UIViewController+Alert.h"
 #import "QueuesSingleton.h"
 #import "WikiTextSectionUploader.h"
-#import "UIViewController+WMFHideKeyboard.h"
 #import "EditTokenFetcher.h"
 #import "SessionSingleton.h"
 #import "PreviewWebView.h"

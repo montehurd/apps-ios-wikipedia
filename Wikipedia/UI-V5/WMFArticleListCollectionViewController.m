@@ -1,7 +1,6 @@
 #import "WMFArticleListCollectionViewController.h"
 
 #import "UICollectionView+WMFExtensions.h"
-#import "UIViewController+WMFHideKeyboard.h"
 #import "UIView+WMFDefaultNib.h"
 #import "UICollectionView+WMFKVOUpdatableList.h"
 #import "UIScrollView+WMFContentOffsetUtils.h"

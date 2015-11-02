@@ -38,7 +38,6 @@
 		042DA8531BB1F1F600FFE587 /* MWKSectionHasTextDataTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 042DA8511BB1F1E900FFE587 /* MWKSectionHasTextDataTests.m */; };
 		042E3B931AA16D6700BF8D66 /* UIViewController+WMFChildViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 042E3B921AA16D6700BF8D66 /* UIViewController+WMFChildViewController.m */; };
 		0433263F1B0D3574009DB316 /* WMFArticleImageProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 0433263E1B0D3574009DB316 /* WMFArticleImageProtocol.m */; };
-		0433542218A023FE009305F0 /* UIViewController+WMFHideKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 0433542118A023FE009305F0 /* UIViewController+WMFHideKeyboard.m */; };
 		0433542618A093C5009305F0 /* UIView+RemoveConstraints.m in Sources */ = {isa = PBXBuildFile; fileRef = 0433542518A093C5009305F0 /* UIView+RemoveConstraints.m */; };
 		0436998E1B45B673002FD81D /* WMFArticleTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0436998D1B45B673002FD81D /* WMFArticleTableHeaderView.m */; };
 		043699911B45B68D002FD81D /* WMFArticleSectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 043699901B45B68D002FD81D /* WMFArticleSectionCell.m */; };
@@ -268,6 +267,7 @@
 		0EFB0F261B31EE2D00D05C08 /* SectionImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EFB0F181B31EE2D00D05C08 /* SectionImage.m */; };
 		222B052ECD9AB4BCC885B932 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8A04642A54B737002D28D70 /* Pods.framework */; };
 		AA61D5DAA39C2A7CB97B4791 /* Pods_WikipediaUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8D04746551BF8DC9FF0160F /* Pods_WikipediaUnitTests.framework */; };
+		B05CBA761BE8090D00A226DC /* UIViewController+WMFHideKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B05CBA751BE8090D00A226DC /* UIViewController+WMFHideKeyboard.swift */; };
 		B0F711051BCED85D0040BB42 /* UIImage+WMFStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = B0F711041BCED85D0040BB42 /* UIImage+WMFStyle.m */; };
 		BC060B3A1B456D030086EBFB /* AnyPromise+WMFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = BC060B391B456D030086EBFB /* AnyPromise+WMFExtensions.m */; };
 		BC092B961B18E89200093C59 /* NSString+WMFPageUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = BC092B951B18E89200093C59 /* NSString+WMFPageUtilities.m */; };
@@ -607,8 +607,6 @@
 		042E3B921AA16D6700BF8D66 /* UIViewController+WMFChildViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+WMFChildViewController.m"; sourceTree = "<group>"; };
 		0433263D1B0D3574009DB316 /* WMFArticleImageProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFArticleImageProtocol.h; path = Wikipedia/Protocols/WMFArticleImageProtocol.h; sourceTree = SOURCE_ROOT; };
 		0433263E1B0D3574009DB316 /* WMFArticleImageProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WMFArticleImageProtocol.m; path = Wikipedia/Protocols/WMFArticleImageProtocol.m; sourceTree = SOURCE_ROOT; };
-		0433542018A023FE009305F0 /* UIViewController+WMFHideKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+WMFHideKeyboard.h"; sourceTree = "<group>"; };
-		0433542118A023FE009305F0 /* UIViewController+WMFHideKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+WMFHideKeyboard.m"; sourceTree = "<group>"; };
 		0433542418A093C5009305F0 /* UIView+RemoveConstraints.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+RemoveConstraints.h"; sourceTree = "<group>"; };
 		0433542518A093C5009305F0 /* UIView+RemoveConstraints.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+RemoveConstraints.m"; sourceTree = "<group>"; };
 		0436998C1B45B673002FD81D /* WMFArticleTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFArticleTableHeaderView.h; sourceTree = "<group>"; };
@@ -1029,6 +1027,7 @@
 		429C152FC8B093B59D18CAD3 /* Pods-WikipediaUnitTests.beta.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WikipediaUnitTests.beta.xcconfig"; path = "Pods/Target Support Files/Pods-WikipediaUnitTests/Pods-WikipediaUnitTests.beta.xcconfig"; sourceTree = "<group>"; };
 		59CB2F41D52F438BED356EF4 /* Pods-WikipediaUnitTests.adhoc.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WikipediaUnitTests.adhoc.xcconfig"; path = "Pods/Target Support Files/Pods-WikipediaUnitTests/Pods-WikipediaUnitTests.adhoc.xcconfig"; sourceTree = "<group>"; };
 		644C62F6A8B8E2ED7DFA53D5 /* Pods.adhoc.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.adhoc.xcconfig; path = "Pods/Target Support Files/Pods/Pods.adhoc.xcconfig"; sourceTree = "<group>"; };
+		B05CBA751BE8090D00A226DC /* UIViewController+WMFHideKeyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+WMFHideKeyboard.swift"; sourceTree = "<group>"; };
 		B0F711021BCC68560040BB42 /* WMFNumberOfExtractCharacters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMFNumberOfExtractCharacters.h; sourceTree = "<group>"; };
 		B0F711031BCED85D0040BB42 /* UIImage+WMFStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+WMFStyle.h"; sourceTree = "<group>"; };
 		B0F711041BCED85D0040BB42 /* UIImage+WMFStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+WMFStyle.m"; sourceTree = "<group>"; };
@@ -2065,8 +2064,7 @@
 				044396221A3D33030081557D /* UICollectionViewCell+DynamicCellHeight.m */,
 				B0F711031BCED85D0040BB42 /* UIImage+WMFStyle.h */,
 				B0F711041BCED85D0040BB42 /* UIImage+WMFStyle.m */,
-				0433542018A023FE009305F0 /* UIViewController+WMFHideKeyboard.h */,
-				0433542118A023FE009305F0 /* UIViewController+WMFHideKeyboard.m */,
+				B05CBA751BE8090D00A226DC /* UIViewController+WMFHideKeyboard.swift */,
 				042E3B911AA16D6700BF8D66 /* UIViewController+WMFChildViewController.h */,
 				042E3B921AA16D6700BF8D66 /* UIViewController+WMFChildViewController.m */,
 				04F0E2E8186EDC1A00468738 /* UIWebView+ElementLocation.h */,
@@ -4082,6 +4080,7 @@
 				04EDEE311A21CB4100798076 /* UIScreen+Extras.m in Sources */,
 				BCB669A91A83F6C400C7B1FE /* MWKSection.m in Sources */,
 				BCB669B61A83F6C400C7B1FE /* MWKImageList.m in Sources */,
+				B05CBA761BE8090D00A226DC /* UIViewController+WMFHideKeyboard.swift in Sources */,
 				0EFB0F231B31EE2D00D05C08 /* ImageData.m in Sources */,
 				B0F711051BCED85D0040BB42 /* UIImage+WMFStyle.m in Sources */,
 				0EA1791C1BD95908004FF529 /* WMFRandomSectionController.m in Sources */,
@@ -4272,7 +4271,6 @@
 				C91A86F41A8BCB680088A801 /* WMFShareCardImageContainer.m in Sources */,
 				BCB58F781A8D081E00465627 /* NSArray+BKIndex.m in Sources */,
 				BCE6EE131B2629ED00AF603B /* MWKLanguageLinkResponseSerializer.m in Sources */,
-				0433542218A023FE009305F0 /* UIViewController+WMFHideKeyboard.m in Sources */,
 				0484E3DE19D9D19B0085D18D /* UIView+ConstraintsScale.m in Sources */,
 				BC505EFD1B5D462700537006 /* CIDetector+WMFFaceDetection.m in Sources */,
 				0E66B9271BDFFA3700B61F69 /* WMFTitleInsetRespectingButton.m in Sources */,

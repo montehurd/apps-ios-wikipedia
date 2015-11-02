@@ -28,7 +28,6 @@
 #import "UIViewController+WMFStoryboardUtilities.h"
 #import "UIStoryboard+WMFExtensions.h"
 #import "UITabBarController+WMFExtensions.h"
-#import "UIViewController+WMFHideKeyboard.h"
 #import "UIFont+WMFStyle.h"
 #import "NSString+WMFGlyphs.h"
 #import "WMFStyleManager.h"

@@ -7,7 +7,6 @@
 #import "WikiGlyphLabel.h"
 #import "WikiGlyph_Chars.h"
 #import "WikipediaAppUtils.h"
-#import "UIViewController+WMFHideKeyboard.h"
 #import "Wikipedia-Swift.h"
 #import "UIColor+WMFHexColor.h"
 #import "MWKRecentSearchList.h"

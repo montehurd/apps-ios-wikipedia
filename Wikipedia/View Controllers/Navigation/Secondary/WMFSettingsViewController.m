@@ -29,7 +29,6 @@
 
 // Utils
 #import "WikipediaAppUtils.h"
-#import "UIViewController+WMFHideKeyboard.h"
 #import "UIView+TemporaryAnimatedXF.h"
 #import "UIViewController+Alert.h"
 #import "NSString+FormattedAttributedString.h"
@@ -44,6 +43,7 @@
 
 // Other
 #import "UIViewController+WMFOpenExternalUrl.h"
+#import "Wikipedia-Swift.h"
 
 #pragma mark - Defines
 
