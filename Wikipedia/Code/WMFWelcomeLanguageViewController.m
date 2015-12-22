@@ -33,7 +33,7 @@
 }
 
 - (IBAction)showHowThisWorksAlert:(id)sender {
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:nil message:MWLocalizedString(@"welcome-languages-more-info-text", nil) delegate:nil cancelButtonTitle:MWLocalizedString(@"welcome-languages-more-info-done-button", nil) otherButtonTitles:nil];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:MWLocalizedString(@"welcome-languages-more-info-button-text", nil) message:MWLocalizedString(@"welcome-languages-more-info-text", nil) delegate:nil cancelButtonTitle:MWLocalizedString(@"welcome-languages-more-info-done-button", nil) otherButtonTitles:nil];
     [alert show];
 }
 
