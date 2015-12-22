@@ -357,7 +357,10 @@
 "welcome-whats-new-bullet-one-more-info-text" = "When you visit an article, related articles are automatically added to your feed. This doesn’t change how we collect your information, and your reading history is still private.";
 "welcome-whats-new-bullet-one-more-info-done-button" = "Got it";
 
-"welcome-languages-title" = "Pick your languages";
+"welcome-languages-title" = "Languages to search";
+"welcome-languages-more-info-button-text" = "How this works...";
+"welcome-languages-more-info-text" = "Wikipedia articles are often available in multiple languages. Choose the languages you would like to use when searching. You can change these later.";
+"welcome-languages-more-info-done-button" = "Got it";
 "welcome-languages-more-languages-button-title" = "Add more languages";
 "welcome-languages-button-title" = "Continue";
 "welcome-languages-footnote-text" = "Don't worry you can change this later.";
