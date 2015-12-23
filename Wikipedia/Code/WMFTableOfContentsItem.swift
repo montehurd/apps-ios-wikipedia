@@ -11,12 +11,15 @@ import Foundation
 // MARK: - TOC Item Types
 
 public enum TableOfContentsItemType {
+    case ArticleTitle
     case Primary
     case Secondary
 
     var titleFont: UIFont {
         get {
             switch (self) {
+            case .ArticleTitle:
+                return UIFont.wmf_tableOfContentsSectionFont()
             case .Primary:
                 return UIFont.wmf_tableOfContentsSectionFont()
             case .Secondary:
@@ -28,6 +31,8 @@ public enum TableOfContentsItemType {
     var titleColor: UIColor {
         get {
             switch (self) {
+            case .ArticleTitle:
+                return UIColor.whiteColor()
             case .Primary:
                 return UIColor.wmf_tableOfContentsSectionTextColor()
             case .Secondary:

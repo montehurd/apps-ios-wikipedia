@@ -21,6 +21,9 @@ extension MWKSection : TableOfContentsItem {
 
     public var itemType: TableOfContentsItemType {
         get {
+            if(isLeadSection()) {
+                return TableOfContentsItemType.ArticleTitle
+            }
             return level?.intValue <= 2 ? TableOfContentsItemType.Primary : TableOfContentsItemType.Secondary
         }
     }
@@ -48,6 +51,9 @@ extension MWKSection : TableOfContentsItem {
     }
 
     public func shouldBeHighlightedAlongWithItem(item: TableOfContentsItem) -> Bool {
+        if(isLeadSection()) {
+            return false
+        }
         guard let sectionItem = item as? MWKSection else {
             return false
         }

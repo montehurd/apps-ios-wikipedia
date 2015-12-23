@@ -186,13 +186,19 @@ public class WMFTableOfContentsViewController: UIViewController,
             shouldHighlight || item.shouldBeHighlightedAlongWithItem(selectedItem)
         }
         cell.setItem(item)
-        cell.setSectionSelected(shouldHighlight, animated: false)
+        if(item.itemType != .ArticleTitle){
+            cell.setSectionSelected(shouldHighlight, animated: false)
+            cell.backgroundColor = UIColor.whiteColor()
+        }else{
+            cell.backgroundColor = UIColor.wmf_blueTintColor()
+        }
         return cell
     }
 
     // MARK: - UITableViewDelegate
     public func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = WMFTableOfContentsHeader.wmf_viewFromClassNib()
+        header.backgroundColor = UIColor.wmf_blueTintColor()
         assert(delegate != nil, "TOC delegate not set!")
         header.articleSite = delegate?.tableOfContentsArticleSite()
         return header
@@ -200,7 +206,9 @@ public class WMFTableOfContentsViewController: UIViewController,
     
     public func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         let item = items[indexPath.row]
-        addHighlightToItem(item, animated: true)
+        if(item.itemType != .ArticleTitle){
+            addHighlightToItem(item, animated: true)
+        }
         return true
     }
     
