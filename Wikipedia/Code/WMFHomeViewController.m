@@ -496,6 +496,24 @@ NS_ASSUME_NONNULL_BEGIN
     [self.dataSource removeAllSections];
 }
 
+- (void)scrollToNearby {
+    NSUInteger section = [self.dataSource indexOfSectionWithIdentifier:self.nearbySectionController.sectionIdentifier];
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+}
+
+- (void)scrollToRandom {
+    NSUInteger section = [self.dataSource indexOfSectionWithIdentifier:WMFRandomSectionIdentifier];
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+}
+
+- (void)scrollToPOTD {
+    NSUInteger section = [self.dataSource indexOfSectionWithIdentifier:self.picOfTheDaySectionController.sectionIdentifier];
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
+    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+}
+
 - (void)didTapFooterInSection:(NSUInteger)section {
     id<WMFHomeSectionController> controllerForSection = [self sectionControllerForSectionAtIndex:section];
     NSParameterAssert(controllerForSection);

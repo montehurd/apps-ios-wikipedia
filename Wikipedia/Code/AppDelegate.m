@@ -7,11 +7,6 @@
 #import "PiwikTracker+WMFExtensions.h"
 #import "WMFAppViewController.h"
 
-static NSString* const WMFIconShortcutTypeSearch          = @"org.wikimedia.wikipedia.icon-shortcut-random";
-static NSString* const WMFIconShortcutTypeContinueReading = @"org.wikimedia.wikipedia.icon-shortcut-continue-reading";
-static NSString* const WMFIconShortcutTypeRandom          = @"org.wikimedia.wikipedia.icon-shortcut-random";
-static NSString* const WMFIconShortcutTypeNearby          = @"org.wikimedia.wikipedia.icon-shortcut-nearby";
-
 @import Tweaks;
 
 @interface AppDelegate ()
@@ -78,6 +73,7 @@ static NSString* const WMFIconShortcutTypeNearby          = @"org.wikimedia.wiki
     [[NSMutableArray alloc] initWithObjects:
      makeShortcut(WMFIconShortcutTypeRandom, @"icon-shortcut-random-title", @"", @"random-quick-action"),
      makeShortcut(WMFIconShortcutTypeNearby, @"icon-shortcut-nearby-title", @"", @"nearby-quick-action"),
+//     makeShortcut(WMFIconShortcutTypePOTD, @"icon-shortcut-nearby-picture-of-day", @"", @"potd-mini"),
      nil
      ];
     
@@ -91,10 +87,16 @@ static NSString* const WMFIconShortcutTypeNearby          = @"org.wikimedia.wiki
     [UIApplication sharedApplication].shortcutItems = shortcutItems;
 }
 
+-(void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    self.shortcutItemSelectedOnLaunch = shortcutItem;
+}
+
 - (void)applicationWillResignActive:(UIApplication*)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     [[NSUserDefaults standardUserDefaults] wmf_setAppResignActiveDate:[NSDate date]];
+    self.shortcutItemSelectedOnLaunch = nil;
+    [self createDynamicIconShortcutItems];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication*)application {
@@ -114,6 +116,8 @@ static NSString* const WMFIconShortcutTypeNearby          = @"org.wikimedia.wiki
 
 - (void)applicationWillTerminate:(UIApplication*)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    self.shortcutItemSelectedOnLaunch = nil;
+    [self createDynamicIconShortcutItems];
 }
 
 // TODO: fetch saved pages in the background

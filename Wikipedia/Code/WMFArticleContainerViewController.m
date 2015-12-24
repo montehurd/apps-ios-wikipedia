@@ -556,6 +556,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:self.articleTitle];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
@@ -563,9 +568,9 @@ NS_ASSUME_NONNULL_BEGIN
     [self saveWebViewScrollOffset];
     [self removeProgressView];
 
-    if ([[[NSUserDefaults standardUserDefaults] wmf_openArticleTitle] isEqualToTitle:self.articleTitle]) {
-        [[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:nil];
-    }
+//    if ([[[NSUserDefaults standardUserDefaults] wmf_openArticleTitle] isEqualToTitle:self.articleTitle]) {
+//        [[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:nil];
+//    }
 }
 
 - (void)traitCollectionDidChange:(nullable UITraitCollection*)previousTraitCollection {

@@ -14,6 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) MWKSavedPageList* savedPages;
 @property (nonatomic, strong) MWKHistoryList* recentPages;
 
+- (void)scrollToNearby;
+- (void)scrollToRandom;
+- (void)scrollToPOTD;
+
 @end
 
 NS_ASSUME_NONNULL_END

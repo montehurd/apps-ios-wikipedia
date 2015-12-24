@@ -40,6 +40,8 @@
 #import "WMFArticleContainerViewController.h"
 #import "UIViewController+WMFArticlePresentation.h"
 
+#import "AppDelegate.h"
+
 /**
  *  Enums for each tab in the main tab bar.
  *
@@ -171,7 +173,57 @@ static dispatch_once_t launchToken;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillResignActiveWithNotification:) name:UIApplicationWillResignActiveNotification object:nil];
 }
 
+-(BOOL)handleSelectionOfShortcutItemIfNecessary{
+    UIApplicationShortcutItem *shortcutItemSelectedOnLaunch = [((AppDelegate*)[UIApplication sharedApplication].delegate) shortcutItemSelectedOnLaunch];
+    if (shortcutItemSelectedOnLaunch) {
+
+        // Ensure search view controller has been hidden.
+        [[self navigationControllerForTab:WMFAppTabTypeHome] dismissViewControllerAnimated:NO completion:nil];
+        
+        
+        if ([shortcutItemSelectedOnLaunch.type isEqualToString:WMFIconShortcutTypeSearch]) {
+            //HAX: fragile bad no good booo.
+            UIBarButtonItem* searchButton = ((WMFArticleContainerViewController*)((UINavigationController*)self.rootTabBarController.selectedViewController).topViewController).navigationItem.rightBarButtonItem;
+            [searchButton.target performSelector:searchButton.action withObject:searchButton];
+            return YES;
+        }else if ([shortcutItemSelectedOnLaunch.type isEqualToString:WMFIconShortcutTypeContinueReading]) {
+// Fall through to normal "continue reading" handling.
+/*
+            MWKTitle* lastRead = [[NSUserDefaults standardUserDefaults] wmf_openArticleTitle];
+            if (lastRead) {
+                //[[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:nil];
+                [self.tabBarController setSelectedIndex:WMFAppTabTypeHome];
+                [[self navigationControllerForTab:WMFAppTabTypeHome] popToRootViewControllerAnimated:NO];
+                [self.homeViewController wmf_pushArticleViewControllerWithTitle:lastRead discoveryMethod:MWKHistoryDiscoveryMethodReloadFromNetwork dataStore:self.session.dataStore];
+                return YES;
+            }
+*/
+        }else if ([shortcutItemSelectedOnLaunch.type isEqualToString:WMFIconShortcutTypeRandom]) {
+            [self.tabBarController setSelectedIndex:WMFAppTabTypeHome];
+            [[self navigationControllerForTab:WMFAppTabTypeHome] popToRootViewControllerAnimated:NO];
+            [self.homeViewController scrollToRandom];
+            return YES;
+        }else if ([shortcutItemSelectedOnLaunch.type isEqualToString:WMFIconShortcutTypeNearby]) {
+            [self.tabBarController setSelectedIndex:WMFAppTabTypeHome];
+            [[self navigationControllerForTab:WMFAppTabTypeHome] popToRootViewControllerAnimated:NO];
+            [self.homeViewController scrollToNearby];
+            return YES;
+        }else if ([shortcutItemSelectedOnLaunch.type isEqualToString:WMFIconShortcutTypePOTD]) {
+            [self.tabBarController setSelectedIndex:WMFAppTabTypeHome];
+            [[self navigationControllerForTab:WMFAppTabTypeHome] popToRootViewControllerAnimated:NO];
+            [self.homeViewController scrollToPOTD];
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (void)resumeApp {
+    BOOL shortcutWasHandled = [self handleSelectionOfShortcutItemIfNecessary];
+    if (shortcutWasHandled) {
+        return;
+    }
+    
     if (![self launchCompleted]) {
         return;
     }
@@ -183,7 +235,9 @@ static dispatch_once_t launchToken;
         if (FBTweakValue(@"Last Open Article", @"General", @"Restore on Launch", YES)) {
             MWKTitle* lastRead = [[NSUserDefaults standardUserDefaults] wmf_openArticleTitle];
             if (lastRead) {
-                [[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:nil];
+                //[[NSUserDefaults standardUserDefaults] wmf_setOpenArticleTitle:nil];
+
+                
                 [self.tabBarController setSelectedIndex:WMFAppTabTypeHome];
                 [self.homeViewController wmf_pushArticleViewControllerWithTitle:lastRead discoveryMethod:MWKHistoryDiscoveryMethodReloadFromNetwork dataStore:self.session.dataStore];
             }
