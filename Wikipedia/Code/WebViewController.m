@@ -862,6 +862,12 @@ NSString* const WMFLicenseTitleOnENWiki =
         NSString* urlString = [[element valueForProperty:@"href"] toString];
         return (!urlString) ? nil : [NSURL URLWithString:urlString];
     }
+    
+    if ([[[element valueForProperty:@"tagName"] toString] isEqualToString:@"IMG"] && [element valueForProperty:@"src"]) {
+        NSString* urlString = [[element valueForProperty:@"src"] toString];
+        return (!urlString) ? nil : [NSURL URLWithString:urlString];
+    }
+    
     return nil;
 }
 

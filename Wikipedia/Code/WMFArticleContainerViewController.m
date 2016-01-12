@@ -842,6 +842,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UIViewController*)previewingContext:(id<UIViewControllerPreviewing>)previewingContext
                       viewControllerForLocation:(CGPoint)location {
+    
+//    self.webViewController.webView.userInteractionEnabled = NO;
+//    self.webViewController.webView.userInteractionEnabled = YES;
+    
     JSValue* peekElement = [self.webViewController htmlElementAtLocation:location];
     if (!peekElement) {
         return nil;
@@ -852,6 +856,29 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
+    
+    if ([[[peekElement valueForProperty:@"tagName"] toString] isEqualToString:@"IMG"]) {
+        MWKImage* selectedImage = [[MWKImage alloc] initWithArticle:self.article sourceURLString:peekURL.absoluteString];
+        /*
+         NOTE(bgerstle): not setting gallery delegate intentionally to prevent header gallery changes as a result of
+         fullscreen gallery interactions that originate from the webview
+         */
+        WMFModalImageGalleryViewController* fullscreenGallery =
+        [[WMFModalImageGalleryViewController alloc] initWithImagesInArticle:self.article
+                                                               currentImage:selectedImage];
+        self.webViewController.isPeeking = YES;
+        previewingContext.sourceRect     = [self.webViewController rectForHTMLElement:peekElement];
+        
+        NSLog(@"previewingContext.sourceRect = %@", NSStringFromCGRect(previewingContext.sourceRect));
+
+        
+//[[self.webViewController.webView wmf_javascriptContext][@"cancel touch event somehow"] callWithArguments:@[@(location.x), @(location.y)]];
+
+        
+        return fullscreenGallery;
+    }
+    
+    
     UIViewController* peekVC = [self viewControllerForPreviewURL:peekURL];
     if (peekVC) {
         if ([peekVC isKindOfClass:[WMFArticleContainerViewController class]]) {
