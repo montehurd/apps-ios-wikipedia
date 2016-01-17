@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     @weakify(self);
     return [self.operationManager wmf_GETWithSite:site parameters:params]
-           .thenInBackground(^id (NSArray<MWKSearchResult*>* unsortedPreviews) {
+    .thenInBackground(^id (NSArray<MWKSearchResult*>* unsortedPreviews) {
         @strongify(self);
         if (!self) {
             return [NSError cancelledError];
@@ -76,6 +76,9 @@ NS_ASSUME_NONNULL_BEGIN
                 return [preview.displayTitle isEqualToString:title.text];
             }];
         }];
+    })
+    .catch(^(NSError* error){
+        return error;
     });
 }
 
