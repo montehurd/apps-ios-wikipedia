@@ -547,6 +547,12 @@ NSString* const WMFLicenseTitleOnENWiki =
                 return;
             }
 
+            NSNumber* imageWidth = payload[@"width"];
+            NSNumber* imageHeight = payload[@"height"];
+            if ((imageWidth.integerValue < MWKImage.minimumImageSizeForGalleryInclusion.width) || (imageHeight.integerValue < MWKImage.minimumImageSizeForGalleryInclusion.height)) {
+                return;
+            }
+
             NSString* selectedImageURL = payload[@"url"];
             NSCParameterAssert(selectedImageURL.length);
             if (!selectedImageURL.length) {
@@ -558,32 +564,6 @@ NSString* const WMFLicenseTitleOnENWiki =
         }];
     }
     return _bridge;
-}
-
-#pragma mark Web view html content live location retrieval
-
-- (void)printLiveContentLocationTestingOutputToConsole {
-    // Test with the top image (presently) on the San Francisco article.
-    // (would test p.x and p.y against CGFLOAT_MAX to ensure good value was retrieved)
-    CGPoint p = [self.webView getScreenCoordsForHtmlImageWithSrc:@"//upload.wikimedia.org/wikipedia/commons/thumb/d/da/SF_From_Marin_Highlands3.jpg/280px-SF_From_Marin_Highlands3.jpg"];
-    NSLog(@"p = %@", NSStringFromCGPoint(p));
-
-    CGPoint p2 = [self.webView getWebViewCoordsForHtmlImageWithSrc:@"//upload.wikimedia.org/wikipedia/commons/thumb/d/da/SF_From_Marin_Highlands3.jpg/280px-SF_From_Marin_Highlands3.jpg"];
-    NSLog(@"p2 = %@", NSStringFromCGPoint(p2));
-
-    // Also test location of second section on page.
-    // (would test r with CGRectIsNull(r) to ensure good values were retrieved)
-    CGRect r = [self.webView getScreenRectForHtmlElementWithId:@"section_heading_and_content_block_1"];
-    NSLog(@"r = %@", NSStringFromCGRect(r));
-
-    CGRect r2 = [self.webView getWebViewRectForHtmlElementWithId:@"section_heading_and_content_block_1"];
-    NSLog(@"r2 = %@", NSStringFromCGRect(r2));
-}
-
-- (void)debugScrollLeadSanFranciscoArticleImageToTopLeft {
-    // Awesome! Now works regarless of pinch-zoom scale!
-    CGPoint p = [self.webView getWebViewCoordsForHtmlImageWithSrc:@"//upload.wikimedia.org/wikipedia/commons/thumb/d/da/SF_From_Marin_Highlands3.jpg/280px-SF_From_Marin_Highlands3.jpg"];
-    [self.webView.scrollView setContentOffset:p animated:YES];
 }
 
 #pragma mark - Display article
@@ -875,6 +855,57 @@ NSString* const WMFLicenseTitleOnENWiki =
     return CGRectMake(left, top + self.webView.scrollView.contentOffset.y, right - left, bottom - top);
 }
 
+
+
+
+
+
+
+
+-(void)didReceiveMemoryWarning {
+
+    MWKArticle *article = self.session.currentArticle;
+    NSLog(@"article = %@", article);
+    
+    
+    for (MWKSection* section in article.sections) {
+        for (MWKImage* image in [section.images uniqueLargestVariants]) {
+            NSLog(@"\n\n\n\nimage.sourceURLString = %@", image.sourceURLString);
+
+                NSLog(@"\tisDownloaded = %d", (int)image.isDownloaded);
+                NSLog(@"\tsize = %@", NSStringFromCGSize(image.size));
+
+//problem - when we get the binary, if the image's MWKImage record doesn't already have the size from the hpple parse, we need to make a uiimage and determine its size and save that to the MWKImage record.
+
+//to confirm this is the problem, take the MWKImage record for cadefde9712e9fe9095cd60bdeea8e44
+//and handcode into the file a size, then see if the gallery shows it. guessing it won't (which is good)
+            
+            
+            
+//            if (image.isDownloaded) {
+//                UIImage* img           = [image asUIImage];
+//            }
+        }
+    }
+    
+    
+
+//    if ([imageNode.attributes[@"src"] containsString:@"cadefde9712e9fe9095cd60bdeea8e44"]) {
+//        NSLog(@"SMALL!");
+//    }
+
+
+}
+
+
+
+
+
+
+
+
+
+
 @end
 
 
@@ -892,5 +923,7 @@ NSString* const WMFLicenseTitleOnENWiki =
     }
     return [super canPerformAction:action withSender:sender];
 }
+
+
 
 @end
