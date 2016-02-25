@@ -121,7 +121,7 @@ NSString* const WMFLicenseTitleOnENWiki =
     self.webView.scrollView.backgroundColor  = [UIColor wmf_articleBackgroundColor];
 
     self.zeroStatusLabel.font = [UIFont systemFontOfSize:ALERT_FONT_SIZE];
-    self.zeroStatusLabel.text = @"";
+    self.zeroStatusLabel.text = @"This is a sample carrier message. This is a very long message. This is very bla bla bla.";
 
     self.webView.backgroundColor = [UIColor whiteColor];
 

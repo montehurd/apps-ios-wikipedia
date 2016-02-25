@@ -8,6 +8,8 @@
 #import "WMFAppViewController.h"
 #import "UIApplicationShortcutItem+WMFShortcutItem.h"
 #import "WMFDailyStatsLoggingFunnel.h"
+#import "WMFWindow.h"
+#import <Masonry/Masonry.h>
 
 @interface AppDelegate ()
 
@@ -42,7 +44,7 @@
 
 - (UIWindow*)window {
     if (!_window) {
-        _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+        _window = [[WMFWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     }
     return _window;
 }
@@ -86,6 +88,15 @@
 
     [self.statsFunnel logAppNumberOfDaysSinceInstall];
 
+    
+    
+//    self.window.translatesAutoresizingMaskIntoConstraints = NO;
+//    [self.window mas_makeConstraints:^(MASConstraintMaker* make) {
+//        make.leading.top.bottom.and.trailing.equalTo(self.window.superview);
+////        make.top.equalTo(self.window.superview.mas_bottom);
+//    }];
+
+    
     WMFAppViewController* vc = [WMFAppViewController initialAppViewControllerFromDefaultStoryBoard];
     [vc launchAppInWindow:self.window];
     self.appViewController = vc;

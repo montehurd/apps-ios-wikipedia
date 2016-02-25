@@ -622,7 +622,7 @@ static NSString* const WMFExploreSectionsFileExtension = @"plist";
 - (void)save {
     dispatchOnBackgroundQueue(^{
         BOOL const success = [NSKeyedArchiver archiveRootObject:self toFile:self.filePath];
-        NSParameterAssert(success);
+//        NSParameterAssert(success);
         if (!success) {
             WMF_TECH_DEBT_TODO(add error handling);
             DDLogError(@"Failed to save sections to disk!");
