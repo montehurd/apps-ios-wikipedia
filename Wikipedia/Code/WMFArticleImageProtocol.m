@@ -14,6 +14,8 @@
 #import "NSURL+WMFExtras.h"
 #import "NSURL+WMFRest.h"
 
+#import "WMFImageURLParsing.h"
+
 // Set the level for logs in this file
 #undef LOG_LEVEL_DEF
 #define LOG_LEVEL_DEF WMFArticleImageProtocolLogLevel
@@ -42,6 +44,29 @@ static NSString* const WMFArticleImageProtocolHost               = @"upload.wiki
 }
 
 + (NSURLRequest*)canonicalRequestForRequest:(NSURLRequest*)request {
+
+/*
+ - Add tweak for "lower resolution images", then use that instead of the existing one to control both native and web
+    image resolutions. (get rid of the 3x part of the tweak too.)
+ - Make lower res mode also not widen images (too pixelated)
+ - Default to low res mode for W0?
+*/
+    
+    NSString* lowResolutionURL = [MWKImage wmf_imageURLFromSizePrefixImageURL:request.URL.absoluteString sizeMultiplier:0.5];
+    
+    DDLogVerbose(@"\n\n%@", lowResolutionURL);
+
+    if (lowResolutionURL) {
+        NSInteger lowResolutionWidth = [MWKImage fileSizePrefix:lowResolutionURL];
+        CGFloat minGalleryInclusionWidth = MWKImage.minimumImageSizeForGalleryInclusion.width;
+        CGFloat screenScaleMultiplier = 1.0 / [[UIScreen mainScreen] scale];
+        // Only use the low res url if it wont drop the image below the gallery inclusion threshold.
+        // (that would make a "tappable" image no longer tappable)
+        if (((CGFloat)(lowResolutionWidth) * screenScaleMultiplier) > minGalleryInclusionWidth) {
+            return [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:lowResolutionURL]];
+        }
+    }
+    
     return request;
 }
 

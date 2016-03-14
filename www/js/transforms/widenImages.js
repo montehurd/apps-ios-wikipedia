@@ -25,7 +25,7 @@ function widenAncestors (el) {
 
 function shouldWidenImage(image) {
     if (
-        image.width >= 64 &&
+        image.width >= 80 &&
         image.hasAttribute('srcset') &&
         !image.hasAttribute('hasOverflowXContainer') &&
         !utilities.isNestedInTable(image)

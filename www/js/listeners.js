@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     transformer.transform( "hideRedlinks", document );
     transformer.transform( "disableFilePageEdit", document );
     transformer.transform( "addImageOverflowXContainers", document ); // Needs to happen before "widenImages" transform.
-    transformer.transform( "widenImages", document );
+//    transformer.transform( "widenImages", document );
     transformer.transform( "hideTables", document );
 
     bridge.sendMessage( "DOMContentLoaded", {} );

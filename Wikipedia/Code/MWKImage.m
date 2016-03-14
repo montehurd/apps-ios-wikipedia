@@ -147,6 +147,27 @@
     return WMFParseSizePrefixFromSourceURL(sourceURL);
 }
 
++ (NSString*)wmf_imageURLFromSizePrefixImageURL:(NSString*)url sizeMultiplier:(CGFloat)sizeMultiplier {
+    NSInteger prefixWidth = [MWKImage fileSizePrefix:url];
+    if (prefixWidth == NSNotFound) {
+        return nil;
+    }
+    
+    NSInteger adjustedWidth = prefixWidth * sizeMultiplier;
+    
+    NSString *lastPathComponent = [url lastPathComponent];
+    
+    NSRange pxRange = [lastPathComponent rangeOfString:@"px-"];
+    if (pxRange.location == NSNotFound) {
+        return nil;
+    }
+    NSString *nameWithoutSizePrefix = [lastPathComponent substringFromIndex:NSMaxRange(pxRange)];
+    
+    NSString *adjustedLastPathComponent = [NSString stringWithFormat:@"%ldpx-%@", adjustedWidth, nameWithoutSizePrefix];
+    
+    return [[url stringByDeletingLastPathComponent] stringByAppendingPathComponent:adjustedLastPathComponent];
+}
+
 - (NSString*)fileNameNoSizePrefix {
     if (!_fileNameNoSizePrefix) {
         _fileNameNoSizePrefix = [MWKImage fileNameNoSizePrefix:self.sourceURLString];
@@ -327,8 +348,8 @@
 }
 
 + (BOOL)isSizeLargeEnoughForGalleryInclusion:(CGSize)size {
-    return (size.width > MWKImage.minimumImageSizeForGalleryInclusion.width) &&
-           (size.height > MWKImage.minimumImageSizeForGalleryInclusion.height);
+    return (size.width > MWKImage.minimumImageSizeForGalleryInclusion.width);// &&
+//           (size.height > MWKImage.minimumImageSizeForGalleryInclusion.height);
 }
 
 @end

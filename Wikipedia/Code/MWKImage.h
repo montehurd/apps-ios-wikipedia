@@ -160,6 +160,10 @@
 
 + (NSInteger)fileSizePrefix:(NSString*)sourceURL;
 
++ (NSString*)wmf_imageURLFromSizePrefixImageURL:(NSString*)url sizeMultiplier:(CGFloat)sizeMultiplier;
+
++ (CGSize)minimumImageSizeForGalleryInclusion;
+
 #pragma mark - Comparison
 
 - (BOOL)isEqualToImage:(MWKImage*)image;
