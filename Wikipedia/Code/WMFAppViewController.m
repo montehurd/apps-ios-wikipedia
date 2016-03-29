@@ -185,7 +185,7 @@ static NSTimeInterval const WMFTimeBeforeRefreshingExploreScreen = 24 * 60 * 60;
     //HAX: fix for "Unbalanced calls to begin/end appearance transitions" warning
     //We could put it in viewdidappear, but then we would have to wrap it in a dispatch_once to make sure it only runs once
     //Add a delay for iOS 8 (for iOS 9+ we can dispatch and that will be enough)
-    dispatchOnMainQueueAfterDelayInSeconds(0.35, ^{
+//    dispatchOnMainQueueAfterDelayInSeconds(0.35, ^{
         @weakify(self)
         [self runDataMigrationIfNeededWithCompletion:^{
             @strongify(self)
@@ -196,13 +196,16 @@ static NSTimeInterval const WMFTimeBeforeRefreshingExploreScreen = 24 * 60 * 60;
             }
             [self presentOnboardingIfNeededWithCompletion:^(BOOL didShowOnboarding) {
                 @strongify(self)
+                
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:@"presentOnboardingIfNeededWithCompletion:"];
+                
                 [self loadMainUI];
                 [self hideSplashViewAnimated:!didShowOnboarding];
                 [self resumeApp];
                 [[PiwikTracker wmf_configuredInstance] wmf_logView:[self rootViewControllerForTab:WMFAppTabTypeExplore]];
             }];
         }];
-    });
+//    });
 }
 
 #pragma mark - Start/Pause/Resume App
@@ -247,6 +250,10 @@ static NSTimeInterval const WMFTimeBeforeRefreshingExploreScreen = 24 * 60 * 60;
     }
 
     if ([item.type isEqualToString:WMFIconShortcutTypeSearch]) {
+     
+// 2
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:@"processShortcutItem:completion:"];
+        
         [self showSearchAnimated:YES];
     } else if ([item.type isEqualToString:WMFIconShortcutTypeRandom]) {
         [self showRandomArticleAnimated:YES];
@@ -586,10 +593,20 @@ static NSString* const WMFDidShowOnboarding = @"DidShowOnboarding5.0";
 
 - (void)showSearchAnimated:(BOOL)animated {
     [self.rootTabBarController setSelectedIndex:WMFAppTabTypeExplore];
+    
     UINavigationController* exploreNavController = [self navigationControllerForTab:WMFAppTabTypeExplore];
     if (exploreNavController.presentedViewController) {
         [exploreNavController dismissViewControllerAnimated:NO completion:NULL];
     }
+    
+// 3
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:@"showSearchAnimated:"];
+
+
+//3.1
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:[@"self.exploreViewController is nil = " stringByAppendingString:self.exploreViewController ? @"no" : @"yes"]];
+
+    
     [self.exploreViewController wmf_showSearchAnimated:animated];
 }
 

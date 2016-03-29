@@ -10,6 +10,7 @@
 #import "WMFDailyStatsLoggingFunnel.h"
 #import <Tweaks/FBTweakShakeWindow.h>
 #import "ZeroConfigState.h"
+#import "WMFWindowWithFloatingTextView.h"
 
 @interface AppDelegate ()
 
@@ -46,7 +47,7 @@
         if ([[[NSProcessInfo processInfo] environment][@"FBTweakShakeWindowEnabled"] boolValue]) {
             _window = [[FBTweakShakeWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
         } else {
-            _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+            _window = [[WMFWindowWithFloatingTextView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
         }
     }
     return _window;
@@ -111,6 +112,10 @@
 }
 
 - (void)application:(UIApplication*)application performActionForShortcutItem:(UIApplicationShortcutItem*)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+
+// 1
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:@"application:performActionForShortcutItem:completionHandler:"];
+    
     [self.appViewController processShortcutItem:shortcutItem completion:completionHandler];
 }
 

@@ -64,6 +64,9 @@ static WMFSearchViewController* _sharedSearchViewController = nil;
 - (void)wmf_showSearchAnimated:(BOOL)animated {
     NSParameterAssert(_dataStore);
 
+// 4
+[[NSNotificationCenter defaultCenter] postNotificationName:WMFFloatingTextViewShowMessage object:@"wmf_showSearchAnimated:"];
+
     if (!_sharedSearchViewController) {
         WMFSearchViewController* searchVC =
             [WMFSearchViewController searchViewControllerWithDataStore:_dataStore];
