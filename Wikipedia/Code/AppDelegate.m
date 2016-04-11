@@ -11,6 +11,8 @@
 #import <Tweaks/FBTweakShakeWindow.h>
 #import "ZeroConfigState.h"
 
+#import "WMFWindowWithZeroBadge.h"
+
 @interface AppDelegate ()
 
 @property (nonatomic, strong) WMFAppViewController* appViewController;
@@ -46,10 +48,14 @@
         if ([[[NSProcessInfo processInfo] environment][@"FBTweakShakeWindowEnabled"] boolValue]) {
             _window = [[FBTweakShakeWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
         } else {
-            _window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+            _window = [[WMFWindowWithZeroBadge alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
         }
     }
     return _window;
+}
+
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application {
+    [[NSNotificationCenter defaultCenter] postNotificationName:WMFZeroBadgeToggle object:nil];
 }
 
 - (WMFDailyStatsLoggingFunnel*)statsFunnel {
