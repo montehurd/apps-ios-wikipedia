@@ -90,20 +90,25 @@
     MWKLanguageLink* langLink = [MWKLanguageLinkController sharedInstance].preferredLanguages[indexPath.row];
     cell.numberLabel.text       = [NSString stringWithFormat:@"%ld", (long)indexPath.row + 1];
     cell.languageNameLabel.text = langLink.localizedName;
-
-    //can only delete non-OS languages
-    if (![[MWKLanguageLinkController sharedInstance] languageIsOSLanguage:langLink]) {
-        cell.deleteButtonTapped = ^{
-            MWKLanguageLink* langLink = [MWKLanguageLinkController sharedInstance].preferredLanguages[indexPath.row];
-            [[MWKLanguageLinkController sharedInstance] removePreferredLanguage:langLink];
-            [tableView reloadData];
-        };
-    }
     return cell;
 }
 
+- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    return ([[MWKLanguageLinkController sharedInstance].preferredLanguages count] > 1);
+}
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return ([[MWKLanguageLinkController sharedInstance].preferredLanguages count] > 1);
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    MWKLanguageLink* langLink = [MWKLanguageLinkController sharedInstance].preferredLanguages[indexPath.row];
+    [[MWKLanguageLinkController sharedInstance] removePreferredLanguage:langLink];
+    [tableView reloadData];
+}
+
 - (UITableViewCellEditingStyle)tableView:(UITableView*)tableView editingStyleForRowAtIndexPath:(NSIndexPath*)indexPath {
-    return UITableViewCellEditingStyleNone; //remove delete control
+    return (indexPath.row == 0) ? UITableViewCellEditingStyleNone : UITableViewCellEditingStyleDelete;
 }
 
 - (void)tableView:(UITableView*)tableView moveRowAtIndexPath:(NSIndexPath*)sourceIndexPath toIndexPath:(NSIndexPath*)destinationIndexPath {
