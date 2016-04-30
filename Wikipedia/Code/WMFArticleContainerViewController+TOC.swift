@@ -87,7 +87,7 @@ extension WMFArticleViewController {
      Append a read more section to the table of contents.
      */
     public func appendReadMoreTableOfContentsItemIfNeeded() {
-        assert(self.tableOfContentsViewController != nil, "Attempting to add read more when toc is nil")
+//        assert(self.tableOfContentsViewController != nil, "Attempting to add read more when toc is nil")
         guard let tvc = self.tableOfContentsViewController
               where !tvc.items.contains({ (item: TableOfContentsItem) in item.dynamicType == TableOfContentsReadMoreItem.self })
               else { return }

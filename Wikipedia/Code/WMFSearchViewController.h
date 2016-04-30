@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "WMFAnalyticsLogging.h"
 
-@class MWKSite, MWKDataStore;
+@class MWKSite, MWKDataStore, WMFSearchResultsTableViewController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)searchViewControllerWithDataStore:(MWKDataStore*)dataStore;
 
 - (void)setSearchTerm:(NSString*)searchTerm;
+
+@property (nonatomic, strong, readonly) WMFSearchResultsTableViewController* resultsListController;
 
 @end
 

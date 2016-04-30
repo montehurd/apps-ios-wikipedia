@@ -97,6 +97,8 @@
 
     [self updateDynamicIconShortcutItems];
 
+    NSLog(@"\n\n%@\n\n", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    
     return YES;
 }
 

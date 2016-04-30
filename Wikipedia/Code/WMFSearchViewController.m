@@ -47,6 +47,7 @@ static NSUInteger const kWMFMinResultsBeforeAutoFullTextSearch = 12;
 @property (nonatomic, strong) NSArray* preferredLanguages;
 
 @property (nonatomic, strong) RecentSearchesViewController* recentSearchesViewController;
+
 @property (nonatomic, strong) WMFSearchResultsTableViewController* resultsListController;
 
 @property (strong, nonatomic) IBOutlet UIView* searchFieldContainer;

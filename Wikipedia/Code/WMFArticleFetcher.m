@@ -29,6 +29,12 @@
 #import "AFHTTPSessionManager+WMFCancelAll.h"
 #import "WMFArticleBaseFetcher_Testing.h"
 
+#import "UIViewController+WMFSearch.h"
+#import "WMFSearchViewController.h"
+#import "WMFSearchResultsTableViewController.h"
+#import "MWKSearchResult.h"
+#import "WMFSearchResults.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 NSString* const WMFArticleFetcherErrorDomain = @"WMFArticleFetcherErrorDomain";
@@ -188,7 +194,34 @@ NSString* const WMFArticleFetcherErrorCachedFallbackArticleKey = @"WMFArticleFet
 }
 
 - (id)serializedArticleWithTitle:(MWKTitle*)title response:(NSDictionary*)response {
+
+
+    
+NSArray<MWKSearchResult*>* searchResults = (NSArray<MWKSearchResult*>*)[UIViewController wmf_sharedSearchViewController].resultsListController.dataSource.searchResults.results;
+NSLog(@"searchResults = %@", searchResults);
+
+    //<MWKSearchResult*>* results;
+MWKSearchResult* matchingResult = [searchResults bk_match:^BOOL (MWKSearchResult* result){
+    return [result.displayTitle isEqualToString:title.text];
+}];
+
+NSLog(@"matchingResult = %@", matchingResult);
+
+
+    
+    
     MWKArticle* article = [[MWKArticle alloc] initWithTitle:title dataStore:self.dataStore];
+
+    
+// thumbnailURL isnt getting written to the file...
+article.thumbnailURL      = matchingResult.thumbnailURL.absoluteString;
+  
+    
+    
+//MWKArticle* article = [[MWKArticle alloc] initWithTitle:title dataStore:self.dataStore searchResultsDict:searchResults];
+
+    
+    
     @try {
         [article importMobileViewJSON:response];
         [article importAndSaveImagesFromSectionHTML];

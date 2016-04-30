@@ -285,9 +285,9 @@ static MWKArticleSchemaVersion const MWKArticleCurrentSchemaVersion = MWKArticle
         return self.thumbnailURL;
     }
 
-    if (self.imageURL) {
-        return self.imageURL;
-    }
+//    if (self.imageURL) {
+//        return self.imageURL;
+//    }
 
     return nil;
 }
@@ -388,9 +388,9 @@ static MWKArticleSchemaVersion const MWKArticleCurrentSchemaVersion = MWKArticle
         return [self thumbnail];
     }
 
-    if (self.imageURL) {
-        return [self image];
-    }
+//    if (self.imageURL) {
+//        return [self image];
+//    }
 
     return nil;
 }
