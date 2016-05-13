@@ -65,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)dealloc {
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.locationManager.delegate = nil;
     [self stopMonitoringLocation];
 }
@@ -128,7 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (void)stopMonitoringLocation {
-    if (self.isUpdating) {
+    if (self.isUpdating) { //THIS!!!! documentation says this can be slow to change... could that make the stopHeadingUpdates maybe not get called sometimes, thus preventing its "removeObservers" call to not happen?
         self.updating = NO;
         DDLogInfo(@"%@ stopping location & heading updates.", self);
         [self stopLocationUpdates];

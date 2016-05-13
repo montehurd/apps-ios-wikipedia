@@ -156,6 +156,10 @@ static WMFAssetsFile* languageFile = nil;
     }
 }
 
+//- (void)dealloc {
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//}
+
 @end
 
 NS_ASSUME_NONNULL_END

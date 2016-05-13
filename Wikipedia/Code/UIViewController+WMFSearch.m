@@ -72,6 +72,10 @@ static WMFSearchViewController* _sharedSearchViewController = nil;
     [self presentViewController:_sharedSearchViewController animated:animated completion:nil];
 }
 
+////- (void)dealloc {
+////    [[NSNotificationCenter defaultCenter] removeObserver:self];
+////}
+
 @end
 
 NS_ASSUME_NONNULL_END
