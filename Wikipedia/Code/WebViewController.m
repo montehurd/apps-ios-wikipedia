@@ -506,10 +506,12 @@ NSString* const WMFCCBySALicenseURL =
         return;
         DDLogError(@"Attempted to scroll ToC to Nan value, ignoring");
     }
+    @weakify(self);
     [UIView animateWithDuration:duration
                           delay:0.0f
                         options:UIViewAnimationOptionBeginFromCurrentState
                      animations:^{
+        @strongify(self);
         [self.webView.scrollView wmf_safeSetContentOffset:point animated:NO];
     } completion:^(BOOL done) {
     }];
