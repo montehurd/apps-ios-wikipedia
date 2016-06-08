@@ -11,10 +11,15 @@
 #import <Tweaks/FBTweakShakeWindow.h>
 #import "ZeroConfigState.h"
 
+#import "GCDWebServer.h"
+#import "GCDWebServerDataResponse.h"
+
 @interface AppDelegate ()
 
 @property (nonatomic, strong) WMFAppViewController* appViewController;
 @property (nonatomic, strong) WMFDailyStatsLoggingFunnel* statsFunnel;
+
+@property (nonatomic, strong) GCDWebServer* webServer;
 
 @end
 
@@ -97,6 +102,40 @@
 
     [self updateDynamicIconShortcutItems];
 
+    NSLog(@"%@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject]);
+    
+    self.webServer = [[GCDWebServer alloc] init];
+    
+    [self.webServer addDefaultHandlerForMethod:@"GET"
+                             requestClass:[GCDWebServerRequest class]
+                        asyncProcessBlock:^(GCDWebServerRequest* request, GCDWebServerCompletionBlock completionBlock) {
+                            
+                            NSString *imgURLString = [request.URL.absoluteString stringByReplacingOccurrencesOfString:@"http://localhost:8080/" withString:@"http://upload.wikimedia.org/"];
+                            NSURL* imgURL = [NSURL URLWithString:imgURLString];
+                            NSData* cachedImgData = [[WMFImageController sharedInstance] diskDataForImageWithURL:imgURL];
+                            
+                            if (cachedImgData) {
+
+                                GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:cachedImgData contentType:[imgURLString.pathExtension wmf_asMIMEType]];
+                                completionBlock(gcdResponse);
+                                
+                            }else{
+                                
+                                NSURLSessionDataTask *downloadImgTask = [[NSURLSession sharedSession] dataTaskWithURL:imgURL completionHandler:^(NSData *imgData, NSURLResponse *response, NSError *error) {
+
+                                    GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:imgData contentType:response.MIMEType];
+                                    completionBlock(gcdResponse);
+                                    
+                                    [[WMFImageController sharedInstance] cacheImageData:imgData url:imgURL];
+
+                                }];
+                                [downloadImgTask resume];
+                                
+                            }
+                        }];
+    
+    [self.webServer startWithPort:8080 bonjourName:nil];
+    
     return YES;
 }
 

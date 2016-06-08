@@ -15,6 +15,20 @@
         string = @"";
     }
 
+    
+    
+    
+    
+    
+    
+string = [string stringByReplacingOccurrencesOfString:@" srcset=" withString:@" wmf_useLocalhost_srcset="];
+string = [string stringByReplacingOccurrencesOfString:@" src=" withString:@" wmf_useLocalhost_src="];
+
+    
+    
+    
+    
+
     NSString* path = [[self getAssetsPath] stringByAppendingPathComponent:fileName];
 
     NSString* fileContents = [NSMutableString stringWithContentsOfFile:path

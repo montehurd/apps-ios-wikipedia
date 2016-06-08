@@ -213,6 +213,31 @@ NSString* const WMFCCBySALicenseURL =
                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
                          forMainFrameOnly:YES]];
 
+    
+    
+    
+    
+    
+    NSString* routeImagesThroughLocalhostTransforms = @""
+    "var tags = document.querySelectorAll('[wmf_useLocalhost_src], [wmf_useLocalhost_srcset]');"
+    "Array.prototype.forEach.call(tags, function( tag ){"
+    "    tag.src = tag.getAttribute('wmf_useLocalhost_src').split('//upload.wikimedia.org').join('http://localhost:8080');"
+    "    tag.removeAttribute('wmf_useLocalhost_src');"
+    "    tag.srcset = tag.getAttribute('wmf_useLocalhost_srcset').split('//upload.wikimedia.org').join('http://localhost:8080');"
+    "    tag.removeAttribute('wmf_useLocalhost_srcset');"
+    "});"
+    ;
+    [userContentController addUserScript:
+     [[WKUserScript alloc] initWithSource:routeImagesThroughLocalhostTransforms
+                            injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                         forMainFrameOnly:YES]];
+    
+    
+    
+    
+    
+    
+    
 
     WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
     configuration.userContentController = userContentController;
