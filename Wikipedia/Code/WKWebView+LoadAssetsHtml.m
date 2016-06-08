@@ -4,6 +4,226 @@
 #import "WKWebView+LoadAssetsHtml.h"
 #import "Wikipedia-Swift.h"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@interface NSString (WMFImageProxy)
+
+- (NSString*)wmf_stringWithLocalhostProxyPrefix;
+- (NSString*)wmf_srcsetValueWithLocalhostProxyPrefixes;
+
+@end
+
+@implementation NSString (WMFImageProxy)
+
+- (NSString*)wmf_stringWithLocalhostProxyPrefix {
+    
+    
+    NSString* string = [self copy];
+    if ([string hasPrefix:@"https:"]) {
+        string = [self wmf_safeSubstringFromIndex:6];
+    }
+    
+    
+    return [NSString stringWithFormat:@"http://localhost:8080/imageProxy?originalSrc=%@", [string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+}
+
+- (NSString*)wmf_srcsetValueWithLocalhostProxyPrefixes {
+    NSArray *pairs = [self componentsSeparatedByString:@","];
+    NSMutableArray* output = [[NSMutableArray alloc] init];
+    for (NSString* pair in pairs) {
+        NSString* trimmedPair = [pair stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSArray* parts = [trimmedPair componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (parts.count == 2) {
+            NSString* url = parts[0];
+            NSString* density = parts[1];
+            [output addObject:[NSString stringWithFormat:@"%@ %@", [url wmf_stringWithLocalhostProxyPrefix], density]];
+        }else{
+            [output addObject:pair];
+        }
+    }
+    return [output componentsJoinedByString:@", "];
+}
+
+@end
+
+@interface NSMutableString (WMFImageProxy)
+
+- (void)wmf_replaceImgTagSrcValuesWithLocalhostProxyURLs;
+
+@end
+
+@implementation NSMutableString (WMFImageProxy)
+
+- (void)wmf_replaceImgTagSrcValuesWithLocalhostProxyURLs{
+    NSError *error;
+    NSString *pattern = @"(<img.+src\\=)(?:\")(.+?)(?:\")(.+?)(\\>)";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:&error];
+    
+    NSInteger offset = 0;
+    for (NSTextCheckingResult* result in [regex matchesInString:self
+                                                        options:0
+                                                          range:NSMakeRange(0, [self length])]) {
+        
+        NSRange resultRange = [result range];
+        resultRange.location += offset;
+        
+        /*
+        NSString* entireTag = [regex replacementStringForResult:result
+                                                       inString:self
+                                                         offset:offset
+                                                       template:@"$0"];
+        */
+        
+        NSString* opener = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$1"];
+        
+        NSString* srcURL = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$2"];
+        
+        NSString* other = [regex replacementStringForResult:result
+                                                   inString:self
+                                                     offset:offset
+                                                   template:@"$3"];
+        
+        NSString* closer = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$4"];
+        
+        NSMutableString* mutableOther = [other mutableCopy];
+        [mutableOther wmf_replaceImgTagSrcsetValuesWithLocalhostProxyURLs];
+        
+        NSString* replacement = [NSString stringWithFormat:@"%@\"%@\"%@%@",
+                                 opener,
+                                 [srcURL wmf_stringWithLocalhostProxyPrefix],
+                                 mutableOther,
+                                 closer
+                                 ];
+        
+        [self replaceCharactersInRange:resultRange withString:replacement];
+        
+        offset += [replacement length] - resultRange.length;
+    }
+}
+
+- (void)wmf_replaceImgTagSrcsetValuesWithLocalhostProxyURLs{
+    NSError *error;
+    NSString *pattern = @"(.+?)(srcset\\=)(?:\")(.+?)(?:\")(.+?)";
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:&error];
+    
+    NSInteger offset = 0;
+    for (NSTextCheckingResult* result in [regex matchesInString:self
+                                                        options:0
+                                                          range:NSMakeRange(0, [self length])]) {
+        
+        NSRange resultRange = [result range];
+        resultRange.location += offset;
+        
+        /*
+        NSString* entireTag = [regex replacementStringForResult:result
+                                                       inString:self
+                                                         offset:offset
+                                                       template:@"$0"];
+        */
+        
+        NSString* before = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$1"];
+        
+        NSString* srcsetKey = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$2"];
+        
+        NSString* srcsetValue = [regex replacementStringForResult:result
+                                                   inString:self
+                                                     offset:offset
+                                                   template:@"$3"];
+        
+        NSString* after = [regex replacementStringForResult:result
+                                                    inString:self
+                                                      offset:offset
+                                                    template:@"$4"];
+        
+        
+        NSString* replacement = [NSString stringWithFormat:@"%@%@\"%@\"%@",
+                                 before,
+                                 srcsetKey,
+                                 [srcsetValue wmf_srcsetValueWithLocalhostProxyPrefixes],
+                                 after
+                                 ];
+        
+        [self replaceCharactersInRange:resultRange withString:replacement];
+        
+        offset += [replacement length] - resultRange.length;
+    }
+}
+
+@end
+
+/*
+ 
+- problem? all images now routed to sd web image cache, but it doesn't seem to hangle svgs... the tiny tangent math images...
+  (cold start w/o internet connection)
+ 
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @implementation WKWebView (LoadAssetsHtml)
 
 - (void)loadHTMLFromAssetsFile:(NSString*)fileName scrolledToFragment:(NSString*)fragment {
@@ -19,11 +239,20 @@
     
     
     
+    NSMutableString* mutableString = [string mutableCopy];
+    [mutableString wmf_replaceImgTagSrcValuesWithLocalhostProxyURLs];
+    string = mutableString;
     
     
+    
+    
+/*
+// http://stackoverflow.com/a/8058771/135557
 string = [string stringByReplacingOccurrencesOfString:@" srcset=" withString:@" wmf_useLocalhost_srcset="];
 string = [string stringByReplacingOccurrencesOfString:@" src=" withString:@" wmf_useLocalhost_src="];
+*/
 
+    
     
     
     

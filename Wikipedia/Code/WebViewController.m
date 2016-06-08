@@ -217,7 +217,7 @@ NSString* const WMFCCBySALicenseURL =
     
     
     
-    
+    /*
     NSString* routeImagesThroughLocalhostTransforms = @""
     "var tags = document.querySelectorAll('[wmf_useLocalhost_src], [wmf_useLocalhost_srcset]');"
     "Array.prototype.forEach.call(tags, function( tag ){"
@@ -231,8 +231,7 @@ NSString* const WMFCCBySALicenseURL =
      [[WKUserScript alloc] initWithSource:routeImagesThroughLocalhostTransforms
                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
                          forMainFrameOnly:YES]];
-    
-    
+    */
     
     
     

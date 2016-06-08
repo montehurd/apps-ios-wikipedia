@@ -13,6 +13,7 @@
 
 #import "GCDWebServer.h"
 #import "GCDWebServerDataResponse.h"
+#import "GCDWebServerErrorResponse.h"
 
 @interface AppDelegate ()
 
@@ -106,32 +107,74 @@
     
     self.webServer = [[GCDWebServer alloc] init];
     
+    @weakify(self);
     [self.webServer addDefaultHandlerForMethod:@"GET"
                              requestClass:[GCDWebServerRequest class]
                         asyncProcessBlock:^(GCDWebServerRequest* request, GCDWebServerCompletionBlock completionBlock) {
                             
-                            NSString *imgURLString = [request.URL.absoluteString stringByReplacingOccurrencesOfString:@"http://localhost:8080/" withString:@"http://upload.wikimedia.org/"];
-                            NSURL* imgURL = [NSURL URLWithString:imgURLString];
-                            NSData* cachedImgData = [[WMFImageController sharedInstance] diskDataForImageWithURL:imgURL];
+                            @strongify(self);
                             
-                            if (cachedImgData) {
-
-                                GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:cachedImgData contentType:[imgURLString.pathExtension wmf_asMIMEType]];
-                                completionBlock(gcdResponse);
-                                
-                            }else{
-                                
-                                NSURLSessionDataTask *downloadImgTask = [[NSURLSession sharedSession] dataTaskWithURL:imgURL completionHandler:^(NSData *imgData, NSURLResponse *response, NSError *error) {
-
-                                    GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:imgData contentType:response.MIMEType];
-                                    completionBlock(gcdResponse);
+                            GCDWebServerErrorResponse* notFound = [GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_NotFound message:@"Image not found"];
+                            
+                            if ([request.path isEqualToString:@"/imageProxy"]) {
+                                NSString* originalSrc = request.query[@"originalSrc"];
+                                if (originalSrc) {
                                     
-                                    [[WMFImageController sharedInstance] cacheImageData:imgData url:imgURL];
-
-                                }];
-                                [downloadImgTask resume];
+                                    NSLog(@"\n\noriginalSrc = %@\n\n", originalSrc);
                                 
+                                    
+                                    
+if(!([originalSrc hasPrefix:@"http"] || [originalSrc hasPrefix:@"https"])){
+    //TODO: remove the http part from WMFImageController's diskDataForImageWithURL and cacheImageData so http or https or no protocol produce same hash
+    originalSrc = [@"http:" stringByAppendingString:originalSrc];
+}
+                                    
+                                    
+                                    
+                                    NSString *imgURLString = originalSrc;//[request.URL.absoluteString stringByReplacingOccurrencesOfString:@"http://localhost:8080/" withString:@"http://upload.wikimedia.org/"];
+                                    NSURL* imgURL = [NSURL URLWithString:imgURLString];
+                                    
+                                    NSAssert(imgURL, @"imageProxy URL should not be nil");
+
+                                    NSData* cachedImgData = [[WMFImageController sharedInstance] diskDataForImageWithURL:imgURL];
+                                    
+                                    if (cachedImgData) {
+                                        
+                                        
+
+                                        NSString *mimeType = [imgURLString.pathExtension wmf_asMIMEType];
+//if([imgURLString containsString:@"/math/render/svg/"]){
+//    mimeType = @"image/svg";
+//}
+                                        GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:cachedImgData contentType:mimeType];
+                                        completionBlock(gcdResponse);
+                                        
+                                    }else{
+                                        
+                                        NSURLSessionDataTask *downloadImgTask = [[NSURLSession sharedSession] dataTaskWithURL:imgURL completionHandler:^(NSData *imgData, NSURLResponse *response, NSError *error) {
+                                            
+                                            NSString *mimeType = response.MIMEType;
+//if([imgURLString containsString:@"/math/render/svg/"]){
+//    mimeType = @"image/svg";
+//}
+                                            GCDWebServerDataResponse* gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:imgData contentType:mimeType];
+                                            completionBlock(gcdResponse);
+                                            
+                                            [[WMFImageController sharedInstance] cacheImageData:imgData url:imgURL];
+                                            
+                                        }];
+                                        [downloadImgTask resume];
+                                        
+                                    }
+                                    
+                                }else{
+                                    completionBlock(notFound);
+                                }
+                            }else{
+                                completionBlock(notFound);
                             }
+                            
+                            
                         }];
     
     [self.webServer startWithPort:8080 bonjourName:nil];
