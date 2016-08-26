@@ -41,7 +41,9 @@ function touchEndedWithoutDragging(event){
         // handle deselection of text.
         window.webkit.messageHandlers.nonAnchorTouchEndedWithoutDragging.postMessage({
                                                   id: event.target.getAttribute( "id" ),
-                                                  tagName: event.target.tagName
+                                                  tagName: event.target.tagName,
+                                                  clientX: event.changedTouches[0].clientX,
+                                                  clientY: event.changedTouches[0].clientY
                                                   });
 
     }
