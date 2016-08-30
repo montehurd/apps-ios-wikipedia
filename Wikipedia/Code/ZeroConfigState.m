@@ -100,11 +100,11 @@ NSString* const ZeroWarnWhenLeaving   = @"ZeroWarnWhenLeaving";
 //                }
             }).catch(^(NSError* error){
                 NSLog(@"FAIL");
+                @strongify(self);
 
                 self.zeroMessage = nil;
                 [self showZeroOffAlert];
 
-//                @strongify(self);
 //                DDLogError(@"Failed to fetch items for section %@. %@", self, error);
 //                self.fetcherPromise = nil;
 //                self.fetchError = error;

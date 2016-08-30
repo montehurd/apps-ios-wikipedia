@@ -83,90 +83,22 @@
     NSHTTPURLResponse* httpUrlResponse = (NSHTTPURLResponse*)response;
     NSDictionary* headers              = httpUrlResponse.allHeaderFields;
     
-//Fix me: re-name xZeroRatedHeader
-
-    /*
-    NSString* xCarrierFromHeader         = [headers objectForKey:WMFURLCacheXCarrier];
-    
-    NSString* xCarrierMetaFromHeader             = [headers objectForKey:WMFURLCacheXCarrierMeta];
-    
-    
-    BOOL zeroRatedHeaderPresent        = xCarrierFromHeader != nil;
-    NSString* xcs                      = [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrier;
-    BOOL zeroProviderChanged           = zeroRatedHeaderPresent && ![xCarrierFromHeader isEqualToString:xcs];
-    BOOL zeroDisposition               = [SessionSingleton sharedInstance].zeroConfigState.disposition;
-
-    // enable this tweak to make the cache pretend it found W0 headers in the response
-    if ([FBTweak wmf_shouldMockWikipediaZeroHeaders]) {
-        zeroRatedHeaderPresent = YES;
-        xCarrierFromHeader       = WMFURLCache00000;
-    }
-
-    if (zeroRatedHeaderPresent && (!zeroDisposition || zeroProviderChanged)) {
-        [SessionSingleton sharedInstance].zeroConfigState.disposition = YES;
-        [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrier  = xCarrierFromHeader;
-    } else if (!zeroRatedHeaderPresent && zeroDisposition) {
-        [SessionSingleton sharedInstance].zeroConfigState.disposition = NO;
-        [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrier  = nil;
-    }
-*/
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /*
-     TODO:
-     - look at disposition setter chain of events
-     - double check the hasChangeHappenedToCarrier with nil
-     */
-    
-    
     bool zeroEnabled = [SessionSingleton sharedInstance].zeroConfigState.disposition;
     
     NSString* xCarrierFromHeader = [headers objectForKey:WMFURLCacheXCarrier];
     bool hasZeroHeader = (xCarrierFromHeader != nil);
     if (hasZeroHeader) {
         NSString* xCarrierMetaFromHeader = [headers objectForKey:WMFURLCacheXCarrierMeta];
-//        if (xCarrierMetaFromHeader == nil) {
-//            xCarrierMetaFromHeader = @"";
-//        }
         if ([self hasChangeHappenedToCarrier:xCarrierFromHeader orMeta:xCarrierMetaFromHeader]) {
-//            identifyZeroCarrier(xCarrierFromHeader, xCarrierMetaFromHeader);
-            
             [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrier  = xCarrierFromHeader;
             [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrierMeta  = xCarrierMetaFromHeader;
             [SessionSingleton sharedInstance].zeroConfigState.disposition = YES;
-            
         }
-
     }else if(zeroEnabled) {
-//        zeroOff();
         [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrier  = nil;
         [SessionSingleton sharedInstance].zeroConfigState.partnerXCarrierMeta  = nil;
         [SessionSingleton sharedInstance].zeroConfigState.disposition = NO;
-
     }
-    
-    /*
-    boolean hasZeroHeader = result.getHeaders().containsKey("X-Carrier");
-    if (hasZeroHeader) {
-        String xCarrierFromHeader = result.getHeaders().get("X-Carrier").get(0);
-        String xCarrierMetaFromHeader = "";
-        if (result.getHeaders().containsKey("X-Carrier-Meta")) {
-            xCarrierMetaFromHeader = result.getHeaders().get("X-Carrier-Meta").get(0);
-        }
-        if (eitherChanged(xCarrierFromHeader, xCarrierMetaFromHeader)) {
-            identifyZeroCarrier(xCarrierFromHeader, xCarrierMetaFromHeader);
-        }
-    } else if (zeroEnabled) {
-        zeroOff();
-    }
-    */
 }
 
 - (BOOL) hasChangeHappenedToCarrier:(NSString*)xCarrier orMeta:(NSString*)xCarrierMeta {
