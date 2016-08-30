@@ -90,9 +90,29 @@ NSString* const ZeroWarnWhenLeaving   = @"ZeroWarnWhenLeaving";
         if (didEnter) {
             promise = [self fetchZeroMessage].then(^(WMFZeroMessage* zeroMessage) {
                 @strongify(self);
-                self.zeroMessage = zeroMessage;
-                [self showFirstTimeZeroOnAlertIfNeeded];
+                
+//                if (zeroMessage){
+                    self.zeroMessage = zeroMessage;
+                    [self showFirstTimeZeroOnAlertIfNeeded];
+//                }else{
+//                    self.zeroMessage = nil;
+//                    [self showZeroOffAlert];
+//                }
+            }).catch(^(NSError* error){
+                NSLog(@"FAIL");
+
+                self.zeroMessage = nil;
+                [self showZeroOffAlert];
+
+//                @strongify(self);
+//                DDLogError(@"Failed to fetch items for section %@. %@", self, error);
+//                self.fetcherPromise = nil;
+//                self.fetchError = error;
+//                return error;
             });
+            
+            
+            
         } else {
             self.zeroMessage = nil;
             [self showZeroOffAlert];

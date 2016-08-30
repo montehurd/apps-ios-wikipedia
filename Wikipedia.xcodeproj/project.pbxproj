@@ -991,6 +991,7 @@
 		B0C0B07C1C6D988800859AD5 /* WMFSettingsCellVisualTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMFSettingsCellVisualTests.m; sourceTree = "<group>"; };
 		B0CA8D3E1D30BDE8007BB3F7 /* WKScriptMessage+WMFScriptMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "WKScriptMessage+WMFScriptMessage.h"; path = "Wikipedia/Code/WKScriptMessage+WMFScriptMessage.h"; sourceTree = SOURCE_ROOT; };
 		B0CA8D3F1D30BDE8007BB3F7 /* WKScriptMessage+WMFScriptMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "WKScriptMessage+WMFScriptMessage.m"; path = "Wikipedia/Code/WKScriptMessage+WMFScriptMessage.m"; sourceTree = SOURCE_ROOT; };
+		B0D3B6AA1D6BA6660031E1A8 /* WMFURLCacheStrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFURLCacheStrings.h; path = Wikipedia/Code/WMFURLCacheStrings.h; sourceTree = SOURCE_ROOT; };
 		B0D530EA1CE151C10078BAED /* CodeFileLocationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CodeFileLocationTests.m; sourceTree = "<group>"; };
 		B0D7FC4E1D0A192500CDC2F0 /* ImageProxyParsingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageProxyParsingTests.m; sourceTree = "<group>"; };
 		B0DE92261D6E26C700EC76A7 /* WMFBarButtonItemPopoverMessageViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = WMFBarButtonItemPopoverMessageViewController.storyboard; sourceTree = "<group>"; };
@@ -2246,6 +2247,7 @@
 				0487043F19F824D700B7D307 /* Queues */,
 				B0E8044D1C0CDFDA0065EBC0 /* WMFURLCache.h */,
 				B0E8044E1C0CDFDA0065EBC0 /* WMFURLCache.m */,
+				B0D3B6AA1D6BA6660031E1A8 /* WMFURLCacheStrings.h */,
 				B0E8067D1C0CE9C70065EBC0 /* WMFNetworkUtilities.h */,
 				B0E8067E1C0CE9C70065EBC0 /* WMFNetworkUtilities.m */,
 				B0E8067B1C0CE9C70065EBC0 /* WMFFixtureRecording.h */,

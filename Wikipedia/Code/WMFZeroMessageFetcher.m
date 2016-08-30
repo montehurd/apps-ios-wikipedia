@@ -13,7 +13,7 @@
 #import "WikipediaAppUtils.h"
 #import "FBTweak+WikipediaZero.h"
 #import "AFHTTPSessionManager+WMFCancelAll.h"
-
+#import "WMFURLCacheStrings.h"
 
 @interface WMFZeroMessageFetcher ()
 
@@ -41,8 +41,9 @@
                                            @"type": @"message",
                                            @"agent": [WikipediaAppUtils versionedUserAgent]
                                        }];
+//
         if ([FBTweak wmf_shouldMockWikipediaZeroHeaders]) {
-            params[@"X-CS"] = @"TEST";
+            params[WMFURLCacheXCarrier] = @"TEST";
         }
         [self.operationManager GET:[[NSURL wmf_mobileAPIURLForURL:siteURL] absoluteString]
                         parameters:params
