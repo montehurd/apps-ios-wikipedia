@@ -31,6 +31,7 @@
 #import "WKScriptMessage+WMFScriptMessage.h"
 #import "WMFFindInPageKeyboardBar.h"
 #import "UIView+WMFDefaultNib.h"
+#import "UIViewController+WMFDynamicHeightPopoverMessage.h"
 
 typedef NS_ENUM(NSInteger, WMFWebViewAlertType) {
     WMFWebViewAlertZeroWebPage,
@@ -120,7 +121,23 @@ NSString *const WMFCCBySALicenseURL =
             [self handleClickEditScriptMessage:safeMessageBody];
             break;
         case WMFWKScriptMessageNonAnchorTouchEndedWithoutDragging:
+            
+        {
+//            NSLog(@"safeMessageBody = %@", safeMessageBody);
+  
+//            [self dismissViewControllerAnimated:NO completion:^{
+                [self wmf_presentDynamicHeightPopoverViewControllerForSourceRect:CGRectMake([safeMessageBody[@"clientX"] floatValue], [safeMessageBody[@"clientY"] floatValue], 1, 1)
+                                                                       withTitle:@"Now works with CGRect!"
+                                                                         message:@"For testing I hooked it up to taps on the web view so you can show popover messages anywhere you want and the arrow will point to the tapped point, repositioning itself above, below, left or right as appropriate."
+                                                                           width:230.0f
+                                                                        duration:-1];
+//            }];
+            
+
+
+            
             [self handleNonAnchorTouchEndedWithoutDraggingScriptMessage];
+    }
             break;
         case WMFWKScriptMessageLateJavascriptTransform:
             [self handleLateJavascriptTransformScriptMessage:safeMessageBody];
