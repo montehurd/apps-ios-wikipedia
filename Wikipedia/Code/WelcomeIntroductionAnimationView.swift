@@ -101,8 +101,14 @@ public class WelcomeIntroAnimationView : WelcomeAnimationView {
         )
     }()
     
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
+//rename - it's not scaled to frame - it's size
+    override public func addAnimationElementsScaledToCurrentFrame(){
+        
+// Fix for: http://stackoverflow.com/a/39614714
+//self.layoutIfNeeded()
+
+        
+        removeExistingSubviewsAndSublayers()
 
         self.addSubview(self.baseImgView)
         self.addSubview(self.tubeImgView)
@@ -120,7 +126,7 @@ public class WelcomeIntroAnimationView : WelcomeAnimationView {
             })
     }
     
-    public func beginAnimations() {
+    override public func beginAnimations() {
         CATransaction.begin()
         
         let tubeOvershootRotationTransform = CATransform3D.wmf_rotationTransformWithDegrees(15.0)

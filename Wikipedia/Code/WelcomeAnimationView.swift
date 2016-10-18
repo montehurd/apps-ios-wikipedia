@@ -39,9 +39,28 @@ public class WelcomeAnimationView : UIView {
           return CATransform3DConcat(wmf_scaleZeroAndRightTransform, wmf_lowerTransform)
     }
     
-    override public func didMoveToSuperview() {
-        super.didMoveToSuperview()
-        // Fix for: http://stackoverflow.com/a/39614714
-        self.layoutIfNeeded()
+//    override public func didMoveToSuperview() {
+//        super.didMoveToSuperview()
+//        // Fix for: http://stackoverflow.com/a/39614714
+//        self.layoutIfNeeded()
+//    }
+    
+    public func beginAnimations() {
+        
+    }
+    
+    public func addAnimationElementsScaledToCurrentFrame(){
+    
+    }
+    
+    public func removeExistingSubviewsAndSublayers() {
+        for subview in self.subviews {
+            subview.removeFromSuperview()
+        }
+        if let sublayers = self.layer.sublayers {
+            for sublayer in sublayers {
+                sublayer.removeFromSuperlayer()
+            }
+        }
     }
 }
