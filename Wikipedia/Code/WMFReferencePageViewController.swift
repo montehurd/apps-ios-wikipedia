@@ -7,9 +7,17 @@ extension UIViewController {
     }
 }
 
-class WMFReferencePageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+@objc protocol WMFReferencePageViewAppearanceDelegate : NSObjectProtocol {
+    func referencePageViewControllerWillAppear(referencePageViewController: WMFReferencePageViewController)
+    func referencePageViewControllerWillDisappear(referencePageViewController: WMFReferencePageViewController)
+}
+
+class WMFReferencePageViewController: UIPageViewController, UIPageViewControllerDataSource {
     var lastClickedReferencesIndex:Int = 0
     var lastClickedReferencesGroup = [WMFReference]()
+    internal var topOffset:CGFloat = 0
+    
+    weak internal var appearanceDelegate: WMFReferencePageViewAppearanceDelegate?
     
     private lazy var pageControllers: [UIViewController] = {
         var controllers:[UIViewController] = []
@@ -26,7 +34,6 @@ class WMFReferencePageViewController: UIPageViewController, UIPageViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         dataSource = self
-        delegate = self
         
         let direction:UIPageViewControllerNavigationDirection = UIApplication.sharedApplication().wmf_isRTL ? .Forward : .Reverse
         
@@ -34,11 +41,54 @@ class WMFReferencePageViewController: UIPageViewController, UIPageViewController
         
         setViewControllers([initiallyVisibleController], direction: direction, animated: true, completion: nil)
         
-        view.backgroundColor = UIColor.init(white: 0.0, alpha: 0.5)
+
+        //view.backgroundColor = UIColor.init(white: 0.0, alpha: 0.5)
+        
+
+        if let firstRef = self.lastClickedReferencesGroup.first {
+            var clearRect = firstRef.rect
+            for reference in self.lastClickedReferencesGroup {
+                clearRect = CGRectUnion(clearRect, reference.rect)
+            }
+            clearRect = CGRectOffset(clearRect, 0, topOffset + 1)
+            
+            clearRect = CGRectInset(clearRect, -1, -3)
+            
+            let bgView = WMFReferencePageBackgroundView()
+            bgView.clearRect = clearRect
+            bgView.userInteractionEnabled = false
+            bgView.clearsContextBeforeDrawing = false
+            bgView.backgroundColor = UIColor.init(white: 0.0, alpha: 0.5)
+            bgView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(bgView)
+            view.sendSubviewToBack(bgView)
+            bgView.mas_makeConstraints { make in
+                make.top.bottom().leading().and().trailing().equalTo()(self.view)
+            }
+        }
+
+        
+       
+        
+        
+        
+        
+        
+        
         
         if let scrollView = view.wmf_firstSubviewOfType(UIScrollView) {
             scrollView.clipsToBounds = false
         }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        appearanceDelegate?.referencePageViewControllerWillAppear(self)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        appearanceDelegate?.referencePageViewControllerWillDisappear(self)
     }
     
     func presentationCountForPageViewController(pageViewController: UIPageViewController) -> Int {
