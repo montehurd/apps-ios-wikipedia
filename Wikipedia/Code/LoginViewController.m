@@ -167,6 +167,20 @@
         UIViewController *presenter = self.presentingViewController;
         [self dismissViewControllerAnimated:YES
                                  completion:^{
+                                     
+
+                                     
+                                     
+                                     
+ForgotPasswordViewController *forgotPasswordVC = [ForgotPasswordViewController wmf_viewControllerFromStoryboardNamed:@"ForgotPasswordViewController"];
+//ForgotPasswordViewController *forgotPasswordVC = [ForgotPasswordViewController wmf_initialViewControllerFromClassStoryboard];
+UINavigationController *nc2 = [[UINavigationController alloc] initWithRootViewController:forgotPasswordVC];
+[presenter presentViewController:nc2 animated:YES completion:nil];
+return;
+                                     
+                                     
+                                     
+                                     
                                      AccountCreationViewController *createAcctVC = [AccountCreationViewController wmf_initialViewControllerFromClassStoryboard];
 
                                      createAcctVC.funnel = [[CreateAccountFunnel alloc] init];

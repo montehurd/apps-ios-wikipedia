@@ -233,6 +233,15 @@ static NSString *const WMFSettingsURLPrivacyPolicy = @"https://m.wikimediafounda
 
 #pragma mark - Log in and out
 
+
+
+-(void)didReceiveMemoryWarning {
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:[LoginViewController wmf_initialViewControllerFromClassStoryboard]]
+                       animated:YES
+                     completion:nil];
+
+}
+
 - (void)showLoginOrLogout {
     NSString *userName = [WMFAuthenticationManager sharedInstance].loggedInUsername;
     if (userName) {
