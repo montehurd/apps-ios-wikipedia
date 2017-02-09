@@ -36,7 +36,7 @@
 #import "WMFAuthenticationManager.h"
 #import "UIViewController+WMFChildViewController.h"
 #import "UIScrollView+ScrollSubviewToLocation.h"
-
+#import "NSURL+WMFLinkParsing.h"
 
 // View Controllers
 #import "WMFArticleViewController_Private.h"
