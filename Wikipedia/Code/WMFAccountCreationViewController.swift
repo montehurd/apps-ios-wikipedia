@@ -309,7 +309,6 @@ class WMFAccountCreationViewController: UIViewController, WMFCaptchaViewControll
         }
         let siteURL = MWKLanguageLinkController.sharedInstance().appLanguage?.siteURL()
         accountCreationInfoFetcher.fetchAccountCreationInfoForSiteURL(siteURL!, success: { info in
-            let siteURL = SessionSingleton.sharedInstance().url(forLanguage: MWKLanguageLinkController.sharedInstance().appLanguage?.languageCode)
             self.tokenFetcher.fetchToken(ofType: .createAccount, siteURL: siteURL!,
                                          success: { token in
                                             let warningMessage = self.hasUserEnteredCaptchaText() ? localizedStringForKeyFallingBackOnEnglish("account-creation-captcha-retry") : localizedStringForKeyFallingBackOnEnglish("account-creation-captcha-required")
@@ -340,8 +339,7 @@ class WMFAccountCreationViewController: UIViewController, WMFCaptchaViewControll
             self.login()
         }
         
-        let siteURL = SessionSingleton.sharedInstance().url(forLanguage: MWKLanguageLinkController.sharedInstance().appLanguage?.languageCode)
-
+        let siteURL = MWKLanguageLinkController.sharedInstance().appLanguage?.siteURL()
         tokenFetcher.fetchToken(ofType: .createAccount,
                                 siteURL: siteURL!,
                                 success: { token in
