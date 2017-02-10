@@ -33,10 +33,11 @@
 #import <HockeySDK/BITCrashManager.h>
 #import "UIViewController+WMFOpenExternalUrl.h"
 
-#import "WMFAuthenticationManager.h"
 #import "UIViewController+WMFChildViewController.h"
 #import "UIScrollView+ScrollSubviewToLocation.h"
 #import "NSURL+WMFLinkParsing.h"
+#import "KeychainCredentials.h"
+#import "NSHTTPCookieStorage+WMFCloneCookie.h"
 
 // View Controllers
 #import "WMFArticleViewController_Private.h"
