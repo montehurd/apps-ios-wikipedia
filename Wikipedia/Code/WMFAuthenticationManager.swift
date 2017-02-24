@@ -43,11 +43,39 @@ class WMFAuthenticationManager: NSObject {
      *  @param success  The handler for success - at this point the user is logged in
      *  @param failure     The handler for any errors
      */
-    public func login(username: String, password:String, retypePassword:String?, oathToken:String?, success loginSuccess:@escaping WMFAccountLoginResultBlock, failure:@escaping WMFErrorHandler){
+    public func login(username: String, password:String, retypePassword:String?, oathToken:String?, captchaID: String?, captchaWord: String?, success loginSuccess:@escaping WMFAccountLoginResultBlock, failure:@escaping WMFErrorHandler){
         let siteURL = MWKLanguageLinkController.sharedInstance().appLanguage?.siteURL();
-        loginInfoFetcher.fetchLoginInfoForSiteURL(siteURL!, success: { info in
+        
+
+        
+        
+        
+        
+        
+        
+/*
+         - don't show the form the first time until the info fetch has finished. that fetch will tell us if the captcha should show
+         
+         - then after user fills fields and submits call "accountLogin" *without* calling info again. (info call invalidates capchaID and issues new one)
+         
+         - *only* on "accountLogin" fail should we call info again
+         
+         - this will allow captcha to *not* show until it's needed
+         
+         
+so to sum up:
+         - call info once on didload and then only on accountLogin failure
+         
+*/
+        
+        
+        
+        
+        
+        
+//        loginInfoFetcher.fetchLoginInfoForSiteURL(siteURL!, success: { info in
             self.tokenFetcher.fetchToken(ofType: .login, siteURL: siteURL!, success: { tokenBlock in
-                self.accountLogin.login(username: username, password: password, retypePassword: retypePassword, loginToken: tokenBlock.token, oathToken: oathToken, siteURL: siteURL!, success: {result in
+                self.accountLogin.login(username: username, password: password, retypePassword: retypePassword, loginToken: tokenBlock.token, oathToken: oathToken, captchaID: captchaID, captchaWord: captchaWord, siteURL: siteURL!, success: {result in
                     let normalizedUserName = result.username
                     self.loggedInUsername = normalizedUserName
                     self.keychainCredentials.userName = normalizedUserName
@@ -56,7 +84,7 @@ class WMFAuthenticationManager: NSObject {
                     loginSuccess(result)
                 }, failure: failure)
             }, failure:failure)
-        }, failure:failure)
+//        }, failure:failure)
     }
     
     /**
@@ -85,7 +113,7 @@ class WMFAuthenticationManager: NSObject {
         }, failure:{ error in
             self.loggedInUsername = nil
             
-            self.login(username: userName, password: password, retypePassword: nil, oathToken: nil, success: success, failure: { error in
+            self.login(username: userName, password: password, retypePassword: nil, oathToken: nil, captchaID: nil, captchaWord: nil, success: success, failure: { error in
                 if let error = error as? URLError {
                     if error.code != .notConnectedToInternet {
                         self.logout()

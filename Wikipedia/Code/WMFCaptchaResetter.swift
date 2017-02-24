@@ -47,6 +47,9 @@ public class WMFCaptchaResetter: NSObject {
                 failure(WMFCaptchaResetterError.zeroLengthIndex)
                 return
             }
+            
+print(response)
+            
             success(WMFCaptchaResetterResult.init(index: index))
         }, failure: { (_, error) in
             failure(error)
