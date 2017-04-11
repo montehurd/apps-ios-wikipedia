@@ -8,6 +8,15 @@
 #import "WMFImageTag+TargetImageWidthURL.h"
 #import "NSString+WMFHTMLParsing.h"
 
+
+
+
+#import "WMFRelatedSearchFetcher.h"
+#import "WMFRelatedSearchResults.h"
+
+
+
+
 static const NSInteger WMFCachedResponseCountLimit = 4;
 
 @interface WMFProxyServerResponse : NSObject
@@ -26,9 +35,33 @@ static const NSInteger WMFCachedResponseCountLimit = 4;
 @property (nonatomic, copy, nonnull) NSString *hostedFolderPath;
 @property (nonatomic) NSURLComponents *hostURLComponents;
 @property (nonatomic, readonly) GCDWebServerAsyncProcessBlock defaultHandler;
+
+
+
+@property (nonatomic, strong) WMFRelatedSearchFetcher *relatedSearchFetcher;
+
+
+
+
 @end
 
 @implementation WMFProxyServer
+
+
+
+
+- (WMFRelatedSearchFetcher *)relatedSearchFetcher {
+    if (_relatedSearchFetcher == nil) {
+        _relatedSearchFetcher = [[WMFRelatedSearchFetcher alloc] init];
+    }
+    return _relatedSearchFetcher;
+}
+
+
+
+
+
+
 
 + (WMFProxyServer *)sharedProxyServer {
     static dispatch_once_t onceToken;
@@ -148,6 +181,39 @@ static const NSInteger WMFCachedResponseCountLimit = 4;
             NSArray *localPathComponents = [components subarrayWithRange:NSMakeRange(3, components.count - 3)];
             NSString *relativePath = [NSString pathWithComponents:localPathComponents];
             [self handleFileRequestForRelativePath:relativePath completionBlock:completionBlock];
+
+            
+            
+            
+   
+            
+            
+            
+            
+            
+            
+/*
+ 
+ - [ ] probably split into articleFooterMenu, articleFooterReadmore and articleFooterLegal?
+ */
+} else if ([baseComponent isEqualToString:@"articleFooter"]) {
+//    NSString *string = [NSString stringWithFormat:@"document.write('%@')", @"<b>THIS IS AN ARTICLE FOOTER AND STUFF"];
+//    completionBlock([GCDWebServerDataResponse responseWithHTML:string]);
+    
+NSString *article = request.query[@"article"];
+[self handleArticleFooterRequestForArticle:article completionBlock:completionBlock];
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+            
+            
         } else if ([baseComponent isEqualToString:WMFProxyImageBasePath]) {
             NSString *originalSrc = request.query[WMFProxyImageOriginalSrcKey];
             if (!originalSrc) {
@@ -173,6 +239,175 @@ static const NSInteger WMFCachedResponseCountLimit = 4;
 }
 
 #pragma mark - Specific Handlers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)handleArticleFooterRequestForArticle:(NSString *)article completionBlock:(GCDWebServerCompletionBlock)completionBlock {
+    
+// - [ ] would need handle the notFound error case below
+
+    GCDWebServerErrorResponse *notFound = [GCDWebServerErrorResponse responseWithClientError:kGCDWebServerHTTPStatusCode_NotFound message:@"Image not found"];
+    //NSAssert(imgURL, @"imageProxy URL should not be nil");
+    
+    NSURL* articleURL = [NSURL URLWithString:@"https://en.wikipedia.org/wiki/Food"];
+    
+//    NSURLCache *URLCache = [NSURLCache sharedURLCache];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:articleURL];
+    [request setValue:[WikipediaAppUtils versionedUserAgent] forHTTPHeaderField:@"User-Agent"];
+//    NSCachedURLResponse *cachedResponse = [URLCache cachedResponseForRequest:request];
+    
+    
+
+// - [ ] would need to hook the cache stuff back up below
+
+    
+//    if (cachedResponse.response && cachedResponse.data) {
+//        NSString *mimeType = cachedResponse.response.MIMEType;
+//        if (mimeType == nil) {
+//            mimeType = [articleURL wmf_mimeTypeForExtension];
+//        }
+//        NSAssert(mimeType != nil, @"MIME type not found for URL %@", articleURL);
+//        GCDWebServerDataResponse *gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:cachedResponse.data contentType:mimeType];
+//        completionBlock(gcdResponse);
+//    } else {
+    
+    
+    [self.relatedSearchFetcher fetchArticlesRelatedArticleWithURL:articleURL
+                                                      resultLimit:3
+                                                  completionBlock:^(WMFRelatedSearchResults *_Nonnull results) {
+                                                      //@strongify(self);
+                                                      //self.relatedSearchResults = results;
+                                                      
+                                                      
+                                                      
+                                                      //NSString *transformedOutput = @"OH HEY!";
+                                                      
+                                                      
+                                                      NSMutableArray* resultsHTMLArray = @[].mutableCopy;
+                for (MWKSearchResult* result in results.results) {
+                    
+// - [ ] Investigate using "initWithHTMLTemplate:variables:" to make these substitutions!
+                    
+                    [resultsHTMLArray addObject:@"<div style=\"padding:3px;margin-bottom:20px;border-color:black;border-style:solid;border-width:1px;\">"];
+
+                    NSURL* thumbUrl = result.thumbnailURL;
+                    if (thumbUrl) {
+                        [resultsHTMLArray addObject:[NSString stringWithFormat:@"<div><img Xwidth=320 height=198 style=\"margin-left:auto; margin-right:auto; display:block;\" src=\"%@\"></div>", thumbUrl]];
+                    }
+
+                    NSString* title = result.displayTitle;
+                    if (title) {
+                        [resultsHTMLArray addObject:[NSString stringWithFormat:@"<div><b>%@</b></div>", title]];
+                    }
+
+                    NSString* description = result.wikidataDescription;
+                    if (description) {
+                        [resultsHTMLArray addObject:[NSString stringWithFormat:@"<div style=\"color:#999;\">%@</div>", description]];
+                    }
+
+                    NSString* extract = result.extract;
+                    if (extract) {
+                        [resultsHTMLArray addObject:[NSString stringWithFormat:@"<div>%@</div>", extract]];
+                    }
+
+                    [resultsHTMLArray addObject:@"</div>"];
+                }
+
+                NSString * resultsHTMLString = [resultsHTMLArray componentsJoinedByString:@""];
+// - [ ] would need to encode document.write argument delimiter in resultsHTMLString
+
+                NSString* transformedOutput = [NSString stringWithFormat:@"document.write('%@')", resultsHTMLString];
+
+                                                      
+                                                      
+                                                      
+                                                      
+                                                      
+                                                      
+                                                      
+                                                      
+                                                      GCDWebServerDataResponse *gcdResponse = [GCDWebServerDataResponse responseWithHTML:transformedOutput];//[[GCDWebServerDataResponse alloc] initWithData:transformedOutput contentType:response.MIMEType];
+                                                      completionBlock(gcdResponse);
+//                                                      NSCachedURLResponse *responseToCache = [[NSCachedURLResponse alloc] initWithResponse:response data:transformedOutput];
+//                                                      [URLCache storeCachedResponse:responseToCache forRequest:request];
+                                                      
+                                                      
+                                                  }
+                                                     failureBlock:^(NSError *_Nonnull error) {
+                                                         completionBlock(notFound);
+                                                     }];
+
+    
+    
+    
+//        NSURLSessionDataTask *downloadImgTask = [[NSURLSession sharedSession] dataTaskWithRequest:request
+//                                                                                completionHandler:^(NSData *imgData, NSURLResponse *response, NSError *error) {
+//                                                                                    if (response && imgData) {
+//                                                                                        GCDWebServerDataResponse *gcdResponse = [[GCDWebServerDataResponse alloc] initWithData:imgData contentType:response.MIMEType];
+//                                                                                        completionBlock(gcdResponse);
+//                                                                                        NSCachedURLResponse *responseToCache = [[NSCachedURLResponse alloc] initWithResponse:response data:imgData];
+//                                                                                        [URLCache storeCachedResponse:responseToCache forRequest:request];
+//                                                                                    } else {
+//                                                                                        completionBlock(notFound);
+//                                                                                    }
+//                                                                                }];
+//        downloadImgTask.priority = NSURLSessionTaskPriorityLow;
+//        [downloadImgTask resume];
+    
+    
+    
+    
+//    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)handleFileRequestForRelativePath:(NSString *)relativePath completionBlock:(GCDWebServerCompletionBlock)completionBlock {
     WMFProxyServerResponse *response = [self responseForPath:relativePath];
@@ -289,6 +524,45 @@ static const NSInteger WMFCachedResponseCountLimit = 4;
     //append the final chunk of the original string
     [newHTMLString appendString:[HTMLString substringWithRange:NSMakeRange(location, HTMLString.length - location)]];
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+NSString *secret = self.secret;
+NSURL *serverURL = self.webServer.serverURL;
+NSURLComponents *components = [NSURLComponents componentsWithURL:serverURL resolvingAgainstBaseURL:NO];
+components.path = [NSString pathWithComponents:@[@"/", secret, @"articleFooter"]];
+// - [ ] would need to send the article title in url qstring? see "cat" below
+NSURLQueryItem *queryItem = [NSURLQueryItem queryItemWithName:@"article" value:@"cat"];
+if (queryItem) {
+    components.queryItems = @[queryItem];
+}
+NSString *jsString = [NSString stringWithFormat:@"<div style='border-color:red;border-style:dashed;border-width:10px;'><h1>JS INJECTED READMORE TEST</h1><script src='%@'></script></div>", components.URL];
+[newHTMLString appendString:jsString];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     return newHTMLString;
 }
 
