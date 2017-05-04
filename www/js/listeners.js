@@ -1,7 +1,7 @@
 (function () {
 var refs = require("./refs");
 var utilities = require("./utilities");
-var tableCollapser = require("./transforms/collapseTables");
+var tableCollapser = require('wikimedia-page-library').CollapseTable;
 
 document.onclick = function() {
     // Reminder: resist adding any click/tap handling here - they can
@@ -50,8 +50,8 @@ function maybeSendMessageForTarget(event, hrefTarget){
         // Handle reference links with a popup view instead of scrolling about!
         refs.sendNearbyReferences( hrefTarget );
     } else if (href && href[0] === "#") {
- 
-        tableCollapser.openCollapsedTableIfItContainsElement(document.getElementById(href.substring(1)));
+
+        tableCollapser.expandCollapsedTableIfItContainsElement(document.getElementById(href.substring(1)));
  
         // If it is a link to an anchor in the current page, use existing link handling
         // so top floating native header height can be taken into account by the regular

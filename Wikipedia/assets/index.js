@@ -601,7 +601,7 @@ exports.removeSearchTermHighlights = removeSearchTermHighlights;
 (function () {
 var refs = require("./refs");
 var utilities = require("./utilities");
-var tableCollapser = require("./transforms/collapseTables");
+var tableCollapser = require('wikimedia-page-library').CollapseTable;
 
 document.onclick = function() {
     // Reminder: resist adding any click/tap handling here - they can
@@ -650,8 +650,8 @@ function maybeSendMessageForTarget(event, hrefTarget){
         // Handle reference links with a popup view instead of scrolling about!
         refs.sendNearbyReferences( hrefTarget );
     } else if (href && href[0] === "#") {
- 
-        tableCollapser.openCollapsedTableIfItContainsElement(document.getElementById(href.substring(1)));
+
+        tableCollapser.expandCollapsedTableIfItContainsElement(document.getElementById(href.substring(1)));
  
         // If it is a link to an anchor in the current page, use existing link handling
         // so top floating native header height can be taken into account by the regular
@@ -706,7 +706,7 @@ document.addEventListener("touchend", handleTouchEnded, false);
 
 })();
 
-},{"./refs":6,"./transforms/collapseTables":7,"./utilities":16}],6:[function(require,module,exports){
+},{"./refs":6,"./utilities":16,"wikimedia-page-library":1}],6:[function(require,module,exports){
 var elementLocation = require("./elementLocation");
 
 function isCitation( href ) {
@@ -854,8 +854,6 @@ exports.sendNearbyReferences = sendNearbyReferences;
 
 },{"./elementLocation":3}],7:[function(require,module,exports){
 const collapseTable = require('wikimedia-page-library').CollapseTable;
-//const elementUtilities = require('wikimedia-page-library').ElementUtilities;
-var utilities = require("../utilities");
 
 function footerDivClickCallback(container) {
   window.scrollTo( 0, container.offsetTop - 10 );
@@ -865,22 +863,9 @@ function hideTables(content, isMainPage, pageTitle, infoboxTitle, otherTitle, fo
   collapseTable.collapseTables(document, content, pageTitle, isMainPage, infoboxTitle, otherTitle, footerTitle, footerDivClickCallback);
 }
 
-exports.openCollapsedTableIfItContainsElement = function(element){
-    if(element){
-//var container = elementUtilities.findClosestAncestor(element, "[class*='app_table_container']");
-var container = utilities.findClosest(element, "[class*='app_table_container']");
-        if(container){
-            var collapsedDiv = container.firstChild;
-            if(collapsedDiv && collapsedDiv.classList.contains('app_table_collapsed_open')){
-                collapsedDiv.click();
-            }
-        }
-    }
-};
-
 exports.hideTables = hideTables;
 
-},{"../utilities":16,"wikimedia-page-library":1}],8:[function(require,module,exports){
+},{"wikimedia-page-library":1}],8:[function(require,module,exports){
 
 function disableFilePageEdit( content ) {
     var filetoc = content.querySelector( '#filetoc' );
