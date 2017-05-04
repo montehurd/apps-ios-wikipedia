@@ -7,6 +7,23 @@
 // todo: delete Empty.css when other overrides exist
 
 /**
+ * Polyfill function that tells whether a given element matches a selector.
+ * @param {!Element} el Element
+ * @param {!string} selector Selector to look for
+ * @returns {!boolean} Whether the element matches the selector
+ */
+var matchesSelectorCompat = function matchesSelectorCompat(el, selector) {
+  if (el.matches) {
+    return el.matches(selector);
+  } else if (el.matchesSelector) {
+    return el.matchesSelector(selector);
+  } else if (el.webkitMatchesSelector) {
+    return el.webkitMatchesSelector(selector);
+  }
+  return false;
+};
+
+/**
  * Returns closest ancestor of element which matches selector.
  * Similar to 'closest' methods as seen here:
  *  https://api.jquery.com/closest/
@@ -17,7 +34,7 @@
  */
 var findClosestAncestor = function findClosestAncestor(el, selector) {
   var parentElement = void 0;
-  for (parentElement = el.parentElement; parentElement && !parentElement.matches(selector); parentElement = parentElement.parentElement) {
+  for (parentElement = el.parentElement; parentElement && !matchesSelectorCompat(parentElement, selector); parentElement = parentElement.parentElement) {
     // Intentionally empty.
   }
   return parentElement;
@@ -107,7 +124,7 @@ var toggleCollapseClickCallback = function toggleCollapseClickCallback(footerDiv
     }
     footer.style.display = 'none';
     // if they clicked the bottom div, then scroll back up to the top of the table.
-    if (this === footer && toggleCollapseClickCallback) {
+    if (this === footer && footerDivClickCallback) {
       footerDivClickCallback(container);
     }
   } else {
@@ -253,9 +270,27 @@ var collapseTables = function collapseTables(document, content, pageTitle, isMai
   }
 };
 
+/**
+ * @param  {?Element} element
+ * @return {void}
+*/
+var expandCollapsedTableIfItContainsElement = function expandCollapsedTableIfItContainsElement(element) {
+  if (element) {
+    var containerSelector = '[class*="app_table_container"]';
+    var container = elementUtilities.findClosestAncestor(element, containerSelector);
+    if (container) {
+      var collapsedDiv = container.firstElementChild;
+      if (collapsedDiv && collapsedDiv.classList.contains('app_table_collapsed_open')) {
+        collapsedDiv.click();
+      }
+    }
+  }
+};
+
 var CollapseTable = {
   toggleCollapseClickCallback: toggleCollapseClickCallback,
   collapseTables: collapseTables,
+  expandCollapsedTableIfItContainsElement: expandCollapsedTableIfItContainsElement,
   test: {
     getTableHeader: getTableHeader,
     shouldTableBeCollapsed: shouldTableBeCollapsed,
