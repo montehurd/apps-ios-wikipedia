@@ -158,11 +158,19 @@ static const char *const WMFImageControllerAssociationKey = "WMFImageController"
              success:(WMFSuccessHandler)success {
     NSAssert([NSThread isMainThread], @"Interaction with a UIImageView should only happen on the main thread");
 
+self.layer.borderColor = [UIColor clearColor].CGColor;
+self.layer.borderWidth = 0;
+    
     if (detectFaces) {
+
         BOOL isFaceBigEnough = NO;
         CGRect unitFaceBounds = [faceBoundsValue CGRectValue];
         CGRect faceBounds = CGRectZero;
         if (!CGRectIsEmpty(unitFaceBounds)) {
+            
+self.layer.borderColor = [UIColor yellowColor].CGColor;
+self.layer.borderWidth = 2;
+            
             faceBounds = [image wmf_denormalizeRect:unitFaceBounds];
             CGFloat faceArea = faceBounds.size.width * faceBounds.size.height;
             CGFloat imageArea = image.size.width * image.size.height;
@@ -171,6 +179,10 @@ static const char *const WMFImageControllerAssociationKey = "WMFImageController"
             isFaceBigEnough = (faceProportionOfImage >= 0.0178);
         }
         if (isFaceBigEnough) {
+            
+self.layer.borderColor = [UIColor greenColor].CGColor;
+self.layer.borderWidth = 2;
+            
             [self wmf_cropContentsByVerticallyCenteringFrame:faceBounds
                                          insideBoundsOfImage:image];
         } else {
