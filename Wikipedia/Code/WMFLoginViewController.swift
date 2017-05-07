@@ -1,6 +1,21 @@
 import UIKit
 
 class WMFLoginViewController: WMFScrollViewController, UITextFieldDelegate, WMFCaptchaViewControllerDelegate {
+    
+
+    
+    
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        let librariesUsedViewController = LibrariesUsedViewController.wmf_viewControllerFromStoryboardNamed(librariesUsedStoryboardName)
+        present(UINavigationController.init(rootViewController: librariesUsedViewController), animated: true, completion: nil)
+    }
+    
+    
+
+    
+    
     @IBOutlet fileprivate var usernameField: UITextField!
     @IBOutlet fileprivate var passwordField: UITextField!
     @IBOutlet fileprivate var usernameTitleLabel: UILabel!
