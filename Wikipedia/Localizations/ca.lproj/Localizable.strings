@@ -257,8 +257,7 @@
 "places-filter-top-articles" = "Més llegits";
 "places-filter-top-articles-count" = "{{PLURAL:$1|$1 article|$1 articles}}";
 "places-no-saved-articles-have-location" = "Cap dels vostres articles desats té informació d'ubicació";
-// Fuzzy
-"places-search-default-text" = "Cerca";
+"places-search-default-text" = "Cerca llocs";
 "places-search-did-you-mean" = "Volíeu dir $1?";
 "places-search-recently-searched-header" = "Cercat recentment";
 "places-search-saved-articles" = "Tots els articles desats";
@@ -266,6 +265,7 @@
 "places-search-this-area" = "Resultats en aquesta àrea";
 "places-search-top-articles" = "Tots els millors articles";
 "places-search-top-articles-that-match-scope" = "A prop";
+"places-search-your-current-location" = "La vostra ubicació actual";
 "places-show-filter-list-accessibility-label" = "Mostra els filtres de cerca";
 "places-title" = "Llocs";
 "places-unknown-distance" = "distància desconeguda";
@@ -362,7 +362,7 @@
 "wikitext-upload-result-unknown" = "No s'ha pogut determinar el resultat de la càrrega del viquitext.";
 "wikitext-upload-save" = "S'està desant...";
 "wikitext-upload-save-anonymously-warning" = "Les edicions seran atribuïdes a l'adreça IP del dispositiu. Si vostè $1 disposarà de més privadesa.";
-"wikitext-upload-save-license-name" = "CC BY-SA 3.0";
+"cc-by-sa-3.0" = "CC BY-SA 3.0";
 "wikitext-upload-save-sign-in" = "Inicia una sessió";
 "wikitext-upload-save-terms-and-license" = "Si deseu, accepteu els $1, i accepteu també alliberar irrevocablement les vostres contribucions sota la llicència $2.";
 "wikitext-upload-save-terms-name" = "Condicions d'ús";

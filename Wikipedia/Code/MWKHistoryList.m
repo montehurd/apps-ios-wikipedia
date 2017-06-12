@@ -1,5 +1,5 @@
-#import "MWKHistoryList.h"
-#import "NSDateFormatter+WMFExtensions.h"
+#import <WMF/MWKHistoryList.h>
+#import <WMF/NSDateFormatter+WMFExtensions.h>
 #import <WMF/WMF-Swift.h>
 
 #define MAX_HISTORY_ENTRIES 100
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)setFragment:(nullable NSString *)fragment scrollPosition:(CGFloat)scrollposition onPageInHistoryWithURL:(NSURL *)URL {
+- (void)setFragment:(nullable NSString *)fragment scrollPosition:(double)scrollposition onPageInHistoryWithURL:(NSURL *)URL {
     if ([URL wmf_isNonStandardURL]) {
         return;
     }
