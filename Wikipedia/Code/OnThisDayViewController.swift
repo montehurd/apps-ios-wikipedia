@@ -58,6 +58,11 @@ extension OnThisDayViewController {
         }
         let event = events[indexPath.section]
         onThisDayCell.configure(with: event, dataStore: dataStore, layoutOnly: false)
+        
+        
+onThisDayCell.shouldAnimateDots = true
+        
+        
         return onThisDayCell
     }
     
@@ -80,6 +85,11 @@ extension OnThisDayViewController {
             return
         }
         cell.selectionDelegate = self
+        
+        
+cell.startDotAnimation()
+
+        
     }
     
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -87,6 +97,11 @@ extension OnThisDayViewController {
             return
         }
         cell.selectionDelegate = nil
+        
+        
+cell.endDotAnimation()
+        
+        
     }
 }
 
