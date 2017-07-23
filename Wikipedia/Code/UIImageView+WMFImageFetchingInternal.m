@@ -27,6 +27,17 @@ static const char *const WMFImageControllerAssociationKey = "WMFImageController"
     return controller;
 }
 
+- (CAShapeLayer *__nullable)wmf_debugLayer {
+    CAShapeLayer *shape = objc_getAssociatedObject(self, "wmf_debugLayer");
+    if (!shape) {
+        shape = [CAShapeLayer new];
+        shape.backgroundColor = [UIColor redColor].CGColor;
+        shape.opacity = 0.5;
+        [self.layer addSublayer:shape];
+    }
+    return shape;
+}
+
 - (void)wmf_setImageController:(nullable WMFImageController *)imageController {
     objc_setAssociatedObject(self, WMFImageControllerAssociationKey, imageController, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -172,6 +183,10 @@ static const char *const WMFImageControllerAssociationKey = "WMFImageController"
             isFaceBigEnough = (faceProportionOfImage >= 0.0178);
         }
         if (isFaceBigEnough) {
+
+self.contentMode = UIViewContentModeTopLeft;
+self.wmf_debugLayer.frame = faceBounds;
+
             [self wmf_cropContentsByVerticallyCenteringFrame:faceBounds
                                          insideBoundsOfImage:image];
         } else {

@@ -76,6 +76,11 @@
 
 - (void)getFaceBoundsInImage:(UIImage *)image onGPU:(BOOL)onGPU failure:(WMFErrorHandler)failure success:(WMFSuccessIdHandler)success {
     CIDetector *detector = onGPU ? [CIDetector wmf_sharedGPUFaceDetector] : [CIDetector wmf_sharedCPUFaceDetector];
+    
+//success(@[[NSValue valueWithCGRect:CGRectMake(0.27, 0.16, 0.41, 0.32)]]);
+//return;
+//HERE
+
     [detector wmf_detectFeaturelessFacesInImage:image
                                     withFailure:failure
                                         success:^(NSArray *features) {
