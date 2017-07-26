@@ -24,15 +24,21 @@
     }
 
     BOOL isMainPage = [SessionSingleton sharedInstance].currentArticle.isMain;
+    BOOL isNonMainPageLeadSection = ([self isLeadSection] && !isMainPage);
 
-    return [NSString stringWithFormat:
-                         @"<div id='section_heading_and_content_block_%d'>%@<div id='content_block_%d' class='content_block'>%@%@%@</div></div>",
-                         self.sectionId,
-                         (isMainPage ? @"" : [self getHeaderTag]),
-                         self.sectionId,
-                         (([self isLeadSection]) && !isMainPage) ? @"<hr id='content_block_0_hr'>" : @"",
-                         (([self isLeadSection]) && !isMainPage) ? [self getEditPencilAnchor] : @"",
-                         html];
+    return [NSString stringWithFormat:@""
+                                       "<div id='section_heading_and_content_block_%d'>"
+                                       "%@"
+                                       "<div id='content_block_%d' class='content_block'>"
+                                       "%@%@%@"
+                                       "</div>"
+                                       "</div>",
+                                      self.sectionId,
+                                      (isMainPage ? @"" : [self getHeaderTag]),
+                                      self.sectionId,
+                                      isNonMainPageLeadSection ? @"<hr id='content_block_0_hr'>" : @"",
+                                      isNonMainPageLeadSection ? [self getEditPencilAnchor] : @"",
+                                      html];
 }
 
 - (NSString *)getHeaderTag {
@@ -73,6 +79,7 @@
 }
 
 - (NSString *)getEditPencilAnchor {
+    return @" ";
     return [NSString stringWithFormat:
                          @"<a class='edit_section_button' data-action='edit_section' onclick='window.webkit.messageHandlers.editClicked.postMessage({ sectionId: %d }); return false;' id='edit_section_button_%d'></a>",
                          self.sectionId,
