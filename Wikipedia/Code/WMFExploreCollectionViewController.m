@@ -437,7 +437,12 @@ const NSInteger WMFExploreFeedMaximumNumberOfDays = 30;
 }
 
 - (void)didReceiveMemoryWarning {
-    [self resetLayoutCache];
+    //    [self resetLayoutCache];
+
+    CGPoint offset = CGPointMake(self.collectionView.contentOffset.x, self.collectionView.contentOffset.y + self.collectionView.frame.size.height);
+
+    [self.collectionView setContentOffset:offset animated:YES];
+
     [super didReceiveMemoryWarning];
 }
 
@@ -1167,6 +1172,7 @@ const NSInteger WMFExploreFeedMaximumNumberOfDays = 30;
     WMFFeedOnThisDayEvent *event = (WMFFeedOnThisDayEvent *)contentGroup.featuredContentObject;
 
     if ([event isKindOfClass:[WMFFeedOnThisDayEvent class]]) {
+
         WMFFeedOnThisDayEvent *previousEvent = event;
         NSInteger attempts = 0;
         while (events.count > featuredIndex + 1 && previousEvent.year == event.year && attempts < 4) {
@@ -1176,6 +1182,7 @@ const NSInteger WMFExploreFeedMaximumNumberOfDays = 30;
             }
             attempts++;
         }
+
         [cell configureWithOnThisDayEvent:event previousEvent:previousEvent dataStore:self.userStore theme:self.theme layoutOnly:layoutOnly];
     }
 }

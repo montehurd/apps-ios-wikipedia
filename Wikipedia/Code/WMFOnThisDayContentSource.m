@@ -127,6 +127,17 @@ NS_ASSUME_NONNULL_BEGIN
                                 }
                                 [moc fetchOrCreateArticleWithURL:[articlePreview articleURL] updatedWithFeedPreview:articlePreview pageViews:nil];
                             }];
+                            
+
+                            
+                            
+//NSRegularExpression* enMahemRegex = [NSRegularExpression regularExpressionWithPattern:
+//@"\\b(kill(s|ed|ers|ing)?|explosion(s)?|bomb(s|ers|ing|ings|ed)?|slaughter(s|ed|ing)?|massacre(d)?|die|dead|death(s)?|attack(ing|ers|ed)?|murder(s|ing|ers|ed)?|execute(d)?|terror(ist|ism|ize|izing)?|war(s)?|fatal(ity|ly)?|crash(ing|ed)?|battle(d)?|coup|riot(ing|ers|ed|s)?)\\b"
+//                                                                       options:NSRegularExpressionCaseInsensitive error:nil];
+//NSUInteger mayhemWordCount = [enMahemRegex numberOfMatchesInString:event.text options:0 range: NSMakeRange(0, [event.text length])];
+//NSNumber *imageScore = @(@(countOfImages).floatValue * 0.2);
+//NSNumber *overallScore = @(imageScore.floatValue - mayhemWordCount);
+//event.score = overallScore;
                             event.score = @(countOfImages);
                             event.index = @(idx);
                         }];
@@ -136,7 +147,11 @@ NS_ASSUME_NONNULL_BEGIN
                         NSArray *eventsSortedByScore = [onThisDayEvents sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"score" ascending:NO]]];
                         if (eventsSortedByScore.count > 0) {
                             NSInteger index = ((year % 10) % eventsSortedByScore.count);
+//NSInteger index = 0;
                             WMFFeedOnThisDayEvent *featuredEvent = eventsSortedByScore[index];
+
+NSLog(@"\n\n%ld-%ld\n%@ - %@\n\n\n", month, day, featuredEvent.year, featuredEvent.text);
+
                             featuredEventIndex = featuredEvent.index.integerValue;
                         }
 
