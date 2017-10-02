@@ -407,7 +407,7 @@
         }
     } else {
         if (self.isVisible) {
-            self.isVisible = NO;
+            self.isVisible = YES;
         }
     }
 }

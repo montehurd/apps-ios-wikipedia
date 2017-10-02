@@ -45,6 +45,8 @@
                 completion();
             }
         }];
+        NSLog(@"NOOOOOOOOO");
+        
         return;
     }
     [self.fetcher fetchAnnouncementsForURL:self.siteURL
@@ -111,9 +113,9 @@
 
     //Only make these visible for previous users of the app
     //Meaning a new install will only see these after they close the app and reopen
-    if ([[NSUserDefaults wmf_userDefaults] wmf_appResignActiveDate] == nil) {
-        return;
-    }
+//    if ([[NSUserDefaults wmf_userDefaults] wmf_appResignActiveDate] == nil) {
+//        return;
+//    }
 
     [moc enumerateContentGroupsOfKind:WMFContentGroupKindAnnouncement
                             withBlock:^(WMFContentGroup *_Nonnull group, BOOL *_Nonnull stop) {

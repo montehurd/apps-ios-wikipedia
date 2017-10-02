@@ -16,7 +16,7 @@
         AFHTTPSessionManager *manager = [AFHTTPSessionManager wmf_createIgnoreCacheManager];
         manager.responseSerializer = [WMFMantleJSONResponseSerializer serializerForArrayOf:[WMFAnnouncement class] fromKeypath:@"announce"];
         NSMutableIndexSet *set = [manager.responseSerializer.acceptableStatusCodes mutableCopy];
-        [set removeIndex:304];
+//        [set removeIndex:304];
         manager.responseSerializer.acceptableStatusCodes = set;
         self.operationManager = manager;
     }
@@ -40,8 +40,12 @@
         return;
     }
 
-    NSURL *url = [siteURL wmf_URLWithPath:@"/api/rest_v1/feed/announcements" isMobile:NO];
+//    NSURL *url = [siteURL wmf_URLWithPath:@"/api/rest_v1/feed/announcements" isMobile:NO];
 
+    
+    NSURL *url = [NSURL URLWithString:@"http://localhost/fr.json"];
+    
+    
     [self.operationManager GET:[url absoluteString]
         parameters:nil
         progress:NULL
@@ -53,6 +57,9 @@
             }
 
             WMFAnnouncement *announcement = responseObject.firstObject;
+            
+//announcement = [[WMFAnnouncement alloc] init];
+            
             if (![announcement isKindOfClass:[WMFAnnouncement class]]) {
                 failure([NSError wmf_errorWithType:WMFErrorTypeUnexpectedResponseType
                                           userInfo:nil]);
@@ -74,7 +81,7 @@
         if (![obj isKindOfClass:[WMFAnnouncement class]]) {
             return NO;
         }
-        __block BOOL valid = NO;
+        __block BOOL valid = YES;
         [[obj countries] enumerateObjectsUsingBlock:^(NSString *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
             if ([header containsString:[NSString stringWithFormat:@"GeoIP=%@", obj]]) {
                 valid = YES;

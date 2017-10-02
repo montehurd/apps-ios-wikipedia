@@ -701,7 +701,7 @@ const NSInteger WMFExploreFeedMaximumNumberOfDays = 30;
             [self configureAnnouncementCell:cell withContentGroup:section atIndexPath:indexPath];
             CGSize size = [cell sizeThatFits:CGSizeMake(columnWidth, UIViewNoIntrinsicMetric)];
             estimate.height = size.height;
-            estimate.precalculated = YES;
+            estimate.precalculated = NO;
         } break;
         default:
             NSAssert(false, @"Unknown display Type");
