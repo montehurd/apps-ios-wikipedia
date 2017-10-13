@@ -437,7 +437,14 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
     if (@available(iOS 11.0, *)) {
         [super viewSafeAreaInsetsDidChange];
         UIEdgeInsets safeInsets = self.view.safeAreaInsets;
-        self.webView.scrollView.scrollIndicatorInsets = UIEdgeInsetsMake(0, safeInsets.left, 0, safeInsets.right);
+//        self.webView.scrollView.scrollIndicatorInsets = UIEdgeInsetsMake(0, safeInsets.left, 0, safeInsets.right);
+
+        
+return;
+        UIEdgeInsets newInsets = self.webView.scrollView.scrollIndicatorInsets;
+        newInsets.left = safeInsets.left;
+        newInsets.right = safeInsets.right;
+        self.webView.scrollView.scrollIndicatorInsets = newInsets;
     }
 }
 
@@ -780,11 +787,11 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
     self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.webView.scrollView addSubview:self.headerView];
 
-    NSLayoutConstraint *leadingConstraint = [self.webView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor];
-    NSLayoutConstraint *trailingConstraint = [self.webView.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor];
+    NSLayoutConstraint *leadingConstraint = [self.headerView.leadingAnchor constraintEqualToAnchor:self.webView.leadingAnchor];
+    NSLayoutConstraint *trailingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.webView.trailingAnchor];
     [self.webView addConstraints:@[leadingConstraint, trailingConstraint]];
 
-    NSLayoutConstraint *topConstraint = [self.webView.scrollView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor];
+    NSLayoutConstraint *topConstraint = [self.headerView.topAnchor constraintEqualToAnchor:self.webView.scrollView.topAnchor];
     [self.webView.scrollView addConstraint:topConstraint];
 
     self.headerHeightConstraint = [self.headerView.heightAnchor constraintEqualToConstant:0];
@@ -1115,6 +1122,12 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
 - (void)scrollViewDidScrollToTop:(UIScrollView *)scrollView {
     if ([self.delegate respondsToSelector:@selector(webViewController:scrollViewDidScrollToTop:)]) {
         [self.delegate webViewController:self scrollViewDidScrollToTop:scrollView];
+    }
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset {
+    if ([self.delegate respondsToSelector:@selector(webViewController:scrollViewWillEndDragging:velocity:)]) {
+        [self.delegate webViewController:self scrollViewWillEndDragging:scrollView velocity:velocity];
     }
 }
 
