@@ -22,10 +22,6 @@ const lazyImageLoadViewportDistanceMultiplier = 2 // Load images on the current 
 const lazyImageLoadingTransformer = new requirements.lazyLoadTransformer(window, lazyImageLoadViewportDistanceMultiplier)
 const liveDocument = document
 
-// backfill fragments with "createElement" so transforms will work as well with fragments as
-// they do with documents
-DocumentFragment.prototype.createElement = name => lazyDocument.createElement(name)
-
 const maybeWidenImage = require('wikimedia-page-library').WidenImage.maybeWidenImage
 
 class Language {
@@ -124,8 +120,17 @@ const processResponseStatus = response => {
 
 const extractResponseJSON = response => response.json()
 
+// Backfill fragments with `createElement` and `createDocumentFragment` so transforms requiring
+// `Document` parameters will also work if passed a `DocumentFragment`.
+const enrichFragment = fragment => {
+  fragment.createElement = (name) => lazyDocument.createElement(name)
+  fragment.createDocumentFragment = () => lazyDocument.createDocumentFragment()
+  fragment.createTextNode = (text) => lazyDocument.createTextNode(text)
+}
+
 const fragmentForSection = section => {
   const fragment = lazyDocument.createDocumentFragment()
+  enrichFragment(fragment)
   const container = section.containerDiv() // do not append this to document. keep unattached to main DOM (ie headless) until transforms have been run on the fragment
   fragment.appendChild(container)
   return fragment
@@ -162,7 +167,7 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   }
 
   // Adds table collapsing header/footers.
-  requirements.tables.adjustTables(window, fragment, article.displayTitle, article.ismain, this.collapseTablesInitially, this.collapseTablesLocalizedStrings.tableInfoboxTitle, this.collapseTablesLocalizedStrings.tableOtherTitle, this.collapseTablesLocalizedStrings.tableFooterTitle, tableFooterDivClickCallback)
+  requirements.tables.adjustTables(window, fragment, article.title, article.ismain, this.collapseTablesInitially, this.collapseTablesLocalizedStrings.tableInfoboxTitle, this.collapseTablesLocalizedStrings.tableOtherTitle, this.collapseTablesLocalizedStrings.tableFooterTitle, tableFooterDivClickCallback)
 
   // Prevents some collapsed tables from scrolling side-to-side.
   // May want to move this to wikimedia-page-library if there are no issues.

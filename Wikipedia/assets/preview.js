@@ -1,45 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-// Implementation of https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
-const findClosest = (el, selector) => {
-  while ((el = el.parentElement) && !el.matches(selector));
-  return el
-}
-
-const setLanguage = (lang, dir, uidir) => {
-  const html = document.querySelector( 'html' )
-  html.lang = lang
-  html.dir = dir
-  html.classList.add( 'content-' + dir )
-  html.classList.add( 'ui-' + uidir )
-}
-
-const setPageProtected =
-  isProtected => document.querySelector( 'html' ).classList[isProtected ? 'add' : 'remove']('page-protected')
-
-const scrollToFragment = fragmentId => {
-  location.hash = ''
-  location.hash = fragmentId
-}
-
-const accessibilityCursorToFragment = fragmentId => {
-    /* Attempt to move accessibility cursor to fragment. We need to /change/ focus,
-     in order to have the desired effect, so we first give focus to the body element,
-     then move it to the desired fragment. */
-  const focus_element = document.getElementById(fragmentId)
-  const other_element = document.body
-  other_element.setAttribute('tabindex', 0)
-  other_element.focus()
-  focus_element.setAttribute('tabindex', 0)
-  focus_element.focus()
-}
-
-exports.accessibilityCursorToFragment = accessibilityCursorToFragment
-exports.scrollToFragment = scrollToFragment
-exports.setPageProtected = setPageProtected
-exports.setLanguage = setLanguage
-exports.findClosest = findClosest
-},{}],2:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -193,22 +152,20 @@ var elementUtilities = {
 var CONSTRAINT = {
   IMAGE_PRESUMES_WHITE_BACKGROUND: 'pagelib_theme_image_presumes_white_background',
   DIV_DO_NOT_APPLY_BASELINE: 'pagelib_theme_div_do_not_apply_baseline'
-};
 
-// Theme to CSS classes.
-var THEME = {
+  // Theme to CSS classes.
+};var THEME = {
   DEFAULT: 'pagelib_theme_default',
   DARK: 'pagelib_theme_dark',
   SEPIA: 'pagelib_theme_sepia',
   BLACK: 'pagelib_theme_black'
-};
 
-/**
- * @param {!Document} document
- * @param {!string} theme
- * @return {void}
- */
-var setTheme = function setTheme(document, theme) {
+  /**
+   * @param {!Document} document
+   * @param {!string} theme
+   * @return {void}
+   */
+};var setTheme = function setTheme(document, theme) {
   var html = document.querySelector('html');
 
   // Set the new theme.
@@ -576,17 +533,102 @@ var CollapseTable = {
   }
 };
 
-var COMPATIBILITY = {
-  FILTER: 'pagelib_compatibility_filter'
+/**
+ * Extracts array of page issues from element
+ * @param {!Document} document
+ * @param {?Element} element
+ * @return {!Array.<string>} Return empty array if nothing is extracted
+ */
+var collectPageIssues = function collectPageIssues(document, element) {
+  if (!element) {
+    return [];
+  }
+  var tables = Polyfill.querySelectorAll(element, 'table.ambox:not(.ambox-multiple_issues):not(.ambox-notice)');
+  // Get the tables into a fragment so we can remove some elements without triggering a layout
+  var fragment = document.createDocumentFragment();
+  var cloneTableIntoFragment = function cloneTableIntoFragment(table) {
+    return fragment.appendChild(table.cloneNode(true));
+  }; // eslint-disable-line require-jsdoc
+  tables.forEach(cloneTableIntoFragment);
+  // Remove some elements we don't want when "textContent" or "innerHTML" are used
+  Polyfill.querySelectorAll(fragment, '.hide-when-compact, .collapsed').forEach(function (el) {
+    return el.remove();
+  });
+  return Polyfill.querySelectorAll(fragment, 'td[class*=mbox-text] > *[class*=mbox-text]');
 };
 
 /**
+ * Extracts array of page issues HTML from element
  * @param {!Document} document
- * @param {!Array.<string>} properties
- * @param {!string} value
- * @return {void}
+ * @param {?Element} element
+ * @return {!Array.<string>} Return empty array if nothing is extracted
  */
-var isStyleSupported = function isStyleSupported(document, properties, value) {
+var collectPageIssuesHTML = function collectPageIssuesHTML(document, element) {
+  return collectPageIssues(document, element).map(function (el) {
+    return el.innerHTML;
+  });
+};
+
+/**
+ * Extracts array of page issues text from element
+ * @param {!Document} document
+ * @param {?Element} element
+ * @return {!Array.<string>} Return empty array if nothing is extracted
+ */
+var collectPageIssuesText = function collectPageIssuesText(document, element) {
+  return collectPageIssues(document, element).map(function (el) {
+    return el.textContent.trim();
+  });
+};
+
+/**
+ * Extracts array of disambiguation titles from an element
+ * @param {?Element} element
+ * @return {!Array.<string>} Return empty array if nothing is extracted
+ */
+var collectDisambiguationTitles = function collectDisambiguationTitles(element) {
+  if (!element) {
+    return [];
+  }
+  return Polyfill.querySelectorAll(element, 'div.hatnote a[href]:not([href=""]):not([redlink="1"])').map(function (el) {
+    return el.href;
+  });
+};
+
+/**
+ * Extracts array of disambiguation items html from an element
+ * @param {?Element} element
+ * @return {!Array.<string>} Return empty array if nothing is extracted
+ */
+var collectDisambiguationHTML = function collectDisambiguationHTML(element) {
+  if (!element) {
+    return [];
+  }
+  return Polyfill.querySelectorAll(element, 'div.hatnote').map(function (el) {
+    return el.innerHTML;
+  });
+};
+
+var CollectionUtilities = {
+  collectDisambiguationTitles: collectDisambiguationTitles,
+  collectDisambiguationHTML: collectDisambiguationHTML,
+  collectPageIssuesHTML: collectPageIssuesHTML,
+  collectPageIssuesText: collectPageIssuesText,
+  test: {
+    collectPageIssues: collectPageIssues
+  }
+};
+
+var COMPATIBILITY = {
+  FILTER: 'pagelib_compatibility_filter'
+
+  /**
+   * @param {!Document} document
+   * @param {!Array.<string>} properties
+   * @param {!string} value
+   * @return {void}
+   */
+};var isStyleSupported = function isStyleSupported(document, properties, value) {
   var element = document.createElement('span');
   return properties.some(function (property) {
     element.style[property] = value;
@@ -868,6 +910,99 @@ var ElementGeometry = function () {
   return ElementGeometry;
 }();
 
+var ELEMENT_NODE = 1;
+
+/**
+ * Determine if paragraph is the one we are interested in.
+ * @param  {!HTMLParagraphElement}  paragraphElement
+ * @return {!boolean}
+ */
+var isParagraphEligible = function isParagraphEligible(paragraphElement) {
+  // Ignore 'coordinates' which are presently hidden. See enwiki 'Bolton Field' and 'Sharya Forest
+  // Museum Railway'. Not counting coordinates towards the eligible P min textContent length
+  // heuristic has dual effect of P's containing only coordinates being rejected, and P's containing
+  // coordinates but also other elements meeting the eligible P min textContent length being
+  // accepted.
+  var coordElement = paragraphElement.querySelector('[id="coordinates"]');
+  var coordTextLength = !coordElement ? 0 : coordElement.textContent.length;
+
+  // Ensures the paragraph has at least a little text. Otherwise silly things like a empty P or P
+  // which only contains a BR tag will get pulled up. See enwiki 'Hawaii', 'United States',
+  // 'Academy (educational institution)', 'Lovászpatona'
+  var minEligibleTextLength = 50;
+  var hasEnoughEligibleText = paragraphElement.textContent.length - coordTextLength >= minEligibleTextLength;
+  return hasEnoughEligibleText;
+};
+
+/**
+ * Nodes we want to move up. This includes the `eligibleParagraph` and everything up to (but not
+ * including) the next paragraph.
+ * @param  {!HTMLParagraphElement} eligibleParagraph
+ * @return {!Array.<Node>} Array of text nodes, elements, etc...
+ */
+var extractLeadIntroductionNodes = function extractLeadIntroductionNodes(eligibleParagraph) {
+  var introNodes = [];
+  var node = eligibleParagraph;
+  do {
+    introNodes.push(node);
+    node = node.nextSibling;
+  } while (node && !(node.nodeType === ELEMENT_NODE && node.tagName === 'P'));
+  return introNodes;
+};
+
+/**
+ * Locate first eligible paragraph. We don't want paragraphs from somewhere in the middle of a
+ * table, so only paragraphs which are direct children of `containerID` element are considered. 
+ * @param  {!Document} document
+ * @param  {!string} containerID ID of the section under examination.
+ * @return {?HTMLParagraphElement}
+ */
+var getEligibleParagraph = function getEligibleParagraph(document, containerID) {
+  return Polyfill.querySelectorAll(document, '#' + containerID + ' > p').find(isParagraphEligible);
+};
+
+/**
+ * Instead of moving the infobox down beneath the first P tag, move the first eligible P tag
+ * (and related elements) up. This ensures some text will appear above infoboxes, tables, images
+ * etc. This method does not do a 'mainpage' check - do so before calling it.
+ * @param  {!Document} document
+ * @param  {!string} containerID ID of the section under examination.
+ * @param  {?Element} afterElement Element after which paragraph will be moved. If not specified
+ * paragraph will be move to top of `containerID` element.
+ * @return {void}
+ */
+var moveLeadIntroductionUp = function moveLeadIntroductionUp(document, containerID, afterElement) {
+  var eligibleParagraph = getEligibleParagraph(document, containerID);
+  if (!eligibleParagraph) {
+    return;
+  }
+
+  // A light-weight fragment to hold everything we want to move up.
+  var fragment = document.createDocumentFragment();
+  // DocumentFragment's `appendChild` attaches the element to the fragment AND removes it from DOM.
+  extractLeadIntroductionNodes(eligibleParagraph).forEach(function (element) {
+    return fragment.appendChild(element);
+  });
+
+  var container = document.getElementById(containerID);
+  var insertBeforeThisElement = !afterElement ? container.firstChild : afterElement.nextSibling;
+
+  // Attach the fragment just before `insertBeforeThisElement`. Conveniently, `insertBefore` on a
+  // DocumentFragment inserts 'the children of the fragment, not the fragment itself.', so no
+  // unnecessary container element is introduced.
+  // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
+  container.insertBefore(fragment, insertBeforeThisElement);
+};
+
+var LeadIntroductionTransform = {
+  moveLeadIntroductionUp: moveLeadIntroductionUp,
+  test: {
+    isParagraphEligible: isParagraphEligible,
+    extractLeadIntroductionNodes: extractLeadIntroductionNodes,
+    getEligibleParagraph: getEligibleParagraph
+  }
+};
+
 /**
  * Ensures the 'Read more' section header can always be scrolled to the top of the screen.
  * @param {!Window} window
@@ -974,12 +1109,6 @@ var FooterLegal = {
 };
 
 /**
- * @typedef {function} FooterMenuItemPayloadExtractor
- * @param {!Document} document
- * @return {!Array.<string>} Important - should return empty array if no payload strings.
- */
-
-/**
  * @typedef {function} FooterMenuItemClickCallback
  * @param {!Array.<string>} payload Important - should return empty array if no payload strings.
  * @return {void}
@@ -988,39 +1117,6 @@ var FooterLegal = {
 /**
  * @typedef {number} MenuItemType
  */
-
-// eslint-disable-next-line valid-jsdoc
-/**
- * Extracts array of no-html page issues strings from document.
- * @type {FooterMenuItemPayloadExtractor}
- */
-var pageIssuesStringsArray = function pageIssuesStringsArray(document) {
-  var tables = Polyfill.querySelectorAll(document, 'div#content_block_0 table.ambox:not(.ambox-multiple_issues):not(.ambox-notice)');
-  // Get the tables into a fragment so we can remove some elements without triggering a layout
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < tables.length; i++) {
-    fragment.appendChild(tables[i].cloneNode(true));
-  }
-  // Remove some element so their text doesn't appear when we use "innerText"
-  Polyfill.querySelectorAll(fragment, '.hide-when-compact, .collapsed').forEach(function (el) {
-    return el.remove();
-  });
-  // Get the innerText
-  return Polyfill.querySelectorAll(fragment, 'td[class$=mbox-text]').map(function (el) {
-    return el.innerText;
-  });
-};
-
-// eslint-disable-next-line valid-jsdoc
-/**
- * Extracts array of disambiguation page urls from document.
- * @type {FooterMenuItemPayloadExtractor}
- */
-var disambiguationTitlesArray = function disambiguationTitlesArray(document) {
-  return Polyfill.querySelectorAll(document, 'div#content_block_0 div.hatnote a[href]:not([href=""]):not([redlink="1"])').map(function (el) {
-    return el.href;
-  });
-};
 
 /**
  * Type representing kinds of menu items.
@@ -1033,12 +1129,11 @@ var MenuItemType = {
   disambiguation: 4,
   coordinate: 5,
   talkPage: 6
+
+  /**
+   * Menu item model.
+   */
 };
-
-/**
- * Menu item model.
- */
-
 var MenuItem = function () {
   /**
    * MenuItem constructor.
@@ -1086,8 +1181,16 @@ var MenuItem = function () {
     }
 
     /**
+     * Extracts array of page issues, disambiguation titles, etc from element.
+     * @typedef {function} PayloadExtractor
+     * @param {!Document} document
+     * @param {?Element} element
+     * @return {!Array.<string>} Return empty array if nothing is extracted
+     */
+
+    /**
      * Returns reference to function for extracting payload when this menu item is tapped.
-     * @return {?FooterMenuItemPayloadExtractor}
+     * @return {?PayloadExtractor}
      */
 
   }, {
@@ -1095,9 +1198,12 @@ var MenuItem = function () {
     value: function payloadExtractor() {
       switch (this.itemType) {
         case MenuItemType.pageIssues:
-          return pageIssuesStringsArray;
+          return CollectionUtilities.collectPageIssuesText;
         case MenuItemType.disambiguation:
-          return disambiguationTitlesArray;
+          // Adapt 'collectDisambiguationTitles' method signature to conform to PayloadExtractor type.
+          return function (_, element) {
+            return CollectionUtilities.collectDisambiguationTitles(element);
+          };
         default:
           return undefined;
       }
@@ -1175,7 +1281,7 @@ var maybeAddItem = function maybeAddItem(title, subtitle, itemType, containerID,
   // Items are not added if they have a payload extractor which fails to extract anything.
   var extractor = item.payloadExtractor();
   if (extractor) {
-    item.payload = extractor(document);
+    item.payload = extractor(document, document.querySelector('div#content_block_0'));
     if (item.payload.length === 0) {
       return;
     }
@@ -1801,15 +1907,15 @@ var UNIT_TO_MINIMUM_LAZY_LOAD_SIZE = {
   px: 50, // https://phabricator.wikimedia.org/diffusion/EMFR/browse/master/includes/MobileFormatter.php;c89f371ea9e789d7e1a827ddfec7c8028a549c12$22
   ex: 10, // ''
   em: 5 // 1ex ≈ .5em; https://developer.mozilla.org/en-US/docs/Web/CSS/length#Units
-};
 
-/**
- * Replace an image with a placeholder.
- * @param {!Document} document
- * @param {!HTMLImageElement} image The image to be replaced.
- * @return {!HTMLSpanElement} The placeholder replacing image.
- */
-var convertImageToPlaceholder = function convertImageToPlaceholder(document, image) {
+
+  /**
+   * Replace an image with a placeholder.
+   * @param {!Document} document
+   * @param {!HTMLImageElement} image The image to be replaced.
+   * @return {!HTMLSpanElement} The placeholder replacing image.
+   */
+};var convertImageToPlaceholder = function convertImageToPlaceholder(document, image) {
   // There are a number of possible implementations for placeholders including:
   //
   // - [MobileFrontend] Replace the original image with a span and replace the span with a new
@@ -2102,14 +2208,14 @@ var _class$1 = function () {
   return _class;
 }();
 
-var CLASS$2 = { ANDROID: 'pagelib_platform_android', IOS: 'pagelib_platform_ios' };
+var CLASS$2 = { ANDROID: 'pagelib_platform_android', IOS: 'pagelib_platform_ios'
 
-// Regular expressions from https://phabricator.wikimedia.org/diffusion/EMFR/browse/master/resources/mobile.startup/browser.js;c89f371ea9e789d7e1a827ddfec7c8028a549c12.
-/**
- * @param {!Window} window
- * @return {!boolean} true if the user agent is Android, false otherwise.
- */
-var isAndroid = function isAndroid(window) {
+  // Regular expressions from https://phabricator.wikimedia.org/diffusion/EMFR/browse/master/resources/mobile.startup/browser.js;c89f371ea9e789d7e1a827ddfec7c8028a549c12.
+  /**
+   * @param {!Window} window
+   * @return {!boolean} true if the user agent is Android, false otherwise.
+   */
+};var isAndroid = function isAndroid(window) {
   return (/android/i.test(window.navigator.userAgent)
   );
 };
@@ -2264,15 +2370,14 @@ var styleWideningKeysAndValues = {
   height: 'auto',
   maxWidth: '100%',
   float: 'none'
-};
 
-/**
- * Perform widening on an element. Certain style properties are updated, but only if existing values
- * for these properties already exist.
- * @param  {!HTMLElement} element
- * @return {void}
- */
-var widenElementByUpdatingExistingStyles = function widenElementByUpdatingExistingStyles(element) {
+  /**
+   * Perform widening on an element. Certain style properties are updated, but only if existing values
+   * for these properties already exist.
+   * @param  {!HTMLElement} element
+   * @return {void}
+   */
+};var widenElementByUpdatingExistingStyles = function widenElementByUpdatingExistingStyles(element) {
   Object.keys(styleWideningKeysAndValues).forEach(function (key) {
     return updateExistingStyleValue(element.style, key, styleWideningKeysAndValues[key]);
   });
@@ -2392,11 +2497,13 @@ var WidenImage = {
 var pagelib$1 = {
   // todo: rename CollapseTableTransform.
   CollapseTable: CollapseTable,
+  CollectionUtilities: CollectionUtilities,
   CompatibilityTransform: CompatibilityTransform,
   DimImagesTransform: DimImagesTransform,
   EditTransform: EditTransform,
   // todo: rename Footer.ContainerTransform, Footer.LegalTransform, Footer.MenuTransform,
   //       Footer.ReadMoreTransform.
+  LeadIntroductionTransform: LeadIntroductionTransform,
   FooterContainer: FooterContainer,
   FooterLegal: FooterLegal,
   FooterMenu: FooterMenu,
@@ -2427,6 +2534,47 @@ return pagelib$1;
 })));
 
 
+},{}],2:[function(require,module,exports){
+
+// Implementation of https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+const findClosest = (el, selector) => {
+  while ((el = el.parentElement) && !el.matches(selector));
+  return el
+}
+
+const setLanguage = (lang, dir, uidir) => {
+  const html = document.querySelector( 'html' )
+  html.lang = lang
+  html.dir = dir
+  html.classList.add( 'content-' + dir )
+  html.classList.add( 'ui-' + uidir )
+}
+
+const setPageProtected =
+  isProtected => document.querySelector( 'html' ).classList[isProtected ? 'add' : 'remove']('page-protected')
+
+const scrollToFragment = fragmentId => {
+  location.hash = ''
+  location.hash = fragmentId
+}
+
+const accessibilityCursorToFragment = fragmentId => {
+    /* Attempt to move accessibility cursor to fragment. We need to /change/ focus,
+     in order to have the desired effect, so we first give focus to the body element,
+     then move it to the desired fragment. */
+  const focus_element = document.getElementById(fragmentId)
+  const other_element = document.body
+  other_element.setAttribute('tabindex', 0)
+  other_element.focus()
+  focus_element.setAttribute('tabindex', 0)
+  focus_element.focus()
+}
+
+exports.accessibilityCursorToFragment = accessibilityCursorToFragment
+exports.scrollToFragment = scrollToFragment
+exports.setPageProtected = setPageProtected
+exports.setLanguage = setLanguage
+exports.findClosest = findClosest
 },{}],3:[function(require,module,exports){
 const wmf = {}
 
@@ -2437,4 +2585,4 @@ wmf.platform = require('wikimedia-page-library').PlatformTransform
 wmf.imageDimming = require('wikimedia-page-library').DimImagesTransform
 
 window.wmf = wmf
-},{"./js/utilities":1,"wikimedia-page-library":2}]},{},[3,1]);
+},{"./js/utilities":2,"wikimedia-page-library":1}]},{},[3,2]);
