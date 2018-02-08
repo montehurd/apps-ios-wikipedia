@@ -34,6 +34,43 @@ class HistoryViewController: ArticleFetchedResultsViewController {
         super.viewDidAppear(animated)
         PiwikTracker.sharedInstance()?.wmf_logView(self)
         NSUserActivity.wmf_makeActive(NSUserActivity.wmf_recentView())
+
+    
+    
+    
+    
+    
+    
+        // EnableReadingListSyncPanelViewController
+        // EnableLocationPanelViewController
+        // AddSavedArticlesToReadingListPanelViewController
+        // LoginToSyncSavedArticlesToReadingListPanelViewController
+        // KeepSavedArticlesOnDevicePanelViewController
+        let panelVC = EnableLocationPanelViewController(showCloseButton: true, primaryButtonTapHandler: { sender in
+            print("PRIMARY")
+            sender.dismiss(animated: true, completion: nil)
+        }, secondaryButtonTapHandler: { sender in
+            print("SECONDARY")
+            sender.dismiss(animated: true, completion: nil)
+        }, dismissHandler: { sender in
+            print("CLOSE")
+        })
+        
+        panelVC.apply(theme: theme)
+        
+        present(panelVC, animated: true, completion: nil)
+        
+        // wmf_showEnableReadingListSyncPanelOnce(theme: theme)
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     }
     
     override var emptyViewType: WMFEmptyViewType {

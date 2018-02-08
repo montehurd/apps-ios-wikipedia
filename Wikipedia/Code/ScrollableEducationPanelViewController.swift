@@ -40,6 +40,11 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     @IBOutlet fileprivate weak var scrollViewContainer: UIView!
     @IBOutlet fileprivate weak var stackView: UIStackView!
 
+    
+//@IBOutlet fileprivate weak var panelContainer: UIView!
+@IBOutlet fileprivate weak var scrollView: UIScrollView!
+
+    
     fileprivate var primaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?
     fileprivate var secondaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?
     fileprivate var dismissHandler: ScrollableEducationPanelDismissHandler?
@@ -115,24 +120,42 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     required public init?(coder aDecoder: NSCoder) {
         return nil
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        // Keep preferredContentSize in sync so if we present this via UIPopoverPresentationController the
-        // popover sizes itself correctly for this VC's stack view nested in a scroll view. Handles content
-        // of any height correctly - is scrollable if content is really tall or device is in landscape and
-        // properly hugs content if it's not very tall. https://stackoverflow.com/a/38444512/135557
-        self.preferredContentSize = scrollViewContainer.bounds.size
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         assert(stackView.wmf_firstArrangedSubviewWithRequiredNonZeroHeightConstraint() == nil, "\n\nAll stackview arrangedSubview height constraints need to have a priority of < 1000 so the stackview can collapse the 'cell' if the arrangedSubview's isHidden property is set to true. This arrangedSubview was determined to have a required height: \(String(describing: stackView.wmf_firstArrangedSubviewWithRequiredNonZeroHeightConstraint())). To fix reduce the priority of its height constraint to < 1000.\n\n")
+        
+// TODO: if showCloseButton enable dismiss when tapping outside the panel
+        
+        modalPresentationStyle = .overFullScreen
+        modalTransitionStyle = .crossDissolve
+
+        
         
         reset()
         configureButtonToAutoAdjustFontSize(button: primaryButton)
         configureButtonToAutoAdjustFontSize(button: secondaryButton)
         closeButton.isHidden = !showCloseButton
+        
+        
+        
+        
+scrollView.backgroundColor = .clear
+let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+effectView.translatesAutoresizingMaskIntoConstraints = false
+effectView.isUserInteractionEnabled = true
+scrollView.addSubview(effectView)
+scrollView.sendSubview(toBack: effectView)
+
+let leadingConstraint = effectView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+let trailingConstraint = effectView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+let topConstraint = effectView.topAnchor.constraint(equalTo: view.topAnchor)
+let bottomConstraint = effectView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+
+        
+        
+        
     }
     
     // Configure button so its text will shrink if the translation is crazy long.
@@ -212,43 +235,5 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     
     func apply(theme: Theme) {
         view.tintColor = theme.colors.link
-    }
-}
-
-// Convenience class containerizing EducationPanelViewController for easy popover presentation.
-class EducationPopoverPanelViewController: ScrollableEducationPanelViewController, UIPopoverPresentationControllerDelegate {
-    var dismissOnTapOutside = false
-    // Note: 'sourceView' is simply used to set 'popoverPresentationController.sourceView'.
-    init(sourceView: UIView, showCloseButton: Bool, primaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, secondaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, dismissHandler: ScrollableEducationPanelDismissHandler?) {
-        super.init(showCloseButton: showCloseButton, primaryButtonTapHandler: primaryButtonTapHandler, secondaryButtonTapHandler: secondaryButtonTapHandler, dismissHandler: dismissHandler)
-
-        self.dismissOnTapOutside = showCloseButton // Always enable 'dismissOnTapOutside' if we have a close button.
-        self.modalPresentationStyle = .popover
-        self.popoverPresentationController?.delegate = self
-        self.popoverPresentationController?.sourceView = sourceView
-        self.popoverPresentationController?.canOverlapSourceViewRect = true
-        self.popoverPresentationController?.sourceRect = sourceView.bounds
-        self.popoverPresentationController?.permittedArrowDirections = []
-    }
-    
-    required public init?(coder aDecoder: NSCoder) {
-        return nil
-    }
-    
-    // MARK: - UIPopoverPresentationControllerDelegate
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .none
-    }
-
-    // Correctly re-position panel after rotation. https://stackoverflow.com/a/45301726/135557
-    func popoverPresentationController(_ popoverPresentationController: UIPopoverPresentationController, willRepositionPopoverTo rect: UnsafeMutablePointer<CGRect>, in view: AutoreleasingUnsafeMutablePointer<UIView>){
-        guard let newRect = popoverPresentationController.sourceView?.bounds else {
-            return
-        }
-        rect.pointee = newRect
-    }
-    
-    func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
-        return dismissOnTapOutside
     }
 }
