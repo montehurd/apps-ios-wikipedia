@@ -184,14 +184,14 @@ extension UIViewController {
         present(panelVC, with: theme, animated: true, completion: nil)
     }
 
-    @objc func wmf_showLoginOrCreateAccountToSyncSavedArticlesToReadingListPanel(theme: Theme, dismissHandler: ScrollableEducationPanelDismissHandler? = nil) {
+    @objc func wmf_showLoginOrCreateAccountToSyncSavedArticlesToReadingListPanel(theme: Theme) {
         let loginToSyncSavedArticlesTapHandler: ScrollableEducationPanelButtonTapHandler = { _ in
             self.presentedViewController?.dismiss(animated: true, completion: {
-                self.wmf_showLoginViewController(theme: theme, enableSync: true)
+                self.wmf_showLoginViewController(theme: theme)
             })
         }
         
-        let panelVC = LoginOrCreateAccountToSyncSavedArticlesToReadingListPanelViewController(showCloseButton: true, primaryButtonTapHandler: loginToSyncSavedArticlesTapHandler, secondaryButtonTapHandler: nil, dismissHandler: dismissHandler)
+        let panelVC = LoginOrCreateAccountToSyncSavedArticlesToReadingListPanelViewController(showCloseButton: true, primaryButtonTapHandler: loginToSyncSavedArticlesTapHandler, secondaryButtonTapHandler: nil, dismissHandler: nil)
         
         present(panelVC, with: theme, animated: true, completion: nil)
     }
