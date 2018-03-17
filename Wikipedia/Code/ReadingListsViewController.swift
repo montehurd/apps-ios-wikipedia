@@ -93,6 +93,9 @@ class ReadingListsViewController: ColumnarCollectionViewController, EditableColl
         fatalError("init(coder:) not supported")
     }
     
+let progressView = UIProgressView()
+private var progressObservation: NSKeyValueObservation?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         register(ReadingListsCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier, addPlaceholder: true)
@@ -105,6 +108,20 @@ class ReadingListsViewController: ColumnarCollectionViewController, EditableColl
         unregisterForPreviewing()
 
         isRefreshControlEnabled = true
+
+        
+progressView.frame = CGRect.init(x: 0, y: 200, width: view.frame.size.width, height: 10)
+view.addSubview(progressView)
+view.bringSubview(toFront: progressView)
+
+
+NotificationCenter.default.addObserver(self, selector: #selector(showProgressView), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesStartedNotification, object: nil)
+NotificationCenter.default.addObserver(self, selector: #selector(hideProgressView), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesCompletedNotification, object: nil)
+//NotificationCenter.default.addObserver(self, selector: #selector(progressReset), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesProgressResetNotification, object: nil)
+
+
+        
+        
     }
     
     override func refresh() {
@@ -118,13 +135,62 @@ class ReadingListsViewController: ColumnarCollectionViewController, EditableColl
         setupFetchedResultsController()
         setupCollectionViewUpdater()
         super.viewWillAppear(animated)
+        
+// progressView.observedProgress = SavedArticlesFetcherProgressManager.shared.progress
+//progressReset()
+progressObservation = SavedArticlesFetcherProgressManager.shared.observe(\SavedArticlesFetcherProgressManager.progress, options: [.new, .initial/*, .old*/]) { [weak self] (fetchProgressManager, change) in
+    self?.progressReset()
+}
+
+        
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+//progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.isFinished
+//progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.totalUnitCount <= 0
+
+        //totalUnitCount
+    }
+
+ 
+    
+    
+/*@objc*/ private func progressReset(){
+    print("PROGRESS RESET")
+    progressView.observedProgress = SavedArticlesFetcherProgressManager.shared.progress
+    progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.totalUnitCount <= 0
+}
+    
+@objc private func showProgressView(){
+    print("SHOW PROGRESS VIEW")
+    progressView.isHidden = false
+}
+
+@objc private func hideProgressView(){
+    print("HIDE PROGRESS VIEW")
+    progressView.isHidden = true
+}
+
+    
+    
+    
+    
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         editController.close()
         collectionViewUpdater = nil
         fetchedResultsController = nil
+        
+progressView.observedProgress = nil
+progressObservation?.invalidate()
+progressObservation = nil
+
+//SavedArticlesFetcherProgressManager.shared.reset()
+        
     }
     
     func readingList(at indexPath: IndexPath) -> ReadingList? {

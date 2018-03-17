@@ -20,14 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SavedArticlesFetcherDelegate <FetchFinishedDelegate>
 
-- (void)savedArticlesFetcher:(SavedArticlesFetcher *)savedArticlesFetcher
-                 didFetchURL:(NSURL *)url
-                     article:(MWKArticle *__nullable)article
-                       error:(NSError *__nullable)error;
+//- (void)savedArticlesFetcher:(SavedArticlesFetcher *)savedArticlesFetcher
+//                 didFetchURL:(NSURL *)url
+//                     article:(MWKArticle *__nullable)article
+//                       error:(NSError *__nullable)error;
 
 @end
 
 @interface SavedArticlesFetcher : FetcherBase
+
+@property (nonatomic, strong, readonly) NSNumber *fetchesInProcessCount;
 
 @property (nonatomic, strong, readonly) MWKSavedPageList *savedPageList;
 

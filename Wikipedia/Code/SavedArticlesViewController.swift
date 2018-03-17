@@ -1,6 +1,32 @@
 
 @objc(WMFSavedArticlesViewController)
 class SavedArticlesViewController: ColumnarCollectionViewController, EditableCollection, SearchableCollection, SortableCollection {
+
+    
+    
+    
+    
+    /*
+    func test() -> Int {
+        do {
+            let moc = dataStore.viewContext
+            let request = WMFArticle.fetchRequest()
+            request.predicate = NSPredicate(format: "savedDate != NULL && isDownloaded != YES")
+            return try moc.count(for: request)
+        } catch let error {
+            DDLogError("Error fetching count: \(error)")
+            return 0
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        print("test count = \(test())")
+    }
+    */
+    
+    
+    
+    
     
     private let reuseIdentifier = "SavedArticlesCollectionViewCell"
     private var cellLayoutEstimate: WMFLayoutEstimate?
@@ -33,6 +59,10 @@ class SavedArticlesViewController: ColumnarCollectionViewController, EditableCol
     
     // MARK - View lifecycle
     
+let progressView = UIProgressView()
+    
+private var progressObservation: NSKeyValueObservation?
+
     override func viewDidLoad() {
         super.viewDidLoad()
         register(SavedArticlesCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier, addPlaceholder: true)
@@ -42,7 +72,30 @@ class SavedArticlesViewController: ColumnarCollectionViewController, EditableCol
         isRefreshControlEnabled = true
         
         emptyViewType = .noSavedPages
+
+    
+        
+progressView.frame = CGRect.init(x: 0, y: 200, width: view.frame.size.width, height: 10)
+view.addSubview(progressView)
+view.bringSubview(toFront: progressView)
+        
+NotificationCenter.default.addObserver(self, selector: #selector(showProgressView), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesStartedNotification, object: nil)
+NotificationCenter.default.addObserver(self, selector: #selector(hideProgressView), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesCompletedNotification, object: nil)
+//NotificationCenter.default.addObserver(self, selector: #selector(progressReset), name: SavedArticlesFetcherProgressManager.fetchingSavedArticlesProgressResetNotification, object: nil)
+
+        
+        
+        
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    
+    
+    
+    
     
     override func refresh() {
         dataStore.readingListsController.backgroundUpdate {
@@ -56,22 +109,64 @@ class SavedArticlesViewController: ColumnarCollectionViewController, EditableCol
         fetch()
         setupCollectionViewUpdater()
         super.viewWillAppear(animated)
+        
+//progressView.observedProgress = SavedArticlesFetcherProgressManager.shared.progress
+//progressReset()
+progressObservation = SavedArticlesFetcherProgressManager.shared.observe(\SavedArticlesFetcherProgressManager.progress, options: [.new, .initial/*, .old*/]) { [weak self] (fetchProgressManager, change) in
+    self?.progressReset()
+}
+
     }
     
     override func viewWillHaveFirstAppearance(_ animated: Bool) {
         super.viewWillHaveFirstAppearance(animated)
         navigationBarHider.isNavigationBarHidingEnabled = false
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         PiwikTracker.sharedInstance()?.wmf_logView(self)
         NSUserActivity.wmf_makeActive(NSUserActivity.wmf_savedPagesView())
+        
+//progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.isFinished
+//progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.totalUnitCount <= 0
     }
+    
+    
+    
+    
+    
+/*@objc*/ private func progressReset(){
+//return
+    print("PROGRESS RESET")
+    progressView.observedProgress = SavedArticlesFetcherProgressManager.shared.progress
+    progressView.isHidden = SavedArticlesFetcherProgressManager.shared.progress.totalUnitCount <= 0
+
+}
+
+@objc private func showProgressView(){
+    print("SHOW PROGRESS VIEW")
+    progressView.isHidden = false
+}
+
+@objc private func hideProgressView(){
+    print("HIDE PROGRESS VIEW")
+    progressView.isHidden = true
+}
+    
+    
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         editController.close()
+        
+progressView.observedProgress = nil
+progressObservation?.invalidate()
+progressObservation = nil
+
+//SavedArticlesFetcherProgressManager.shared.reset()
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
