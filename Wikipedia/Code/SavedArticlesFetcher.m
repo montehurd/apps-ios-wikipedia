@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableDictionary<NSURL *, NSURLSessionTask *> *fetchOperationsByArticleTitle;
 @property (nonatomic, strong) NSMutableDictionary<NSURL *, NSError *> *errorsByArticleTitle;
 
+@property (nonatomic, strong) NSNumber *fetchesInProcessCount;
+
 - (instancetype)initWithDataStore:(MWKDataStore *)dataStore
                     savedPageList:(MWKSavedPageList *)savedPageList
                    articleFetcher:(WMFArticleFetcher *)articleFetcher
@@ -47,6 +49,43 @@ static SavedArticlesFetcher *_articleFetcher = nil;
     [self stop];
 }
 
+
+
+
+
+
+
+
+
+
+- (void)printArticleFetchesInFlight {
+
+    /*
+     post
+        - a "fetchesInFlightIncreased" notification
+        - a "fetchesInFlightChanged"
+    */
+
+    NSManagedObjectContext *moc = self.dataStore.viewContext;
+    NSFetchRequest *request = [WMFArticle fetchRequest];
+    request.predicate = [NSPredicate predicateWithFormat:@"savedDate != NULL && isDownloaded != YES"];
+    NSError *fetchError = nil;
+    NSUInteger count = [moc countForFetchRequest:request error:&fetchError];
+    if (fetchError) {
+        DDLogError(@"Error counting number of article to be downloaded: %@", fetchError);
+    }
+    NSLog(@"\n\nTOTAL FETCHES COUNT %lu", (unsigned long)count);
+//    NSLog(@"\n\nFETCHES IN FLIGHT %lu\n\n", (unsigned long)self.fetchOperationsByArticleTitle.count);
+    
+    self.fetchesInProcessCount = @(count);
+}
+
+
+
+
+
+
+
 - (instancetype)initWithDataStore:(MWKDataStore *)dataStore
                     savedPageList:(MWKSavedPageList *)savedPageList
                    articleFetcher:(WMFArticleFetcher *)articleFetcher
@@ -59,8 +98,12 @@ static SavedArticlesFetcher *_articleFetcher = nil;
     NSParameterAssert(imageInfoFetcher);
     self = [super init];
     if (self) {
+        self.fetchesInProcessCount = @0;
         self.accessQueue = dispatch_queue_create("org.wikipedia.savedarticlesarticleFetcher.accessQueue", DISPATCH_QUEUE_SERIAL);
         self.fetchOperationsByArticleTitle = [NSMutableDictionary new];
+        
+[self printArticleFetchesInFlight];
+        
         self.errorsByArticleTitle = [NSMutableDictionary new];
         self.dataStore = dataStore;
         self.articleFetcher = articleFetcher;
@@ -127,10 +170,12 @@ static SavedArticlesFetcher *_articleFetcher = nil;
             [self fetchArticleURL:articleURL
                 priority:NSURLSessionTaskPriorityLow
                 failure:^(NSError *error) {
+[self printArticleFetchesInFlight];
                     updateAgain();
                 }
                 success:^{
                     [self.spotlightManager addToIndexWithUrl:articleURL];
+[self printArticleFetchesInFlight];
                     updateAgain();
                 }];
         } else {
@@ -239,6 +284,9 @@ static SavedArticlesFetcher *_articleFetcher = nil;
                             }];
                     });
                 }];
+
+[self printArticleFetchesInFlight];
+
     }
 }
 
@@ -386,6 +434,9 @@ static SavedArticlesFetcher *_articleFetcher = nil;
     DDLogVerbose(@"Canceling saved page download for title: %@", URL);
     [self.articleFetcher cancelFetchForArticleURL:URL];
     [self.fetchOperationsByArticleTitle removeObjectForKey:URL];
+    
+[self printArticleFetchesInFlight];
+    
 }
 
 #pragma mark - Delegate Notification
@@ -408,6 +459,8 @@ static SavedArticlesFetcher *_articleFetcher = nil;
     // stop tracking operation, effectively advancing the progress
     [self.fetchOperationsByArticleTitle removeObjectForKey:url];
 
+[self printArticleFetchesInFlight];
+    
     if (!error) {
         WMFArticle *article = [self.dataStore fetchArticleWithURL:url];
         article.isDownloaded = YES;
@@ -417,10 +470,10 @@ static SavedArticlesFetcher *_articleFetcher = nil;
             DDLogError(@"Error saving after saved articles fetch: %@", saveError);
         }
     }
-    [self.fetchFinishedDelegate savedArticlesFetcher:self
-                                         didFetchURL:url
-                                             article:fetchedArticle
-                                               error:error];
+//    [self.fetchFinishedDelegate savedArticlesFetcher:self
+//                                         didFetchURL:url
+//                                             article:fetchedArticle
+//                                               error:error];
 }
 
 /// Only invoke within accessQueue

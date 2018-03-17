@@ -313,7 +313,7 @@ static NSString *const WMFLastRemoteAppConfigCheckAbsoluteTimeKey = @"WMFLastRem
 }
 
 #pragma mark - Background Fetch
-
+/*
 - (void)performBackgroundFetchWithCompletion:(void (^)(UIBackgroundFetchResult))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self.isMigrationComplete) {
@@ -330,7 +330,7 @@ static NSString *const WMFLastRemoteAppConfigCheckAbsoluteTimeKey = @"WMFLastRem
         }];
     });
 }
-
+*/
 #pragma mark - Background Tasks
 
 - (void)startHousekeepingBackgroundTask {
@@ -1045,6 +1045,15 @@ static NSString *const WMFLastRemoteAppConfigCheckAbsoluteTimeKey = @"WMFLastRem
             [[SavedArticlesFetcher alloc] initWithDataStore:[[SessionSingleton sharedInstance] dataStore]
 
                                               savedPageList:[self.dataStore savedPageList]];
+        
+
+        
+        
+        SavedArticlesFetcherProgressManager* prog = [SavedArticlesFetcherProgressManager shared];
+        prog.fetcher = _savedArticlesFetcher;
+        
+        
+        
     }
     return _savedArticlesFetcher;
 }
