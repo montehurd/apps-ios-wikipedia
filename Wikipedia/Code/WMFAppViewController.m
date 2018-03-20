@@ -1045,6 +1045,15 @@ static NSString *const WMFLastRemoteAppConfigCheckAbsoluteTimeKey = @"WMFLastRem
             [[SavedArticlesFetcher alloc] initWithDataStore:[[SessionSingleton sharedInstance] dataStore]
 
                                               savedPageList:[self.dataStore savedPageList]];
+        
+
+        
+        
+        SavedArticlesFetcherProgressManager* prog = [SavedArticlesFetcherProgressManager shared];
+        prog.fetcher = _savedArticlesFetcher;
+        
+        
+        
     }
     return _savedArticlesFetcher;
 }
