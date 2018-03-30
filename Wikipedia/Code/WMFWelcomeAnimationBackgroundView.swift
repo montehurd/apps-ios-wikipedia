@@ -16,10 +16,12 @@ public struct ImageViewAndModel {
 
 open class WMFWelcomeAnimationBackgroundView: WMFWelcomeAnimationView {
 
-    open lazy var imageModels:[ImageModel]? = nil
-
+    func getImageModels() -> [ImageModel]? {
+        return nil
+    }
+    
     private lazy var imageViewsAndModels: [ImageViewAndModel]? = {
-        guard let imageModels = imageModels else {
+        guard let imageModels = getImageModels() else {
             assertionFailure("Expected models")
             return nil
         }
