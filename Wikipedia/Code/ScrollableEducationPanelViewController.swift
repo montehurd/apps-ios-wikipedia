@@ -41,6 +41,8 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     @IBOutlet fileprivate weak var stackView: UIStackView!
     @IBOutlet fileprivate weak var roundedCornerContainer: UIView!
 
+    @IBOutlet fileprivate weak var testView: UIView!
+
     fileprivate var primaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?
     fileprivate var secondaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?
     fileprivate var dismissHandler: ScrollableEducationPanelDismissHandler?
@@ -48,6 +50,7 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     private var discardDismissHandlerOnPrimaryButtonTap = false
     private var primaryButtonTapped = false
     
+    fileprivate var theme: Theme = Theme.standard
     
     var image:UIImage? {
         get {
@@ -109,8 +112,9 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
         }
     }
     
-    init(showCloseButton: Bool, primaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, secondaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, dismissHandler: ScrollableEducationPanelDismissHandler?, discardDismissHandlerOnPrimaryButtonTap: Bool = false) {
+    init(showCloseButton: Bool, primaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, secondaryButtonTapHandler: ScrollableEducationPanelButtonTapHandler?, dismissHandler: ScrollableEducationPanelDismissHandler?, discardDismissHandlerOnPrimaryButtonTap: Bool = false, theme: Theme) {
         super.init(nibName: "ScrollableEducationPanelView", bundle: nil)
+        self.theme = theme
         self.showCloseButton = showCloseButton
         self.primaryButtonTapHandler = primaryButtonTapHandler
         self.secondaryButtonTapHandler = secondaryButtonTapHandler
@@ -124,7 +128,7 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     override func viewDidLoad() {
         super.viewDidLoad()
         assert(stackView.wmf_firstArrangedSubviewWithRequiredNonZeroHeightConstraint() == nil, "\n\nAll stackview arrangedSubview height constraints need to have a priority of < 1000 so the stackview can collapse the 'cell' if the arrangedSubview's isHidden property is set to true. This arrangedSubview was determined to have a required height: \(String(describing: stackView.wmf_firstArrangedSubviewWithRequiredNonZeroHeightConstraint())). To fix reduce the priority of its height constraint to < 1000.\n\n")
-        
+
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
         
@@ -136,6 +140,9 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
         [self.view, self.roundedCornerContainer].forEach {view in
             view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.overlayTapped(_:))))
         }
+
+apply(theme: theme)
+
     }
     
     @IBAction func overlayTapped(_ sender: UITapGestureRecognizer) {
@@ -218,6 +225,36 @@ class ScrollableEducationPanelViewController: UIViewController, Themeable {
     }
     
     func apply(theme: Theme) {
-        view.tintColor = theme.colors.link
+        self.theme = theme
+        guard viewIfLoaded != nil else {
+            return
+        }
+
+        let aa = theme.colors.link
+        
+//        view.tintColor = theme.colors.link
+        
+//        testView.backgroundColor = theme.colors.popoverBackground.withAlphaComponent(0.8) // UIColor.wmf_colorWithHex(0x0000ff).withAlphaComponent(0.2)  // theme.colors.chromeBackground//.withAlphaComponent(0.8)
+  
+        
+view.tintColor = .red//theme.colors.link
+
+        
+return
+
+        primaryButton.tintColor = .red
+        primaryButton.layer.borderColor = UIColor.blue.cgColor
+        secondaryButton.tintColor = .green
+
+        headingLabel.textColor = theme.colors.primaryText
+        subheadingLabel.textColor = theme.colors.primaryText
+        footerLabel.textColor = theme.colors.primaryText
+
+        
     }
+    
+//    override func didReceiveMemoryWarning() {
+//        secondaryButtonTitle = "Bla"
+//    }
+    
 }

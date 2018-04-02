@@ -756,6 +756,11 @@ static NSString *const WMFLastRemoteAppConfigCheckAbsoluteTimeKey = @"WMFLastRem
     self.searchViewController = nil;
     self.settingsViewController = nil;
     [self.dataStore clearMemoryCache];
+    
+    
+[self wmf_showEnableReadingListSyncPanelOncePerLoginWithTheme:self.theme];
+
+    
 }
 
 #pragma mark - Logging

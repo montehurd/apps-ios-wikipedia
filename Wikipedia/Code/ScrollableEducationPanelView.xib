@@ -21,6 +21,7 @@
                 <outlet property="secondaryButton" destination="hB2-ah-QwX" id="WJa-gl-cPm"/>
                 <outlet property="stackView" destination="zdf-Q2-cLc" id="tUG-MZ-nEX"/>
                 <outlet property="subheadingLabel" destination="Ka1-Ou-kwY" id="OLQ-hq-5Wx"/>
+                <outlet property="testView" destination="i3Y-1u-tKd" id="RTP-cH-PMF"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -38,7 +39,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="280" height="454.5"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </view>
-                            <blurEffect style="extraLight"/>
+                            <blurEffect style="light"/>
                         </visualEffectView>
                         <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e3o-Ht-LDd">
                             <rect key="frame" x="0.0" y="0.0" width="280" height="454.5"/>
