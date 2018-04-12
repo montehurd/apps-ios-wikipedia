@@ -19,24 +19,10 @@ public class ReadingListHintController: NSObject, ReadingListHintViewControllerD
     private let hintHeight: CGFloat = 50
     private var theme: Theme = Theme.standard
     private var didSaveArticle: Bool = false
-
-private var containerView = UIView()
+    private var containerView = UIView()
     
     private func isHintHidden() -> Bool {
         return self.containerView.superview == nil
-/*
-        didSet {
-            guard isHintHidden != oldValue else {
-                return
-            }
-            if isHintHidden {
-                removeHint()
-            } else {
-                addHint()
-//                dismissHint()
-            }
-        }
-*/
     }
         
     @objc init(dataStore: MWKDataStore, presenter: UIViewController) {
@@ -48,19 +34,6 @@ private var containerView = UIView()
         self.hintVC.delegate = self
     }
     
-    
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
     func removeHint() {
         task?.cancel()
         
@@ -68,22 +41,13 @@ private var containerView = UIView()
         hintVC.view.removeFromSuperview()
         hintVC.removeFromParentViewController()
 
-containerView.removeFromSuperview()
+        containerView.removeFromSuperview()
         
         resetHint()
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-var containerBottomConstraint:NSLayoutConstraint?
-var containerTopConstraint:NSLayoutConstraint?
-    
+    var containerBottomConstraint:NSLayoutConstraint?
+    var containerTopConstraint:NSLayoutConstraint?
     
     func addHint() {
         guard isHintHidden() else {
@@ -92,46 +56,23 @@ var containerTopConstraint:NSLayoutConstraint?
         hintVC.apply(theme: theme)
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .red
-        containerView.layer.borderColor = UIColor.green.cgColor
-        containerView.layer.borderWidth = 2
 
         presenter?.view.addSubview(containerView)
         
         if let presenter = presenter {
-//            let safeBottomAnchor: NSLayoutYAxisAnchor?
             let safeBottomAnchor = presenter.wmf_safeBottomAnchor()
-
-//            if #available(iOS 11.0, *) {
-//                safeBottomAnchor = presenter.view.safeAreaLayoutGuide.bottomAnchor
-//            } else {
-//                safeBottomAnchor = presenter.bottomLayoutGuide.bottomAnchor
-//            }
-
-            
-
-            
             let bottomAnchorOffset = presenter.wmf_bottomAnchorOffset()
 
-            
-            
-            
-//            if let safeBottomAnchor = safeBottomAnchor {
-                // visible
+            // `containerBottomConstraint` is activated when the hint is visible
             containerBottomConstraint = containerView.bottomAnchor.constraint(equalTo: safeBottomAnchor, constant: bottomAnchorOffset)
-                containerBottomConstraint?.isActive = false
-                // hidden
-                containerTopConstraint = containerView.topAnchor.constraint(equalTo: safeBottomAnchor, constant: bottomAnchorOffset)
-//            }else{
-//                assertionFailure("Expected bottom anchor")
-//            }
+            containerBottomConstraint?.isActive = false
+
+            // `containerTopConstraint` is activated when the hint is hidden
+            containerTopConstraint = containerView.topAnchor.constraint(equalTo: safeBottomAnchor, constant: bottomAnchorOffset)
             
             let leadingConstraint = containerView.leadingAnchor.constraint(equalTo: presenter.view.leadingAnchor)
             let trailingConstraint = containerView.trailingAnchor.constraint(equalTo: presenter.view.trailingAnchor)
             NSLayoutConstraint.activate([containerTopConstraint!, leadingConstraint, trailingConstraint])
-            
-            //view.setNeedsLayout()
-            //view.layoutIfNeeded()
             
         }else{
             assertionFailure("Expected presenter")
@@ -143,37 +84,7 @@ var containerTopConstraint:NSLayoutConstraint?
         containerView.setContentCompressionResistancePriority(.required, for: .vertical)
         
         presenter?.wmf_add(childController: hintVC, andConstrainToEdgesOfContainerView: containerView)
-        
-//        containerView.setNeedsUpdateConstraints()
-//        containerView.setNeedsLayout()
-//        containerView.layoutIfNeeded()
-        
-        //if let view = presenter?.view {
-        //  view.setNeedsUpdateConstraints()
-        //  view.setNeedsLayout()
-        //  view.layoutIfNeeded()
-        //}
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     var hintVisibilityTime: TimeInterval = 13 {
         didSet {
@@ -202,31 +113,6 @@ var containerTopConstraint:NSLayoutConstraint?
         self.task = task
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     @objc func setHintHidden(_ hintHidden: Bool) {
         guard isHintHidden() != hintHidden else {
             return
@@ -235,74 +121,31 @@ var containerTopConstraint:NSLayoutConstraint?
         if !hintHidden {
             // add hint before animation starts
             addHint()
-
-//containerView.layoutIfNeeded()
-containerView.superview?.layoutIfNeeded()
-
+            
+            containerView.superview?.layoutIfNeeded()
         }
         
-//return
-    
-    
-    
-    
-
-    updateRandom(hintHidden)
+        updateRandom(hintHidden)
         
         UIView.animate(withDuration: 0.4, delay: 0, options: [.curveEaseInOut/*.beginFromCurrentState*/], animations: {
-
-            
-            
-if hintHidden {
-    self.containerBottomConstraint?.isActive = false
-    self.containerTopConstraint?.isActive = true
-} else {
-    self.containerBottomConstraint?.isActive = true
-    self.containerTopConstraint?.isActive = false
-}
-            
-            
-//            self.hintVC.view.setNeedsLayout()
-//self.containerView.setNeedsUpdateConstraints()
-//self.containerView.setNeedsLayout()
-            
-//            self.containerView.layoutIfNeeded()
-            
-self.containerView.superview?.layoutIfNeeded()
-    
-//}
-            
-            
-            
-            
-            
+            if hintHidden {
+                self.containerBottomConstraint?.isActive = false
+                self.containerTopConstraint?.isActive = true
+            } else {
+                self.containerBottomConstraint?.isActive = true
+                self.containerTopConstraint?.isActive = false
+            }
+            self.containerView.superview?.layoutIfNeeded()
         }, completion: { (_) in
             // remove hint after animation is completed
-//            self.isHintHidden = hintHidden
             if hintHidden {
                 self.updateRandom(hintHidden)
-self.removeHint()
+                self.removeHint()
             }else{
-self.dismissHint()
+                self.dismissHint()
             }
         })
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     @objc func didSave(_ didSave: Bool, article: WMFArticle, theme: Theme) {
         guard presenter?.presentedViewController == nil else {
@@ -356,21 +199,11 @@ self.dismissHint()
         setHintHidden(shouldBeHidden)
     }
     
-    
-    
-    
-    
     func readingListHintRotated() {
-//also re-hide/show here to fix any layout issues?
         dispatchOnMainQueueAfterDelayInSeconds(0.1) { [weak self] in
             self?.updateRandom(self?.isHintHidden() ?? true)
         }
     }
-    
-    
-    
-    
-    
 }
 
 private extension UIViewController {

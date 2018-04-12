@@ -18,70 +18,11 @@ class ReadingListHintViewController: UIViewController {
     }
     
     @IBOutlet weak var hintView: UIView?
-//    @IBOutlet weak var hintButton: UIButton? //AlignedImageButton?
-    @IBOutlet weak var hintLabel: UILabel? //AlignedImageButton?
+    @IBOutlet weak var hintLabel: UILabel?
     @IBOutlet weak var confirmationView: UIView?
     @IBOutlet weak var confirmationImageView: UIImageView!
-//    @IBOutlet weak var confirmationButton: UIButton!
-@IBOutlet weak var confirmationLabel: UILabel!
+    @IBOutlet weak var confirmationLabel: UILabel!
     @IBOutlet weak var confirmationChevron: UIButton!
-    
-    
-    
-    
-    
-    
-    
-    
-override func didReceiveMemoryWarning() {
-    
-    
-//    let testView = UIView()
-//    testView.backgroundColor = .green
-//    testView.alpha = 0.5
-//    testView.translatesAutoresizingMaskIntoConstraints = false
-//    view.addSubview(testView)
-//    NSLayoutConstraint.activate([
-//        testView.heightAnchor.constraint(equalToConstant: 200),
-//        testView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-//        testView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
-//
-//        view.trailingAnchor.constraint(equalTo: testView.trailingAnchor, constant: 20),
-//        view.bottomAnchor.constraint(equalTo: testView.bottomAnchor, constant: 20)
-//        ])
-
-    
-    
-    
-    setHintButtonTitle()
-
-//    hintButton?.titleLabel?.setNeedsUpdateConstraints()
-//    hintButton?.titleLabel?.setNeedsLayout()
-//    hintButton?.titleLabel?.layoutIfNeeded()
-//
-//hintButton?.setNeedsUpdateConstraints()
-//hintButton?.setNeedsLayout()
-//hintButton?.layoutIfNeeded()
-
-view.setNeedsUpdateConstraints()
-view.setNeedsLayout()
-view.layoutIfNeeded()
-//view.backgroundColor = .blue
-
-    
-
-// testView.removeFromSuperview()
-    
-    
-}
-    
-    
-    
-    
-    
-    
-    
-    
     
     private var isConfirmationImageViewHidden: Bool = false {
         didSet {
@@ -96,18 +37,12 @@ view.layoutIfNeeded()
         }
     }
     
-    
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         isHintViewHidden = false
         
         confirmationImageView.layer.cornerRadius = 3
         confirmationImageView.clipsToBounds = true
-//        hintButton?.verticalPadding = 5
-//        hintButton?.titleLabel?.numberOfLines = 0
-//        confirmationButton?.titleLabel?.numberOfLines = 0
         setHintButtonTitle()
         apply(theme: theme)
         NotificationCenter.default.addObserver(self, selector: #selector(themeChanged), name: Notification.Name(ReadingThemesControlsViewController.WMFUserDidSelectThemeNotification), object: nil)
@@ -127,25 +62,15 @@ view.layoutIfNeeded()
     }
     
     private func setHintButtonTitle() {
-//        hintButton?.setTitle(hintButtonTitle, for: .normal)
-hintLabel?.text = hintButtonTitle
+        hintLabel?.text = hintButtonTitle
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-//        hintButton?.titleLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
-hintLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
-
-//        confirmationButton?.titleLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
-confirmationLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
-        
-        
-        
-        
-if (traitCollection.verticalSizeClass != previousTraitCollection?.verticalSizeClass) {
-    delegate?.readingListHintRotated()
-}
-        
-        
+        hintLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
+        confirmationLabel?.setFont(with: .systemMedium, style: .subheadline, traitCollection: traitCollection)
+        if (traitCollection.verticalSizeClass != previousTraitCollection?.verticalSizeClass) {
+            delegate?.readingListHintRotated()
+        }
     }
     
     public weak var delegate: ReadingListHintViewControllerDelegate?
@@ -202,10 +127,7 @@ extension ReadingListHintViewController: AddArticlesToReadingListDelegate {
         self.readingList = readingList
         isHintViewHidden = true
         let title = String.localizedStringWithFormat(WMFLocalizedString("reading-lists-article-added-confirmation", value: "Article added to “%1$@” test test test test test test test test test test test test test test test test test 123", comment: "Confirmation shown after the user adds an article to a list"), name)
-//        confirmationButton.setTitle(title, for: .normal)
-        
-confirmationLabel.text = title
-        
+        confirmationLabel.text = title
         delegate?.readingListHint(self, shouldBeHidden: false)
     }
     
@@ -221,15 +143,9 @@ extension ReadingListHintViewController: Themeable {
             return
         }
         view.backgroundColor = theme.colors.hintBackground
-hintLabel?.textColor = theme.colors.link
-//        hintButton?.setTitleColor(theme.colors.link, for: .normal)
-hintLabel?.tintColor = theme.colors.link
-//        hintButton?.tintColor = theme.colors.link
-//        confirmationButton.setTitleColor(theme.colors.link, for: .normal)
-        
-        
-confirmationLabel?.textColor = theme.colors.link
-        
+        hintLabel?.textColor = theme.colors.link
+        hintLabel?.tintColor = theme.colors.link
+        confirmationLabel?.textColor = theme.colors.link        
         confirmationChevron.tintColor = theme.colors.link
     }
 }
