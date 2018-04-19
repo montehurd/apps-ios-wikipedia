@@ -64,11 +64,39 @@ class Section {
   }
 
   headingTag() {
+
+
+/*
+TODO:
+- figure out how to fix lead section (re-add article title, work with our little horizontal rule)
+- remove now unused funcs
+- test on arabic article (pencils didn't seem to move correctly)
+- re-do containerDiv() to not use string for construction so we can get rid of tempSpan here
+- run before-after performance test to ensure things didn't slow down
+- re-test all other transforms
+
+- should we deprecate the edit pencil xf and have a "section heading" xf instead? the section heading
+  xf could still use the edit pencil xf...
+*/
+
+
+
+
+    
     if(this.isLeadSection()){
       return `<h1 class='section_heading' ${this.anchorAsElementId()} sectionId='${this.id}'>
                 ${this.article.displayTitle}
               </h1>${this.article.descriptionParagraph()}`
     }
+
+    
+const tempSpan = lazyDocument.createElement('span')
+const header = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
+tempSpan.appendChild(header)
+return tempSpan.innerHTML
+
+    
+    
     const hSize = this.headingTagSize()
     return `<h${hSize} class="section_heading" data-id="${this.id}" id="${this.anchor}">
               ${this.line}
@@ -145,6 +173,7 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
     requirements.leadIntroductionTransform.moveLeadIntroductionUp(fragment, 'content_block_0', afterElement)
   }
 
+
   const isFilePage = fragment.querySelector('#filetoc') !== null
   if(!article.ismain && !isFilePage){
     if (isLead){
@@ -155,12 +184,13 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
         hr.nextSibling
       )
     }else{
-      // Add non-lead section edit buttons inside respective header elements.
-      const heading = fragment.querySelector('.section_heading[data-id]')
-      heading.appendChild(requirements.editTransform.newEditSectionButton(fragment, heading.getAttribute('data-id')))
+      // // Add non-lead section edit buttons inside respective header elements.
+      // const heading = fragment.querySelector('.section_heading[data-id]')
+      // heading.appendChild(requirements.editTransform.newEditSectionButton(fragment, heading.getAttribute('data-id')))
     }
     fragment.querySelectorAll('a.pagelib_edit_section_link').forEach(anchor => {anchor.href = 'WMFEditPencil'})
   }
+
 
   const tableFooterDivClickCallback = container => {
     if(requirements.location.isElementTopOnscreen(container)){
