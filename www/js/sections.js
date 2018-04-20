@@ -74,11 +74,8 @@ TODO:
 - re-do containerDiv() to not use string for construction so we can get rid of tempSpan here
 - run before-after performance test to ensure things didn't slow down
 - re-test all other transforms
-
-- should we deprecate the edit pencil xf and have a "section heading" xf instead? the section heading
-  xf could still use the edit pencil xf...
+- fix toc scrolling! is brokey (missing 'anchor')
 */
-
 
 
 
@@ -179,8 +176,13 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
     if (isLead){
       // Add lead section edit button after the lead section horizontal rule element.
       const hr = fragment.querySelector('#content_block_0_hr')
+      const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
+      
+//console.log(`${article.language}`)
+      
+      editButton.style.float = article.language.isRTL ? 'left': 'right'
       hr.parentNode.insertBefore(
-        requirements.editTransform.newEditSectionButton(fragment, 0),
+        editButton,
         hr.nextSibling
       )
     }else{
