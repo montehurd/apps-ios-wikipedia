@@ -59,9 +59,9 @@ class Section {
     this.article = article
   }
 
-  headingTagSize() {
-    return Math.max(1, Math.min(parseInt(this.level), 6))
-  }
+  // headingTagSize() {
+  //   return Math.max(1, Math.min(parseInt(this.level), 6))
+  // }
 
   headingTag() {
 
@@ -89,15 +89,19 @@ TODO:
     
 const tempSpan = lazyDocument.createElement('span')
 const header = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
+if (!(this.anchor === undefined || this.anchor.length === 0)) {
+  // TODO: consider renaming 'id' here to 'anchor' - check for native code impact (used for scrolling to section)
+  header.id = this.anchor
+}
 tempSpan.appendChild(header)
 return tempSpan.innerHTML
 
     
     
-    const hSize = this.headingTagSize()
-    return `<h${hSize} class="section_heading" data-id="${this.id}" id="${this.anchor}">
-              ${this.line}
-            </h${hSize}>`
+    // const hSize = this.headingTagSize()
+    // return `<h${hSize} class="section_heading" data-id="${this.id}" id="${this.anchor}">
+    //           ${this.line}
+    //         </h${hSize}>`
   }
 
   isLeadSection() {
