@@ -947,6 +947,10 @@ class Section {
   }
 
   nonLeadSectionHeading() {
+    // Non-lead section edit pencils are added as part of the heading via `newEditSectionHeader`
+    // because it provides a heading correclty aligned with the edit pencil. (Lead section edit
+    // pencils are added in `applyTransformationsToFragment` because they need to be added after
+    // the `moveLeadIntroductionUp` has finished)
     const heading = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
     this.addAnchorAsIdToHeading(heading)
     return heading
@@ -1005,19 +1009,58 @@ class Section {
       if(description){
         container.appendChild(description)
       }
+      
+      
+if(this.isLeadSection()){
+  const hr = lazyDocument.createElement('hr')
+  hr.id = 'content_block_0_hr'
+  container.appendChild(hr)
+}
+      
     }
     
     const block = lazyDocument.createElement('div')
     block.id = `content_block_${this.id}`
     block.class = 'content_block'
     block.innerHTML = this.html()
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/*    
+    if(this.isNonMainPageLeadSection()){
+      // Add lead section edit button at before the section html.
+      const editButton = requirements.editTransform.newEditSectionButton(lazyDocument, 0)
+      editButton.style.float = this.article.language.isRTL ? 'left': 'right'
+      block.insertBefore(
+        editButton,
+        block.firstChild
+      )
+    }
+*/    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/*
     if(this.isNonMainPageLeadSection()){
       const hr = lazyDocument.createElement('hr')
       hr.id = 'content_block_0_hr'
       block.insertBefore(hr, block.firstChild)
     }
-
+*/
     container.appendChild(block)    
     
     
@@ -1061,8 +1104,8 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   requirements.redLinks.hideRedLinks(fragment)
 
   if(!article.ismain && isLead){
-    const afterElement = fragment.getElementById('content_block_0_hr')
-    requirements.leadIntroductionTransform.moveLeadIntroductionUp(fragment, 'content_block_0', afterElement)
+//    const afterElement = fragment.getElementById('content_block_0_hr')
+    requirements.leadIntroductionTransform.moveLeadIntroductionUp(fragment, 'content_block_0')//, afterElement)
   }
 
 
@@ -1078,6 +1121,29 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   if(!article.ismain && !isFilePage){
     if (isLead){
       
+    
+    
+    
+    
+    
+    
+      // Add lead section edit pencil before the section html.
+      // The first section edit pencil must be added after `moveLeadIntroductionUp` has finished.
+      // The other edit pencils are constructed in `nonLeadSectionHeading()`
+      const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
+      editButton.style.float = article.language.isRTL ? 'left': 'right'
+      const firstContentBlock = fragment.getElementById('content_block_0')
+      firstContentBlock.insertBefore(
+        editButton,
+        firstContentBlock.firstChild
+      )
+
+    
+    
+    
+      
+      
+/*      
       // Add lead section edit button after the lead section horizontal rule element.
       const hr = fragment.querySelector('#content_block_0_hr')
       const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
@@ -1087,6 +1153,9 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
         editButton,
         hr.nextSibling
       )
+*/      
+      
+      
       
     }else{
       // // Add non-lead section edit buttons inside respective header elements.
