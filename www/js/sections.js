@@ -1,4 +1,27 @@
 
+
+
+
+/*
+TODO:
+- [ ] figure out how to fix lead section (re-add article title, work with our little horizontal rule)
+- [ ] remove now unused funcs
+- [ ] test on arabic article (pencils didn't seem to move correctly)
+- [x] re-do containerDiv() to not use string for construction so we can get rid of tempSpan here
+- [ ] run before-after performance test to ensure things didn't slow down
+- [ ] re-test all other transforms
+- [ ] fix toc scrolling! is brokey (missing 'anchor')
+      Related: consider renaming 'header.id' in nonLeadSectionHeading() to 'header.anchor' - check for native code impact (used for scrolling to section)
+- [ ] check if develop has this gray box appearing around article read more "Save for later" buttons when tapped...
+*/
+
+
+
+
+
+
+
+
 const requirements = {
   editTransform: require('wikimedia-page-library').EditTransform,
   utilities: require('./utilities'),
@@ -43,9 +66,12 @@ class Article {
   }
   descriptionParagraph() {
     if(this.description !== undefined && this.description.length > 0){
-      return `<p id='entity_description'>${this.description}</p>`
+      const p = lazyDocument.createElement('p')
+      p.id = 'entity_description'
+      p.innerHTML = this.description
+      return p
     }
-    return ''
+    return undefined
   }
 }
 
@@ -59,49 +85,33 @@ class Section {
     this.article = article
   }
 
-  // headingTagSize() {
-  //   return Math.max(1, Math.min(parseInt(this.level), 6))
-  // }
-
-  headingTag() {
-
-
-/*
-TODO:
-- figure out how to fix lead section (re-add article title, work with our little horizontal rule)
-- remove now unused funcs
-- test on arabic article (pencils didn't seem to move correctly)
-- re-do containerDiv() to not use string for construction so we can get rid of tempSpan here
-- run before-after performance test to ensure things didn't slow down
-- re-test all other transforms
-- fix toc scrolling! is brokey (missing 'anchor')
-*/
-
-
-
+  leadSectionHeading() {
+    const leadHeader = lazyDocument.createElement('h1')
+    leadHeader.class = 'section_heading'
     
-    if(this.isLeadSection()){
-      return `<h1 class='section_heading' ${this.anchorAsElementId()} sectionId='${this.id}'>
-                ${this.article.displayTitle}
-              </h1>${this.article.descriptionParagraph()}`
+// TODO: DRY
+
+    if (!(this.anchor === undefined || this.anchor.length === 0)) {
+      leadHeader.id = this.anchor
     }
+    leadHeader.sectionId = this.id
+    leadHeader.innerHTML = this.article.displayTitle
+    return leadHeader
+  }
 
+  nonLeadSectionHeading() {
+    const header = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
     
-const tempSpan = lazyDocument.createElement('span')
-const header = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
-if (!(this.anchor === undefined || this.anchor.length === 0)) {
-  // TODO: consider renaming 'id' here to 'anchor' - check for native code impact (used for scrolling to section)
-  header.id = this.anchor
-}
-tempSpan.appendChild(header)
-return tempSpan.innerHTML
+// TODO: DRY
 
-    
-    
-    // const hSize = this.headingTagSize()
-    // return `<h${hSize} class="section_heading" data-id="${this.id}" id="${this.anchor}">
-    //           ${this.line}
-    //         </h${hSize}>`
+    if (!(this.anchor === undefined || this.anchor.length === 0)) {
+      header.id = this.anchor
+    }
+    return header
+  }
+
+  heading() {
+    return this.isLeadSection() ? this.leadSectionHeading() : this.nonLeadSectionHeading()
   }
 
   isLeadSection() {
@@ -130,12 +140,44 @@ return tempSpan.innerHTML
   containerDiv() {
     const container = lazyDocument.createElement('div')
     container.id = `section_heading_and_content_block_${this.id}`
-    container.innerHTML = `
-        ${this.article.ismain ? '' : this.headingTag()}
-        <div id="content_block_${this.id}" class="content_block">
-            ${this.isNonMainPageLeadSection() ? '<hr id="content_block_0_hr">' : ''}
-            ${this.html()}
-        </div>`
+    
+    
+    
+    if(!this.article.ismain){
+      container.appendChild(this.heading())
+      if(this.isLeadSection()){
+        const descriptionParagraph = this.article.descriptionParagraph()
+        if(descriptionParagraph){
+          container.appendChild(descriptionParagraph)
+        }
+      }
+    }
+    
+
+    
+    const blockDiv = lazyDocument.createElement('div')
+    blockDiv.id = `content_block_${this.id}`
+    blockDiv.class = 'content_block'
+    blockDiv.innerHTML = this.html()
+
+
+    if(this.isNonMainPageLeadSection()){
+      const hr = lazyDocument.createElement('hr')
+      hr.id = 'content_block_0_hr'
+      blockDiv.insertBefore(hr, blockDiv.firstChild)
+    }
+
+
+
+    container.appendChild(blockDiv)    
+    
+    
+    // container.innerHTML = `
+    //     ${this.article.ismain ? '' : this.heading()}
+    //     <div id="content_block_${this.id}" class="content_block">
+    //         ${this.isNonMainPageLeadSection() ? '<hr id="content_block_0_hr">' : ''}
+    //         ${this.html()}
+    //     </div>`
     return container
   }
 }
@@ -175,6 +217,14 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   }
 
 
+
+
+
+
+
+
+
+
   const isFilePage = fragment.querySelector('#filetoc') !== null
   if(!article.ismain && !isFilePage){
     if (isLead){
@@ -196,6 +246,14 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
     }
     fragment.querySelectorAll('a.pagelib_edit_section_link').forEach(anchor => {anchor.href = 'WMFEditPencil'})
   }
+
+
+
+
+
+
+
+
 
 
   const tableFooterDivClickCallback = container => {
