@@ -85,29 +85,28 @@ class Section {
     this.article = article
   }
 
-  leadSectionHeading() {
-    const leadHeader = lazyDocument.createElement('h1')
-    leadHeader.class = 'section_heading'
-    
-// TODO: DRY
-
+  addAnchorAsIdToHeading(heading) {
     if (!(this.anchor === undefined || this.anchor.length === 0)) {
-      leadHeader.id = this.anchor
+      // TODO: consider renaming this 'id' to 'anchor' for clarity - would need to update native
+      // code as well - used when TOC sections made to jump to sections.
+      // If we make this change this method should probably be renamed to 'addAnchorToHeading'.
+      heading.id = this.anchor
     }
-    leadHeader.sectionId = this.id
-    leadHeader.innerHTML = this.article.displayTitle
-    return leadHeader
+  }
+
+  leadSectionHeading() {
+    const heading = lazyDocument.createElement('h1')
+    heading.class = 'section_heading'
+    this.addAnchorAsIdToHeading(heading)
+    heading.sectionId = this.id
+    heading.innerHTML = this.article.displayTitle
+    return heading
   }
 
   nonLeadSectionHeading() {
-    const header = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
-    
-// TODO: DRY
-
-    if (!(this.anchor === undefined || this.anchor.length === 0)) {
-      header.id = this.anchor
-    }
-    return header
+    const heading = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
+    this.addAnchorAsIdToHeading(heading)
+    return heading
   }
 
   heading() {
@@ -137,39 +136,46 @@ class Section {
     return this.text
   }
 
+
+
+
+
+  description() {
+    if(this.isLeadSection()){
+      return this.article.descriptionParagraph()
+    }
+    return undefined
+  }
+
+
+
+
+
+
   containerDiv() {
     const container = lazyDocument.createElement('div')
     container.id = `section_heading_and_content_block_${this.id}`
     
-    
-    
     if(!this.article.ismain){
       container.appendChild(this.heading())
-      if(this.isLeadSection()){
-        const descriptionParagraph = this.article.descriptionParagraph()
-        if(descriptionParagraph){
-          container.appendChild(descriptionParagraph)
-        }
+      const description = this.description()
+      if(description){
+        container.appendChild(description)
       }
     }
     
-
-    
-    const blockDiv = lazyDocument.createElement('div')
-    blockDiv.id = `content_block_${this.id}`
-    blockDiv.class = 'content_block'
-    blockDiv.innerHTML = this.html()
-
+    const block = lazyDocument.createElement('div')
+    block.id = `content_block_${this.id}`
+    block.class = 'content_block'
+    block.innerHTML = this.html()
 
     if(this.isNonMainPageLeadSection()){
       const hr = lazyDocument.createElement('hr')
       hr.id = 'content_block_0_hr'
-      blockDiv.insertBefore(hr, blockDiv.firstChild)
+      block.insertBefore(hr, block.firstChild)
     }
 
-
-
-    container.appendChild(blockDiv)    
+    container.appendChild(block)    
     
     
     // container.innerHTML = `
@@ -228,17 +234,23 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   const isFilePage = fragment.querySelector('#filetoc') !== null
   if(!article.ismain && !isFilePage){
     if (isLead){
+      
+      
+      
+      
       // Add lead section edit button after the lead section horizontal rule element.
       const hr = fragment.querySelector('#content_block_0_hr')
       const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
-      
-//console.log(`${article.language}`)
       
       editButton.style.float = article.language.isRTL ? 'left': 'right'
       hr.parentNode.insertBefore(
         editButton,
         hr.nextSibling
       )
+      
+      
+      
+      
     }else{
       // // Add non-lead section edit buttons inside respective header elements.
       // const heading = fragment.querySelector('.section_heading[data-id]')
