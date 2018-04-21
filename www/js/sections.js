@@ -4,13 +4,13 @@
 
 /*
 TODO:
-- [ ] figure out how to fix lead section (re-add article title, work with our little horizontal rule)
+- [x] figure out how to fix lead section (re-add article title, work with our little horizontal rule)
 - [ ] remove now unused funcs
 - [ ] test on arabic article (pencils didn't seem to move correctly)
 - [x] re-do containerDiv() to not use string for construction so we can get rid of tempSpan here
 - [ ] run before-after performance test to ensure things didn't slow down
 - [ ] re-test all other transforms
-- [ ] fix toc scrolling! is brokey (missing 'anchor')
+- [x] fix toc scrolling! is brokey (missing 'anchor')
       Related: consider renaming 'header.id' in nonLeadSectionHeading() to 'header.anchor' - check for native code impact (used for scrolling to section)
 - [ ] check if develop has this gray box appearing around article read more "Save for later" buttons when tapped...
 */
@@ -140,21 +140,12 @@ class Section {
     return this.text
   }
 
-
-
-
-
   description() {
     if(this.isLeadSection()){
       return this.article.descriptionParagraph()
     }
     return undefined
   }
-
-
-
-
-
 
   containerDiv() {
     const container = lazyDocument.createElement('div')
@@ -166,14 +157,11 @@ class Section {
       if(description){
         container.appendChild(description)
       }
-      
-      
-if(this.isLeadSection()){
-  const hr = lazyDocument.createElement('hr')
-  hr.id = 'content_block_0_hr'
-  container.appendChild(hr)
-}
-      
+      if(this.isLeadSection()){
+        const hr = lazyDocument.createElement('hr')
+        hr.id = 'content_block_0_hr'
+        container.appendChild(hr)
+      }      
     }
     
     const block = lazyDocument.createElement('div')
@@ -181,52 +169,8 @@ if(this.isLeadSection()){
     block.class = 'content_block'
     block.innerHTML = this.html()
     
+    container.appendChild(block)
     
-    
-    
-    
-    
-    
-    
-    
-    
-/*    
-    if(this.isNonMainPageLeadSection()){
-      // Add lead section edit button at before the section html.
-      const editButton = requirements.editTransform.newEditSectionButton(lazyDocument, 0)
-      editButton.style.float = this.article.language.isRTL ? 'left': 'right'
-      block.insertBefore(
-        editButton,
-        block.firstChild
-      )
-    }
-*/    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-/*
-    if(this.isNonMainPageLeadSection()){
-      const hr = lazyDocument.createElement('hr')
-      hr.id = 'content_block_0_hr'
-      block.insertBefore(hr, block.firstChild)
-    }
-*/
-    container.appendChild(block)    
-    
-    
-    // container.innerHTML = `
-    //     ${this.article.ismain ? '' : this.heading()}
-    //     <div id="content_block_${this.id}" class="content_block">
-    //         ${this.isNonMainPageLeadSection() ? '<hr id="content_block_0_hr">' : ''}
-    //         ${this.html()}
-    //     </div>`
     return container
   }
 }
@@ -261,75 +205,25 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   requirements.redLinks.hideRedLinks(fragment)
 
   if(!article.ismain && isLead){
-//    const afterElement = fragment.getElementById('content_block_0_hr')
-    requirements.leadIntroductionTransform.moveLeadIntroductionUp(fragment, 'content_block_0')//, afterElement)
+    requirements.leadIntroductionTransform.moveLeadIntroductionUp(fragment, 'content_block_0')
   }
-
-
-
-
-
-
-
-
-
 
   const isFilePage = fragment.querySelector('#filetoc') !== null
   if(!article.ismain && !isFilePage){
     if (isLead){
-      
-    
-    
-    
-    
-    
-    
-      // Add lead section edit pencil before the section html.
-      // The first section edit pencil must be added after `moveLeadIntroductionUp` has finished.
-      // The other edit pencils are constructed in `nonLeadSectionHeading()`
-      const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
-      editButton.style.float = article.language.isRTL ? 'left': 'right'
+      // Add lead section edit pencil before the section html. Lead section edit pencil must be 
+      // added after `moveLeadIntroductionUp` has finished. (The other edit pencils are constructed
+      // in `nonLeadSectionHeading()`)
+      const leadSectionEditButton = requirements.editTransform.newEditSectionButton(fragment, 0)
+      leadSectionEditButton.style.float = article.language.isRTL ? 'left': 'right'
       const firstContentBlock = fragment.getElementById('content_block_0')
       firstContentBlock.insertBefore(
-        editButton,
+        leadSectionEditButton,
         firstContentBlock.firstChild
       )
-
-    
-    
-    
-      
-      
-/*      
-      // Add lead section edit button after the lead section horizontal rule element.
-      const hr = fragment.querySelector('#content_block_0_hr')
-      const editButton = requirements.editTransform.newEditSectionButton(fragment, 0)
-      
-      editButton.style.float = article.language.isRTL ? 'left': 'right'
-      hr.parentNode.insertBefore(
-        editButton,
-        hr.nextSibling
-      )
-*/      
-      
-      
-      
-    }else{
-      // // Add non-lead section edit buttons inside respective header elements.
-      // const heading = fragment.querySelector('.section_heading[data-id]')
-      // heading.appendChild(requirements.editTransform.newEditSectionButton(fragment, heading.getAttribute('data-id')))
     }
     fragment.querySelectorAll('a.pagelib_edit_section_link').forEach(anchor => {anchor.href = 'WMFEditPencil'})
   }
-
-
-
-
-
-
-
-
-
 
   const tableFooterDivClickCallback = container => {
     if(requirements.location.isElementTopOnscreen(container)){
