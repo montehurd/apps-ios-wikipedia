@@ -13,6 +13,10 @@ TODO:
 - [x] fix toc scrolling! is brokey (missing 'anchor')
       Related: consider renaming 'header.id' in nonLeadSectionHeading() to 'header.anchor' - check for native code impact (used for scrolling to section)
 - [ ] check if develop has this gray box appearing around article read more "Save for later" buttons when tapped...
+- [ ] double-check if title and section text sizes have changed - i have a testwiki page with all sections - take screenshot on develop and compare
+- [ ] test with text size changes!
+- [ ] don't change farsi: https://github.com/wikimedia/wikipedia-ios/compare/develop...montehurd:integrate-page-lib-edit-pencil?expand=1#diff-2809326a41445f0581ff4f8e6249dc9dL95
+
 */
 
 
@@ -105,9 +109,9 @@ class Section {
 
   nonLeadSectionHeading() {
     // Non-lead section edit pencils are added as part of the heading via `newEditSectionHeader`
-    // because it provides a heading correclty aligned with the edit pencil. (Lead section edit
+    // because it provides a heading correctly aligned with the edit pencil. (Lead section edit
     // pencils are added in `applyTransformationsToFragment` because they need to be added after
-    // the `moveLeadIntroductionUp` has finished)
+    // the `moveLeadIntroductionUp` has finished.)
     const heading = requirements.editTransform.newEditSectionHeader(lazyDocument, this.id, this.level, this.line)
     this.addAnchorAsIdToHeading(heading)
     return heading
@@ -153,10 +157,12 @@ class Section {
     
     if(!this.article.ismain){
       container.appendChild(this.heading())
+      
       const description = this.description()
       if(description){
         container.appendChild(description)
       }
+      
       if(this.isLeadSection()){
         const hr = lazyDocument.createElement('hr')
         hr.id = 'content_block_0_hr'
@@ -212,15 +218,12 @@ const applyTransformationsToFragment = (fragment, article, isLead) => {
   if(!article.ismain && !isFilePage){
     if (isLead){
       // Add lead section edit pencil before the section html. Lead section edit pencil must be 
-      // added after `moveLeadIntroductionUp` has finished. (The other edit pencils are constructed
-      // in `nonLeadSectionHeading()`)
+      // added after `moveLeadIntroductionUp` has finished. (Other edit pencils are constructed
+      // in `nonLeadSectionHeading()`.)
       const leadSectionEditButton = requirements.editTransform.newEditSectionButton(fragment, 0)
       leadSectionEditButton.style.float = article.language.isRTL ? 'left': 'right'
       const firstContentBlock = fragment.getElementById('content_block_0')
-      firstContentBlock.insertBefore(
-        leadSectionEditButton,
-        firstContentBlock.firstChild
-      )
+      firstContentBlock.insertBefore(leadSectionEditButton, firstContentBlock.firstChild)
     }
     fragment.querySelectorAll('a.pagelib_edit_section_link').forEach(anchor => {anchor.href = 'WMFEditPencil'})
   }
