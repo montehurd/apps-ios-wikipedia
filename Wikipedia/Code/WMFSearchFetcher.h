@@ -6,6 +6,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSUInteger const WMFMaxSearchResultLimit;
+extern NSString *const WMFSearchTermKey;
 
 @interface WMFSearchFetcher : NSObject
 

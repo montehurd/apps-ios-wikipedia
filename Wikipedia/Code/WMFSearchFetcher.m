@@ -6,6 +6,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 NSUInteger const WMFMaxSearchResultLimit = 24;
+NSString *const WMFSearchTermKey = @"searchTerm";
 
 #pragma mark - Internal Class Declarations
 
@@ -102,7 +103,12 @@ NSUInteger const WMFMaxSearchResultLimit = 24;
         }
         failure:^(NSURLSessionDataTask *operation, NSError *error) {
             [[MWNetworkActivityIndicatorManager sharedManager] pop];
-            failure(error);
+
+            NSMutableDictionary *userInfo = (!error.userInfo) ? [NSMutableDictionary new] : [NSMutableDictionary dictionaryWithDictionary:error.userInfo];
+            userInfo[WMFSearchTermKey] = searchTerm;
+            NSError *errorWithSearchTerm = [NSError errorWithDomain:error.domain code:error.code userInfo:userInfo];
+
+            failure(errorWithSearchTerm);
         }];
 }
 
