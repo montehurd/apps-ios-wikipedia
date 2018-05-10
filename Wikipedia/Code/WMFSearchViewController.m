@@ -450,7 +450,8 @@ static NSUInteger const kWMFMinResultsBeforeAutoFullTextSearch = 12;
                                          dispatch_async(dispatch_get_main_queue(), ^{
                                              @strongify(self);
                                              if (![results.searchTerm isEqualToString:self.searchField.text]) {
-                                                 failure([NSError wmf_cancelledError]);
+                                                 NSError *cancelErrorWithSearchTerm = [NSError wmf_errorWithType:WMFErrorTypeCancelled userInfo:@{WMFSearchTermKey: results.searchTerm}];
+                                                 failure(cancelErrorWithSearchTerm);
                                                  return;
                                              }
 
