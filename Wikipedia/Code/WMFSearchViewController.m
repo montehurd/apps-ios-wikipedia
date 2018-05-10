@@ -402,11 +402,15 @@ static NSUInteger const kWMFMinResultsBeforeAutoFullTextSearch = 12;
             [[AFNetworkActivityIndicatorManager sharedManager] decrementActivityCount];
             [self.fakeProgressController stop];
             @strongify(self);
-            if ([searchTerm isEqualToString:self.searchField.text]) {
-                [self.resultsListController wmf_showEmptyViewOfType:WMFEmptyViewTypeNoSearchResults theme:self.theme frame:self.resultsListController.view.bounds];
-                [[WMFAlertManager sharedInstance] showErrorAlert:error sticky:NO dismissPreviousAlerts:YES tapCallBack:NULL];
-                [self.searchFunnel logShowSearchErrorWithTypeOfSearch:self.searchType elapsedTime:fabs([start timeIntervalSinceNow])];
-                DDLogError(@"Encountered search error: %@", error);
+            BOOL searchTermFoundInError = error && error.userInfo && error.userInfo[WMFSearchTermKey];
+            if(searchTermFoundInError){
+                NSString *actualSearchTerm = error.userInfo[WMFSearchTermKey];
+                if ([actualSearchTerm isEqualToString:self.searchField.text]) {
+                    [self.resultsListController wmf_showEmptyViewOfType:WMFEmptyViewTypeNoSearchResults theme:self.theme frame:self.resultsListController.view.bounds];
+                    [[WMFAlertManager sharedInstance] showErrorAlert:error sticky:NO dismissPreviousAlerts:YES tapCallBack:NULL];
+                    [self.searchFunnel logShowSearchErrorWithTypeOfSearch:self.searchType elapsedTime:fabs([start timeIntervalSinceNow])];
+                    DDLogError(@"Encountered search error: %@", error);
+                }
             }
         });
     };
