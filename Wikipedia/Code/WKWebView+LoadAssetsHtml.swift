@@ -80,7 +80,16 @@ extension WKWebView {
              because this fires before any of the head tag contents are resolved, including references to our JS
              libraries - we'd have to make a larger set of changes to make this work.
         */
+        
+        var siteCSSLink = ""
+        if let baseSite = baseURL.wmf_site?.absoluteString {
+            siteCSSLink = """
+                <link href="\(baseSite)/api/rest_v1/data/css/mobile/site" rel="stylesheet" type="text/css"></link>
+            """
+        }
+        
         return """
+            \(siteCSSLink)
             <style type='text/css'>
                 body {
                     -webkit-text-size-adjust: \(fontSize)%;
