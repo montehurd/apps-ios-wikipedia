@@ -24,11 +24,12 @@ extension XCUIElement {
 private enum ElementPropertyType: String {
     case label
     case placeholderValue
-
-    private func predicate(for text: String) -> NSPredicate {
+    case `self`
+    
+    func predicate(for text: String) -> NSPredicate {
         return NSPredicate(format: "\(rawValue) == %@", text)
     }
-    private func wildcardPredicate(for text: String) -> NSPredicate {
+    func wildcardPredicate(for text: String) -> NSPredicate {
         var mutableText = text
         for i in 0...9 {
             mutableText = mutableText.replacingOccurrences(of: "%\(i)$@", with: "*")
@@ -116,18 +117,44 @@ extension XCUIApplication {
         }
     }
     
-    func wmf_scrollToOtherElement(key: String, success: (XCUIElement) -> ()){
-        let maxScrollSeconds: Double = 240
+    // Scrolls to first items for each key. Does so in a single scrolling pass.
+    func wmf_scrollToFirstElements(items: [KeyAndSuccess], timeout seconds: Double = 240) {
         let start = Date()
+        for item in items {
+            item.predicate = ElementPropertyType.`self`.wildcardPredicate(for: WMFLocalizedString(item.key, value: "", comment: ""))
+        }
+        var skipScrollDown: Bool
+        var keys = items.map{item in item.key}
+        
         repeat {
-            let element = otherElements.wmf_firstElement(with: .label, withTranslationIn: [key], convertTranslationSubstitutionStringsToWildcards: true, timeout: TimeInterval(1))
+            skipScrollDown = false
+            let element = otherElements.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1)
             if element.exists {
-                wmf_scrollElementToTop(element: element)
-                success(element)
-                sleep(2)
-                break
+                for item in items {
+                    if let predicate = item.predicate, predicate.evaluate(with: element.label) {
+                        skipScrollDown = true // Need to skip scroll down because another element may already be onscreen (in which case the next loop will catch it).
+                        wmf_scrollElementToTop(element: element)
+                        item.success(element)
+                        sleep(2)
+                        if let index = keys.index(of: item.key) {
+                            keys.remove(at: index)
+                        }
+                    }
+                }
             }
-            wmf_scrollDown()
-        } while Date().timeIntervalSince(start) < maxScrollSeconds
+            if !skipScrollDown {
+                wmf_scrollDown()
+            }
+        } while (Date().timeIntervalSince(start) < seconds) && (keys.count > 0)
+    }
+}
+
+class KeyAndSuccess {
+    let key: String
+    let success: (XCUIElement) -> ()
+    var predicate: NSPredicate? = nil
+    init(key: String, success: @escaping (XCUIElement) -> ()) {
+        self.key = key
+        self.success = success
     }
 }
