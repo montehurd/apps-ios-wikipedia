@@ -4,7 +4,7 @@ protocol ArticleLocationAuthorizationCollectionViewCellDelegate: class {
     func articleLocationAuthorizationCollectionViewCellDidTapAuthorize(_ cell: ArticleLocationAuthorizationCollectionViewCell)
 }
 
-class ArticleLocationAuthorizationCollectionViewCell: ArticleLocationCollectionViewCell {
+class ArticleLocationAuthorizationCollectionViewCell: ArticleLocationExploreCollectionViewCell {
     let authorizeTitleLabel: UILabel = UILabel()
     let authorizeButton: UIButton = UIButton()
     let authorizeDescriptionLabel: UILabel = UILabel()
@@ -49,9 +49,10 @@ class ArticleLocationAuthorizationCollectionViewCell: ArticleLocationCollectionV
     override func apply(theme: Theme) {
         super.apply(theme: theme)
         authorizeTitleLabel.textColor = theme.colors.primaryText
-        authorizeButton.backgroundColor = theme.colors.midBackground
+        authorizeButton.backgroundColor = theme.colors.cardButtonBackground
         authorizeButton.setTitleColor(theme.colors.link, for: .normal)
         authorizeDescriptionLabel.textColor = theme.colors.secondaryText
+        backgroundView?.backgroundColor = theme.colors.midBackground
     }
     
     @objc public func authorizeButtonPressed(_ sender: Any?) {
