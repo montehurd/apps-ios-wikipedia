@@ -404,8 +404,14 @@ class ExploreCardViewController: PreviewingViewController, UICollectionViewDataS
         let itemLayoutMargins = ColumnarCollectionViewLayoutMetrics.defaultItemLayoutMargins
         let layoutMargins: UIEdgeInsets
         switch kind {
-        case .topRead, .location, .locationPlaceholder, .onThisDay:
-            layoutMargins = UIEdgeInsets(top: 25 - itemLayoutMargins.top, left: 0, bottom: 25 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
+        case .location:
+            layoutMargins = UIEdgeInsets(top: 18 - itemLayoutMargins.top, left: 0, bottom: 18 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
+        case .locationPlaceholder:
+            layoutMargins = UIEdgeInsets(top: 22 - itemLayoutMargins.top, left: 0, bottom: 10 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
+        case .topRead:
+            layoutMargins = UIEdgeInsets(top: 22 - itemLayoutMargins.top, left: 0, bottom: 22 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
+        case .onThisDay:
+            layoutMargins = UIEdgeInsets(top: 22 - itemLayoutMargins.top, left: 0, bottom: 20 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
         case .relatedPages:
             layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 25 - itemLayoutMargins.bottom, right: 0) // add additional spacing around the section
         default:
