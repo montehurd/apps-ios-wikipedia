@@ -18,9 +18,12 @@ extension XCUIElement {
         typeText(text)
         return true
     }
-    func wmf_waitUntilExists(timeout: TimeInterval = 30) -> XCUIElement {
+    func wmf_waitUntilExists(timeout: TimeInterval = 30) -> XCUIElement? {
         if self.exists && self.isHittable { return self }
-        _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true AND isHittable = true"), object: self)], timeout: timeout)
+        let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true AND isHittable = true"), object: self)], timeout: timeout)
+        if result != .completed {
+            return nil
+        }
         return self
     }
     func elementIsWithinWindow() -> Bool {
@@ -139,7 +142,7 @@ private enum ElementPropertyType: String {
 }
 
 private extension XCUIElementQuery {
-    func wmf_firstElement(with propertyType: ElementPropertyType, withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false, timeout: TimeInterval = 30) -> XCUIElement {
+    func wmf_firstElement(with propertyType: ElementPropertyType, withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false, timeout: TimeInterval = 30) -> XCUIElement? {
         let translations = keys.map{key in WMFLocalizedString(key, value: "", comment: "")} // localization strings are copied into this scheme during a build phase: https://stackoverflow.com/a/38133902/135557
         let predicate = shouldConvert ? propertyType.wildcardPredicate(for: translations) : propertyType.predicate(for: translations)
         // Used `element:boundBy:0` rather than `firstMatch` because the latter doesn't play nice with `exists` checking as of Xcode 9.3
@@ -148,28 +151,40 @@ private extension XCUIElementQuery {
 }
 
 extension XCUIApplication {
-    func wmf_firstButton(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement {
+    func wmf_firstButton(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement? {
         return buttons.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert)
     }
     func wmf_tapFirstButton(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> Bool {
-        return wmf_firstButton(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert).wmf_tap()
+        if let firstButton = wmf_firstButton(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert) {
+            return firstButton.wmf_tap()
+        } else {
+            return false
+        }
     }
 
-    func wmf_firstStaticText(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement {
+    func wmf_firstStaticText(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement? {
         return staticTexts.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert)
     }
     func wmf_tapFirstStaticText(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> Bool {
-        return wmf_firstStaticText(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert).wmf_tap()
+        if let firstStaticText = wmf_firstStaticText(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert) {
+            return firstStaticText.wmf_tap()
+        } else {
+            return false
+        }
     }
 
-    func wmf_firstSwitch(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement {
+    func wmf_firstSwitch(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement? {
         return switches.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert)
     }
     func wmf_tapFirstSwitch(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> Bool {
-        return wmf_firstSwitch(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert).wmf_tap()
+        if let firstSwitch = wmf_firstSwitch(withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert) {
+            return firstSwitch.wmf_tap()
+        } else {
+            return false
+        }
     }
     
-    func wmf_firstSearchField(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement {
+    func wmf_firstSearchField(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement? {
         return searchFields.wmf_firstElement(with: .placeholderValue, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert)
     }
 
@@ -183,17 +198,29 @@ extension XCUIApplication {
             return backButtonTapped
         }
         // Needed because if the title is long, the back button sometimes won't have text, as seen on https://stackoverflow.com/q/38595242/135557
-        return navigationBars.buttons.element(boundBy: 0).wmf_waitUntilExists().wmf_tap()
+        if let button = navigationBars.buttons.element(boundBy: 0).wmf_waitUntilExists() {
+            return button.wmf_tap()
+        } else {
+            return false
+        }
     }
     
     func wmf_tapFirstCollectionViewCell() -> Bool {
-        return collectionViews.children(matching: .cell).element(boundBy: 0).wmf_waitUntilExists().wmf_tap()
+        if let cell = collectionViews.children(matching: .cell).element(boundBy: 0).wmf_waitUntilExists() {
+            return cell.wmf_tap()
+        } else {
+            return false
+        }
     }
     
     func wmf_scrollToTop() -> Bool {
-        let tapResult = statusBars.element(boundBy: 0).wmf_waitUntilExists().wmf_tap()
-        sleep(2) // Give it time to scroll up.
-        return tapResult
+        if let statusBar = statusBars.element(boundBy: 0).wmf_waitUntilExists() {
+            let tapResult = statusBar.wmf_tap()
+            sleep(2) // Give it time to scroll up.
+            return tapResult
+        } else {
+            return false
+        }
     }
     
     func wmf_scrollElementToTop(element: XCUIElement, yOffset: CGFloat = 0.0) {
@@ -218,9 +245,9 @@ extension XCUIApplication {
         let start = Date()
         var keys = items.map{$0.key}
         scrollLoop: repeat {
-            let element = these.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1)
+            if let element = these.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1) {
 //            if element.elementIsWithinWindow() { //element.exists //&& element.isHittable { //DOUBLE check that the first commits in this PR still work if i remove isHittable - suspect they will because of `wmf_tap()` isHittable change...
-            if element.exists && element.isHittable { //DOUBLE check that the first commits in this PR still work if i remove isHittable - suspect they will because of `wmf_tap()` isHittable change...
+//            if element.exists && element.isHittable { //DOUBLE check that the first commits in this PR still work if i remove isHittable - suspect they will because of `wmf_tap()` isHittable change...
                 if let item = items.first(where: {$0.predicate.evaluate(with: element.label)}) {
                     wmf_scrollElementToTop(element: element, yOffset: yOffset)
                     item.success(element)

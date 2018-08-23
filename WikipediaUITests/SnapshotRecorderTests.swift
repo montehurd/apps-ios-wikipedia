@@ -184,11 +184,12 @@ class WikipediaUITests: XCTestCase {
         
         // SEARCH
         _ = app.wmf_scrollToTop()
-        let searchField = app.wmf_firstSearchField(withTranslationIn: ["search-field-placeholder-text"])
-        if searchField.wmf_tap() {
-            wmf_snapshot("SearchScreen1")
-            if searchField.wmf_typeText(text: "a") {
-                wmf_snapshot("SearchScreen2")
+        if let searchField = app.wmf_firstSearchField(withTranslationIn: ["search-field-placeholder-text"]){
+            if searchField.wmf_tap() {
+                wmf_snapshot("SearchScreen1")
+                if searchField.wmf_typeText(text: "a") {
+                    wmf_snapshot("SearchScreen2")
+                }
             }
         }
         
@@ -322,10 +323,11 @@ class WikipediaUITests: XCTestCase {
         // Article find in page
         _ = app.wmf_tapFirstButton(withTranslationIn: ["find-in-page-button-label"])
         wmf_snapshot("ArticleScreenFindInPage1")
-        let textField = app.textFields.element(boundBy: 0).wmf_waitUntilExists()
-        if textField.wmf_tap() {
-            if textField.wmf_typeText(text: "a") {
-                wmf_snapshot("ArticleScreenFindInPage2")
+        if let textField = app.textFields.element(boundBy: 0).wmf_waitUntilExists(){
+            if textField.wmf_tap() {
+                if textField.wmf_typeText(text: "a") {
+                    wmf_snapshot("ArticleScreenFindInPage2")
+                }
             }
         }
         _ = app.wmf_tapFirstCloseButton()
@@ -336,7 +338,7 @@ class WikipediaUITests: XCTestCase {
         
         // SETTINGS
         _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-        wmf_snapshot("SettingsScreen1")
+//        wmf_snapshot("SettingsScreen1")
 
 
         
@@ -355,7 +357,7 @@ class WikipediaUITests: XCTestCase {
         
         
         
-
+//is still getting stuck in here after login section now tha i commented out " if element.exists && element.isHittable {"?
         
         app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.13, items:
             [
