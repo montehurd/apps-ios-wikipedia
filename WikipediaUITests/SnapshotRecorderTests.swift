@@ -205,24 +205,99 @@ class WikipediaUITests: XCTestCase {
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
             wmf_snapshot("ArticleScreenTOC")
             
-            // `About this article` footer
-            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
-            wmf_snapshot("ArticleScreenFooterAboutThisArticle")
             
-            // Article history
-            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["page-last-edited"], convertTranslationSubstitutionStringsToWildcards: true)
-            sleep(8)
-            wmf_snapshot("ArticleScreenFooterArticleHistory")
-            _ = app.wmf_tapFirstCloseButton()
             
-            // `Read more` footer
+            
+            
+            
+            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+                [
+                    ScrollItem(key: "article-about-title", success: { element in
+                        // `About this article` footer
+                        _ = element.wmf_tap()
+                        self.wmf_snapshot("ArticleScreenFooterAboutThisArticle")
+                        
+                        // Article history
+                        _ = self.app.wmf_tapFirstStaticText(withTranslationIn: ["page-last-edited"], convertTranslationSubstitutionStringsToWildcards: true)
+                        sleep(8)
+                        self.wmf_snapshot("ArticleScreenFooterArticleHistory")
+                        _ = self.app.wmf_tapFirstCloseButton()
+
+                        
+//                        print("aaa")
+
+                    })
+                ]
+            )
+
+            
+            
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
-            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-read-more-title"])
-            wmf_snapshot("ArticleScreenFooterReadMore")
+
+            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+                [
+                    ScrollItem(key: "article-read-more-title", success: { element in
+                        // `Read more` footer
+                        _ = element.wmf_tap()
+                        self.wmf_snapshot("ArticleScreenFooterReadMore")
+                        
+
+//                        print("bbb")
+
+                    })
+                ]
+            )
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+//            // `About this article` footer
+//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
+//            wmf_snapshot("ArticleScreenFooterAboutThisArticle")
+//
+//            // Article history
+//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["page-last-edited"], convertTranslationSubstitutionStringsToWildcards: true)
+//            sleep(8)
+//            wmf_snapshot("ArticleScreenFooterArticleHistory")
+//            _ = app.wmf_tapFirstCloseButton()
+            
+//            // `Read more` footer
+//            _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
+//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-read-more-title"])
+//            wmf_snapshot("ArticleScreenFooterReadMore")
         } else {
             // Article footer (both the `About this article` and `Read more` footers are visible on larger iPad screens so no need to do separate screenshot for `Read more`)
-            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
-            wmf_snapshot("ArticleScreenFooter")
+//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
+//            wmf_snapshot("ArticleScreenFooter")
+            
+            
+            
+            
+            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+                [
+                    ScrollItem(key: "article-about-title", success: { element in
+                        // `About this article` footer
+                        _ = element.wmf_tap()
+                        self.wmf_snapshot("ArticleScreenFooter")
+                    })
+                ]
+            )
+
+            
+            
+            
+            
+            
+            
+            
         }
         
         
