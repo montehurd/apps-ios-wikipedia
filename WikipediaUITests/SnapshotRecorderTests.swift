@@ -66,7 +66,7 @@ class WikipediaUITests: XCTestCase {
     // This UI test is used as a harness to navigate to various parts of the app and record screenshots. Fastlane snapshots don't seem to play nice with multiple tests taking snapshots, so we have all of them in this single test.
     func testRecordAppScreenshots() {
 
-
+/*
         // WECOME
         wmf_snapshot("WelcomeScreen1")
 
@@ -278,7 +278,7 @@ class WikipediaUITests: XCTestCase {
         _ = app.wmf_tapFirstButton(withTranslationIn: ["button-save-for-later"])
         
         _ = app.wmf_tapFirstButton(withTranslationIn: ["home-button-explore-accessibility-label"])
-
+*/
         
         // SETTINGS
         _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
@@ -361,6 +361,12 @@ class WikipediaUITests: XCTestCase {
                     _ = self.app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
                     _ = self.app.wmf_tapFirstCloseButton()
                 })
+//             // Explore feed
+//             ScrollItem(key: "welcome-exploration-explore-feed-title", success: { element in
+//             }),
+//             // Search
+//             ScrollItem(key: "search-title", success: { element in
+//             })
             ]
         )
 
