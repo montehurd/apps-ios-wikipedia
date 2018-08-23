@@ -206,11 +206,6 @@ class WikipediaUITests: XCTestCase {
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
             wmf_snapshot("ArticleScreenTOC")
             
-            
-            
-            
-            
-            
             app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
                 [
                     ScrollItem(key: "article-about-title", success: { element in
@@ -223,15 +218,9 @@ class WikipediaUITests: XCTestCase {
                         sleep(8)
                         self.wmf_snapshot("ArticleScreenFooterArticleHistory")
                         _ = self.app.wmf_tapFirstCloseButton()
-
-                        
-//                        print("aaa")
-
                     })
                 ]
             )
-
-            
             
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
 
@@ -241,47 +230,10 @@ class WikipediaUITests: XCTestCase {
                         // `Read more` footer
                         _ = element.wmf_tap()
                         self.wmf_snapshot("ArticleScreenFooterReadMore")
-                        
-
-//                        print("bbb")
-
                     })
                 ]
             )
-
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-//            // `About this article` footer
-//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
-//            wmf_snapshot("ArticleScreenFooterAboutThisArticle")
-//
-//            // Article history
-//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["page-last-edited"], convertTranslationSubstitutionStringsToWildcards: true)
-//            sleep(8)
-//            wmf_snapshot("ArticleScreenFooterArticleHistory")
-//            _ = app.wmf_tapFirstCloseButton()
-            
-//            // `Read more` footer
-//            _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
-//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-read-more-title"])
-//            wmf_snapshot("ArticleScreenFooterReadMore")
         } else {
-            // Article footer (both the `About this article` and `Read more` footers are visible on larger iPad screens so no need to do separate screenshot for `Read more`)
-//            _ = app.wmf_tapFirstStaticText(withTranslationIn: ["article-about-title"])
-//            wmf_snapshot("ArticleScreenFooter")
-            
-            
-            
-            
             app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
                 [
                     ScrollItem(key: "article-about-title", success: { element in
@@ -291,14 +243,6 @@ class WikipediaUITests: XCTestCase {
                     })
                 ]
             )
-
-            
-            
-            
-            
-            
-            
-            
         }
         
         
@@ -338,26 +282,8 @@ class WikipediaUITests: XCTestCase {
         
         // SETTINGS
         _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-//        wmf_snapshot("SettingsScreen1")
+        wmf_snapshot("SettingsScreen1")
 
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-//is still getting stuck in here after login section now tha i commented out " if element.exists && element.isHittable {"?
         
         app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.13, items:
             [
@@ -437,113 +363,6 @@ class WikipediaUITests: XCTestCase {
                 })
             ]
         )
-
-        
-//return
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-/*
-        // Login
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["main-menu-account-login"])
-        wmf_snapshot("LoginScreen1")
-
-        
-        // Create account
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["login-no-account"], convertTranslationSubstitutionStringsToWildcards: true)
-        wmf_snapshot("CreateAccountScreen1")
-        _ = app.wmf_tapFirstCloseButton()
-
-        
-        // Forgot password
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["main-menu-account-login"])
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["login-forgot-password"])
-        wmf_snapshot("ForgotPasswordScreen1")
-        _ = app.wmf_tapFirstCloseButton()
-
-        
-        // My languages
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-my-languages"])
-        wmf_snapshot("MyLanguagesScreen1")
-        _ = app.wmf_tapFirstCloseButton()
-
-
-        // Notifications
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-notifications"])
-        wmf_snapshot("NotificationsScreen1")
-        _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-
-     
-        // Reading preferences
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-appearance"])
-        wmf_snapshot("AppearanceScreen1")
-        _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-
-        
-        // Article storage and syncing
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-storage-and-syncing-title"])
-        wmf_snapshot("StorageAndSyncingScreen1")
-        _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-
-        
-        // Clear cached data
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-clear-cache"])
-        wmf_snapshot("ClearCacheScreen1")
-
-        
-        // Help and feedback
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["settings-help-and-feedback"])
-        sleep(8)
-        wmf_snapshot("HelpAndFeedbackScreen1")
-        sleep(8) // give tooltip time to disappear (this uitest target sleeps - the app doesn't)
-        _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-
-
-        
-        // About the app
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["main-menu-about"])
-        sleep(8)
-        wmf_snapshot("AboutTheAppScreen1")
-        app.wmf_scrollDown()
-        wmf_snapshot("AboutTheAppScreen2")
-        app.wmf_scrollDown()
-        wmf_snapshot("AboutTheAppScreen3")
-        app.wmf_scrollDown()
-        wmf_snapshot("AboutTheAppScreen4")
-
-        // Libraries used
-        _ = app.wmf_tapFirstStaticText(withTranslationIn: ["about-libraries-complete-list"])
-        wmf_snapshot("AboutTheAppScreenLibrariesUsed")
-        _ = app.wmf_tapFirstCloseButton()
-
-        
-        _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
-        _ = app.wmf_tapFirstCloseButton()
-*/
 
         
         // SAVED
