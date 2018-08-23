@@ -26,94 +26,6 @@ extension XCUIElement {
         }
         return self
     }
-    func elementIsWithinWindow() -> Bool {
-        
-        
-        guard exists && !frame.isEmpty /*&& isHittable*/ else { return false }
-        
-        
-//this `contains` call is WRONG because frame is not in screen coords!
-// https://forums.developer.apple.com/thread/103421
-        
-//        po frame
-//        po coordinate(withNormalizedOffset:CGVector(dx: 0.0, dy: 0.0)).screenPoint // <-- OS bug? this is printing coords not in screen space but in this view's frame, which is in terms of its superview not the SCREEN!
-        
-//        let aa = coordinate(withNormalizedOffset:CGVector(dx: 0.0, dy: 0.0)).screenPoint
-
-        
-//        self.label = "wa"
-        let predicate = NSPredicate(format: "label == [cd] %@", label)
-//        let tree = XCUIApplication().windows.element(boundBy: 0).descendants(matching:.any).containing(predicate)
-        let tree = XCUIApplication().descendants(matching:.any).containing(predicate)
-
-print(tree.element(boundBy: 0))
-
-        
-var aaa:CGPoint = .zero
-        // need last item in tree frame expressed in terms of 1st item in tree
-        var loopIndex = 0
-        while (loopIndex < tree.count) {
-            let foundElement = tree.element(boundBy:loopIndex)
-            print("\(foundElement.frame)")
-aaa.x = aaa.x + foundElement.frame.origin.x
-aaa.y = aaa.y + foundElement.frame.origin.y
-            loopIndex += 1
-        }
-
-
-let rootFrame:CGRect = tree.element(boundBy: 0).frame
-print("rootFrame = \(rootFrame)")
-
-var thisFrame:CGRect = tree.element(boundBy: tree.count - 1).frame
-//let ha = tree.element(boundBy: tree.count - 1).coordinate(withNormalizedOffset:CGVector(dx: 0.0, dy: 0.0)).screenPoint
-//print("ha = \(ha)")
-        print("thisFrame = \(thisFrame)")
-//thisFrame.origin.x = aaa.x
-//thisFrame.origin.y = aaa.y
-        print("thisFrame = \(thisFrame)")
-print("CONTAINS = \(rootFrame.contains(thisFrame))")
-        
-        
-        
-/*
-po tree.element(boundBy: 8)
-        ↪︎Find: Elements containing elements matching predicate 'label ==[cd] "Help and feedback"'
-        Output: {
-            Window, 0x600000385d70, Main Window, {{0.0, 0.0}, {375.0, 667.0}}
-            Other, 0x600000386590, {{0.0, 0.0}, {375.0, 667.0}}
-            Other, 0x600000386730, traits: 8589934592, {{0.0, 0.0}, {375.0, 667.0}}
-            Other, 0x600000386800, traits: 8589934592, {{0.0, 0.0}, {375.0, 667.0}}
-            Other, 0x6000003868d0, traits: 8589934592, {{0.0, 0.0}, {375.0, 667.0}}
-            Other, 0x6000003869a0, traits: 8589934592, {{0.0, 0.0}, {375.0, 667.0}}
-            Table, 0x600000387290, traits: 35192962023424, {{0.0, 20.0}, {375.0, 647.0}}
-            Cell, 0x604000193800, traits: 8589934593, {{0.0, 1035.0}, {375.0, 44.0}}
-            StaticText, 0x600000389cd0, traits: 8589934656, {{0.0, 100.0}, {160.5, 30.0}}, label: 'Help and feedback'
-        }
-        ↪︎Find: Element at index 8
-        Output: {
-            StaticText, 0x600000389cd0, traits: 8589934656, {{0.0, 100.0}, {160.5, 30.0}}, label: 'Help and feedback'
-        }
-*/
-        
-        
-//        let descendants = XCUIApplication().windows.element(boundBy: 0).descendants(matching:.any)
-////        var cursor:XCUIElement? = self
-//        var loopIndex = 0
-//        while (loopIndex < descendants.count) {
-//            let foundElement = descendants.element(boundBy:loopIndex)
-//            print(foundElement.frame)
-//            loopIndex += 1
-//        }
-        
-        
-        
-        //XCUIApplication().windows.element(boundBy: 0).frame
-        
-        
-  return false
-        
-//        return XCUIApplication().windows.element(boundBy: 0).frame.contains(frame)
-    }
 }
 
 private enum ElementPropertyType: String {
@@ -246,8 +158,6 @@ extension XCUIApplication {
         var keys = items.map{$0.key}
         scrollLoop: repeat {
             if let element = these.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1) {
-//            if element.elementIsWithinWindow() { //element.exists //&& element.isHittable { //DOUBLE check that the first commits in this PR still work if i remove isHittable - suspect they will because of `wmf_tap()` isHittable change...
-//            if element.exists && element.isHittable { //DOUBLE check that the first commits in this PR still work if i remove isHittable - suspect they will because of `wmf_tap()` isHittable change...
                 if let item = items.first(where: {$0.predicate.evaluate(with: element.label)}) {
                     wmf_scrollElementToTop(element: element, yOffset: yOffset)
                     item.success(element)
