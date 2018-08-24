@@ -66,7 +66,7 @@ class WikipediaUITests: XCTestCase {
     // This UI test is used as a harness to navigate to various parts of the app and record screenshots. Fastlane snapshots don't seem to play nice with multiple tests taking snapshots, so we have all of them in this single test.
     func testRecordAppScreenshots() {
 
-/*
+
         // WECOME
         wmf_snapshot("WelcomeScreen1")
 
@@ -97,7 +97,7 @@ class WikipediaUITests: XCTestCase {
 
 
         // Useful if you temporarily comment out the welcome screens above.
-//        _ = app.wmf_tapFirstButton(withTranslationIn: ["button-skip"])
+        //_ = app.wmf_tapFirstButton(withTranslationIn: ["button-skip"])
 
 
         // Sleep for a bit to give Explore data some time to be fetched.
@@ -113,7 +113,7 @@ class WikipediaUITests: XCTestCase {
 
         let iPhoneXSafeTopOffset: CGFloat = 0.04 // As of Xcode 9.4 an offset of 0 drags elements a little too far up.
 
-        app.wmf_scrollToFirstElements(in: app.links, yOffset: iPhoneXSafeTopOffset, items:
+        app.wmf_scrollToFirstElements(matching: .link, yOffset: iPhoneXSafeTopOffset, items:
             [
                 // Picture of the day / Gallery
                 ScrollItem(key: "explore-potd-heading", success: { element in
@@ -206,7 +206,7 @@ class WikipediaUITests: XCTestCase {
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
             wmf_snapshot("ArticleScreenTOC")
             
-            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+            app.wmf_scrollToFirstElements(matching: .staticText, yOffset: 0.1, items:
                 [
                     ScrollItem(key: "article-about-title", success: { element in
                         // `About this article` footer
@@ -224,7 +224,7 @@ class WikipediaUITests: XCTestCase {
             
             _ = app.wmf_tapFirstButton(withTranslationIn: ["table-of-contents-button-label"])
 
-            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+            app.wmf_scrollToFirstElements(matching: .staticText, yOffset: 0.1, items:
                 [
                     ScrollItem(key: "article-read-more-title", success: { element in
                         // `Read more` footer
@@ -234,7 +234,7 @@ class WikipediaUITests: XCTestCase {
                 ]
             )
         } else {
-            app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.1, items:
+            app.wmf_scrollToFirstElements(matching: .staticText, yOffset: 0.1, items:
                 [
                     ScrollItem(key: "article-about-title", success: { element in
                         // `About this article` footer
@@ -278,14 +278,15 @@ class WikipediaUITests: XCTestCase {
         _ = app.wmf_tapFirstButton(withTranslationIn: ["button-save-for-later"])
         
         _ = app.wmf_tapFirstButton(withTranslationIn: ["home-button-explore-accessibility-label"])
-*/
+
+
         
         // SETTINGS
         _ = app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
         wmf_snapshot("SettingsScreen1")
 
         
-        app.wmf_scrollToFirstElements(in: app.staticTexts, yOffset: 0.13, items:
+        app.wmf_scrollToFirstElements(matching: .staticText, yOffset: 0.13, items:
             [
                 // Login
                 ScrollItem(key: "main-menu-account-login", success: { element in
@@ -353,20 +354,28 @@ class WikipediaUITests: XCTestCase {
                     self.app.wmf_scrollDown()
                     self.wmf_snapshot("AboutTheAppScreen3")
 
-                    // Libraries used
-                    _ = self.app.wmf_tapFirstStaticText(withTranslationIn: ["about-libraries-complete-list"])
-                    self.wmf_snapshot("AboutTheAppScreenLibrariesUsed")
-                    _ = self.app.wmf_tapFirstCloseButton()
-                    
+                    self.app.webViews.element(boundBy: 0).wmf_waitUntilExists(timeout: 1.0)?.wmf_scrollToFirstElements(matching: .staticText, yOffset: 0.1, items:
+                        [
+                            // Libraries used
+                            ScrollItem(key: "about-libraries-complete-list", success: { element in
+                                _ = element.wmf_tap()
+                                self.wmf_snapshot("AboutTheAppScreenLibrariesUsed")
+                                _ = self.app.wmf_tapFirstCloseButton()
+                            })
+                        ]
+                    )
+
                     _ = self.app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
                     _ = self.app.wmf_tapFirstCloseButton()
                 })
-//             // Explore feed
-//             ScrollItem(key: "welcome-exploration-explore-feed-title", success: { element in
-//             }),
-//             // Search
-//             ScrollItem(key: "search-title", success: { element in
-//             })
+/*
+                // Explore feed
+                ScrollItem(key: "welcome-exploration-explore-feed-title", success: { element in
+                }),
+                // Search
+                ScrollItem(key: "search-title", success: { element in
+                })
+*/
             ]
         )
 

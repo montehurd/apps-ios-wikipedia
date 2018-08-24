@@ -19,50 +19,16 @@ extension XCUIElement {
         return true
     }
     func wmf_waitUntilExists(timeout: TimeInterval = 30) -> XCUIElement? {
-        if self.exists && self.isHittable { return self }
+        if exists && isHittable {
+            return self
+        }
         let result = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true AND isHittable = true"), object: self)], timeout: timeout)
         if result != .completed {
             return nil
         }
         return self
     }
-}
-
-private enum ElementPropertyType: String {
-    case label
-    case placeholderValue
-    case `self`
     
-    func predicate(for text: String) -> NSPredicate {
-        return NSPredicate(format: "\(rawValue) == %@", text)
-    }
-    func wildcardPredicate(for text: String) -> NSPredicate {
-        var mutableText = text
-        for i in 0...9 {
-            mutableText = mutableText.replacingOccurrences(of: "%\(i)$@", with: "*")
-        }
-        mutableText = "*\(mutableText)*"
-        return NSPredicate(format: "\(rawValue) like[cd] %@", mutableText)
-    }
-    
-    func predicate(for texts: [String]) -> NSPredicate {
-        return NSCompoundPredicate(orPredicateWithSubpredicates: texts.map{text in predicate(for: text)})
-    }
-    func wildcardPredicate(for texts: [String]) -> NSPredicate {
-        return NSCompoundPredicate(orPredicateWithSubpredicates: texts.map{text in wildcardPredicate(for: text)})
-    }
-}
-
-private extension XCUIElementQuery {
-    func wmf_firstElement(with propertyType: ElementPropertyType, withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false, timeout: TimeInterval = 30) -> XCUIElement? {
-        let translations = keys.map{key in WMFLocalizedString(key, value: "", comment: "")} // localization strings are copied into this scheme during a build phase: https://stackoverflow.com/a/38133902/135557
-        let predicate = shouldConvert ? propertyType.wildcardPredicate(for: translations) : propertyType.predicate(for: translations)
-        // Used `element:boundBy:0` rather than `firstMatch` because the latter doesn't play nice with `exists` checking as of Xcode 9.3
-        return matching(predicate).element(boundBy: 0).wmf_waitUntilExists(timeout: timeout)
-    }
-}
-
-extension XCUIApplication {
     func wmf_firstButton(withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false) -> XCUIElement? {
         return buttons.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: shouldConvert)
     }
@@ -153,11 +119,11 @@ extension XCUIApplication {
     }
     
     // Scrolls to first element for each ScrollItem key in single scrolling pass (i.e. without scrolling back to top between items).
-    func wmf_scrollToFirstElements(in these: XCUIElementQuery, yOffset: CGFloat, items: [ScrollItem], timeout seconds: Double = 360) {
+    func wmf_scrollToFirstElements(matching type: XCUIElement.ElementType, yOffset: CGFloat, items: [ScrollItem], timeout seconds: Double = 360) {
         let start = Date()
         var keys = items.map{$0.key}
         scrollLoop: repeat {
-            if let element = these.wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1) {
+            if let element = descendants(matching: type).wmf_firstElement(with: .label, withTranslationIn: keys, convertTranslationSubstitutionStringsToWildcards: true, timeout: 1) {
                 if let item = items.first(where: {$0.predicate.evaluate(with: element.label)}) {
                     wmf_scrollElementToTop(element: element, yOffset: yOffset)
                     item.success(element)
@@ -170,6 +136,39 @@ extension XCUIApplication {
             }
             wmf_scrollDown()
         } while (Date().timeIntervalSince(start) < seconds) && (keys.count > 0)
+    }
+}
+
+private enum ElementPropertyType: String {
+    case label
+    case placeholderValue
+    case `self`
+    
+    func predicate(for text: String) -> NSPredicate {
+        return NSPredicate(format: "\(rawValue) == %@", text)
+    }
+    func wildcardPredicate(for text: String) -> NSPredicate {
+        var mutableText = text
+        for i in 0...9 {
+            mutableText = mutableText.replacingOccurrences(of: "%\(i)$@", with: "*")
+        }
+        mutableText = "*\(mutableText)*"
+        return NSPredicate(format: "\(rawValue) like[cd] %@", mutableText)
+    }
+    
+    func predicate(for texts: [String]) -> NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: texts.map{text in predicate(for: text)})
+    }
+    func wildcardPredicate(for texts: [String]) -> NSPredicate {
+        return NSCompoundPredicate(orPredicateWithSubpredicates: texts.map{text in wildcardPredicate(for: text)})
+    }
+}
+
+private extension XCUIElementQuery {
+    func wmf_firstElement(with propertyType: ElementPropertyType, withTranslationIn keys: [String], convertTranslationSubstitutionStringsToWildcards shouldConvert: Bool = false, timeout: TimeInterval = 30) -> XCUIElement? {
+        let translations = keys.map{key in WMFLocalizedString(key, value: "", comment: "")} // localization strings are copied into this scheme during a build phase: https://stackoverflow.com/a/38133902/135557
+        let predicate = shouldConvert ? propertyType.wildcardPredicate(for: translations) : propertyType.predicate(for: translations)
+        return matching(predicate).element(boundBy: 0).wmf_waitUntilExists(timeout: timeout)
     }
 }
 
