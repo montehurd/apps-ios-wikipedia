@@ -367,15 +367,19 @@ class WikipediaUITests: XCTestCase {
 
                     _ = self.app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
                     _ = self.app.wmf_tapFirstCloseButton()
-                })
-/*
+                }),
                 // Explore feed
                 ScrollItem(key: "welcome-exploration-explore-feed-title", success: { element in
+                    _ = element.wmf_tap()
+                    self.wmf_snapshot("ExploreCustomizationScreen1")
+                    _ = self.app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
                 }),
                 // Search
                 ScrollItem(key: "search-title", success: { element in
+                    _ = element.wmf_tap()
+                    self.wmf_snapshot("SearchCustomizationScreen1")
+                    _ = self.app.wmf_tapFirstButton(withTranslationIn: ["settings-title"])
                 })
-*/
             ]
         )
 
