@@ -48,7 +48,10 @@ NSString *const WMFFaceDetectionErrorDomain = @"org.wikimedia.face-detection-err
 }
 
 - (void)wmf_detectFeaturesInImage:(UIImage *)image options:(NSDictionary *)options onQueue:(dispatch_queue_t)queue failure:(WMFErrorHandler)failure success:(WMFSuccessIdHandler)success {
+    static int counter = 0;
     dispatch_async(queue, ^{
+        counter = counter + 1;
+        NSLog(@"\n\n\nFACEFIND = %d\n\n\n", counter);
         id features = [self featuresInImage:[image wmf_getOrCreateCIImage] options:options];
         success(features);
     });
