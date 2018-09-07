@@ -851,7 +851,7 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
     }
 }
 
-- (NSURL*)leadImageURL {
+- (NSString*)leadImageURLString {
     NSString *imageURL = self.article.imageURL;
     if(!imageURL){
         imageURL = self.article.thumbnailURL;
@@ -859,7 +859,7 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
     if (!imageURL) {
         return nil;
     }
-    return [[WMFProxyServer sharedProxyServer] proxyURLForImageURLString:imageURL];
+    return imageURL;
 }
 
 - (void)displayArticle {
@@ -875,7 +875,9 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
     WMFProxyServer *proxy = [WMFProxyServer sharedProxyServer];
     [proxy cacheSectionDataForArticle:self.article];
 
-    NSURL *leadImageURL = [self leadImageURL];
+    NSString *leadImageURLString = [self leadImageURLString];
+    NSURL *proxiedLeadImageURL = [[WMFProxyServer sharedProxyServer] proxyURLForImageURLString:leadImageURLString];
+    
     CGFloat leadImageYOffset = 0;
     MWKImage *leadImage = self.article.leadImage;
     if (leadImage && leadImage.hasFaces && !CGRectEqualToRect(leadImage.firstFaceBounds, CGRectZero)) {
@@ -883,9 +885,58 @@ typedef NS_ENUM(NSUInteger, WMFFindInPageScrollDirection) {
         // 0 aligns top to top of lead_image_div, 50 centers it vertically, and 100 aligns bottom of image to bottom of lead_image_div.
         float percentFromTop = CGRectGetMidY(leadImage.firstFaceBounds) * 100.0f;
         leadImageYOffset = @(MAX(0, MIN(100, percentFromTop))).integerValue;
+NSLog(@"HAS FACE at %@", NSStringFromCGRect(leadImage.firstFaceBounds));
+    }else{
+NSLog(@"NO FACE");
     }
+
     
-    [self.webView loadHTML:@"" baseURL:self.article.url withAssetsFile:@"index.html" scrolledToFragment:self.articleURL.fragment padding:UIEdgeInsetsMake(headerHeight, marginWidth, 0, marginWidth) theme:self.theme leadImageURL:leadImageURL leadImageYOffset:leadImageYOffset];
+    
+    NSString *cacheKey = [@"https:" stringByAppendingString:leadImageURLString];
+    NSValue *thing = [[WMFFaceDetectionCache sharedCache] faceBoundsForURL:[NSURL URLWithString:cacheKey]];
+NSLog(@"thing cacheKey = %@", cacheKey);
+NSLog(@"thing = %@", thing);
+
+    
+    
+// CACHE KEY NEEDS TO BE IMAGE NAME W/O size prefix (as long as coords are unit!)
+// - check cached coords returned for sizes of same img to see if unit
+    
+//    2018-09-06 19:11:40.378273-0700 Wikipedia[67674:843484] SET CACHE KEY = https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/John_McCain_official_portrait_2009.jpg/240px-John_McCain_official_portrait_2009.jpg
+
+//    2018-09-06 19:11:46.456092-0700 Wikipedia[67674:843000] thing cacheKey = https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/John_McCain_official_portrait_2009.jpg/640px-John_McCain_official_portrait_2009.jpg
+
+    
+    
+/*
+ 
+ link tap don't have image in time for face y offset
+ could 2 step fetch
+    - article data
+    - smallish lead image (so face detect still works)
+ would need to not report article fetch as complete until image fetched (face detected and face data cached as unit so can use for any image) and article data fetched
+ 
+ (try it - for now just park the offset on a MWKArticle property?)
+ 
+ 
+ should/do we save face coords for feed images already? (they don't seem to be available in article.leadImage after 1st feed tap...
+ 
+ 
+ old version showed image scrolled to top (or center) right away then animated the css change sliding the image vertically as soon as face offset was determined
+    - wonky seeing the image load w incorrect y offset
+    - doesn't play nice with transition from feed image
+ 
+ */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    [self.webView loadHTML:@"" baseURL:self.article.url withAssetsFile:@"index.html" scrolledToFragment:self.articleURL.fragment padding:UIEdgeInsetsMake(headerHeight, marginWidth, 0, marginWidth) theme:self.theme leadImageURL:proxiedLeadImageURL leadImageYOffset:leadImageYOffset];
 
     NSString *shareMenuItemTitle = WMFLocalizedStringWithDefaultValue(@"share-menu-item", nil, nil, @"Share…", @"Button label for 'Share…' menu");
     UIMenuItem *shareSnippet = [[UIMenuItem alloc] initWithTitle:shareMenuItemTitle

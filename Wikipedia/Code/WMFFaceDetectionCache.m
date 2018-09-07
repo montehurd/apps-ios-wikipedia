@@ -2,6 +2,7 @@
 #import <WMF/CIDetector+WMFFaceDetection.h>
 #import "UIImage+WMFNormalization.h"
 #import <WMF/MWKImage.h>
+#import <WMF/WMFImageURLParsing.h>
 
 @interface WMFFaceDetectionCache ()
 
@@ -94,16 +95,31 @@
     if (!bounds) {
         bounds = @[];
     }
+    NSLog(@"SET CACHE KEY = %@ bounds = %@", url.absoluteString, bounds);
 
-    [self.faceDetectionBoundsKeyedByURL setObject:bounds forKey:url];
+    NSURL *key = [self keyForURL:url];
+    
+    [self.faceDetectionBoundsKeyedByURL setObject:bounds forKey:key];
 }
 
 - (NSArray *)faceDetectionBoundsForURL:(NSURL *)url {
-    return [self.faceDetectionBoundsKeyedByURL objectForKey:url];
+
+    NSURL *key = [self keyForURL:url];
+
+    return [self.faceDetectionBoundsKeyedByURL objectForKey:key];
 }
 
 - (void)clearCache {
     [self.faceDetectionBoundsKeyedByURL removeAllObjects];
+}
+
+// Face bounds are stored as unit rects so no need to recalculate for size variants.
+- (NSURL *)keyForURL: (NSURL *)url {
+    NSString *imgNameWithoutSizePrefix = WMFParseImageNameFromSourceURL(url.absoluteString);
+    if (imgNameWithoutSizePrefix) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@|%@", url.host, imgNameWithoutSizePrefix]];
+    }
+    return url;
 }
 
 @end
