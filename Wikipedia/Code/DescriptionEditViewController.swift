@@ -59,6 +59,8 @@ override func didReceiveMemoryWarning() {
             descriptionTextView.text = whiteSpaceNormalizationRegex.stringByReplacingMatches(in: text, options: [], range: NSMakeRange(0, text.count), withTemplate: " ")
         }
         enableProgressiveButton(description.count > 0)
+
+test2()
     }
 
     @IBOutlet private var learnMoreButton: UIButton!
@@ -69,6 +71,8 @@ override func didReceiveMemoryWarning() {
     @IBOutlet private var divider: UIView!
     @IBOutlet private var cc0ImageView: UIImageView!
     @IBOutlet private var publishDescriptionButton: WMFAuthButton!
+    @IBOutlet private var warningLabel: UILabel!
+    @IBOutlet private var warningCharacterCountLabel: UILabel!
     private var theme = Theme.standard
 
     override func viewDidLoad() {
@@ -77,7 +81,7 @@ override func didReceiveMemoryWarning() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named:"close"), style: .plain, target:self, action:#selector(closeButtonPushed(_:)))
         navigationItem.leftBarButtonItem?.accessibilityLabel = CommonStrings.closeButtonAccessibilityLabel
 
-        // descriptionTextView.placeholder = WMFLocalizedString("field-username-placeholder", value:"enter username", comment:"Placeholder text shown inside username field until user taps on it")
+        warningLabel.text = WMFLocalizedString("description-edit-warning", value:"Try to keep descriptions short so users can understand the article's subject at a glance", comment:"Title text for label reminding users to keep descriptions concise")
         publishDescriptionButton.setTitle(WMFLocalizedString("description-edit-publish", value:"Publish description", comment:"Title for publish description button"), for: .normal)
         
         learnMoreButton.setTitle(WMFLocalizedString("description-edit-learn-more", value:"Learn more", comment:"Title text for description editing learn more button"), for: .normal)
@@ -96,6 +100,8 @@ override func didReceiveMemoryWarning() {
         descriptionTextView.textContainerInset = .zero
         
         isPlaceholderLabelHidden = shouldHidePlaceholder()
+        
+test2()
     }
     
     private var isPlaceholderLabelHidden = true {
@@ -195,6 +201,29 @@ print("'\(descriptionToSave)'")
         descriptionTextView.textColor = theme.colors.primaryText
         divider.backgroundColor = theme.colors.border
         descriptionPlaceholderLabel.textColor = theme.colors.unselected
+        warningLabel.textColor = theme.colors.descriptionBackground
+        warningCharacterCountLabel.textColor = theme.colors.descriptionBackground
         publishDescriptionButton.apply(theme: theme)
+    }
+
+    
+    
+
+    private func test2() {
+        warningCharacterCountLabel.text = test()
+    }
+
+    private func test() -> String? {
+        let maxCount = 90
+        let currentCount = (descriptionTextView.text ?? "").count
+        guard currentCount > 0 else {
+            return nil
+        }
+        if (maxCount > 0 && currentCount == -1) {
+            return String.localizedStringWithFormat("%lu", maxCount)
+        } else {
+            let formatString = WMFLocalizedString("description-edit-length-warning", value: "%1$@ / %2$@", comment: "Displayed to indicate how many description characters were entered. Separator can be customized depending on the language. %1$@ is replaced with the number of characters entered, %2$@ is replaced with the recommended maximum number of characters.")
+            return String.localizedStringWithFormat(formatString, String(currentCount), String(maxCount))
+        }
     }
 }
