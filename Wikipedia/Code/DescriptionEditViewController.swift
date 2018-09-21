@@ -184,12 +184,12 @@ class DescriptionEditViewController: WMFScrollViewController, Themeable, UITextV
         // Final trim to remove leading and trailing space
         let descriptionToSave = descriptionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        guard let article = article, let dataStore = article.dataStore else {
-            assertionFailure("Expected article or datastore not found")
+        guard let article = article, let articleURL = article.url, let dataStore = article.dataStore else {
+            assertionFailure("Expected article url or datastore not found")
             return
         }
         
-        dataStore.wikidataDescriptionEditingController.publish(newWikidataDescription: descriptionToSave, for: article) {error in
+        dataStore.wikidataDescriptionEditingController.publish(newWikidataDescription: descriptionToSave, for: articleURL) {error in
             let presentingVC = self.presentingViewController
             DispatchQueue.main.async {
                 guard let error = error else {
