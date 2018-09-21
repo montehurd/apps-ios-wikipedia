@@ -31,6 +31,13 @@ extension WikidataAPIResult {
     }
 }
 
+enum WikidataPublishingError: LocalizedError {
+    case invalidArticleURL
+    case apiResultNotParsedCorrectly
+    case blacklistedLanguage
+    case unknown
+}
+
 @objc public final class WikidataDescriptionEditingController: NSObject {
     private var blacklistedLanguages = Set<String>()
 
@@ -45,15 +52,18 @@ extension WikidataAPIResult {
         return blacklistedLanguages.contains(languageCode)
     }
 
-    @objc(publishNewWikidataDescription:forArticle:completion:)
-    public func publish(newWikidataDescription: String, for article: MWKArticle, completion: @escaping (_ error: Error?) -> Void) {
-        guard let title = article.url.wmf_title,
-        let language = article.url.wmf_language,
-        let wiki = article.url.wmf_wiki else {
-            assertionFailure()
+    public typealias Success = () -> Void
+    public typealias Failure = (Error) -> Void
+
+    @objc(publishNewWikidataDescription:forArticle:success:failure:)
+    public func publish(newWikidataDescription: String, for articleURL: URL, success: @escaping Success, failure: @escaping Failure) {
+        guard let title = articleURL.wmf_title,
+        let language = articleURL.wmf_language,
+        let wiki = articleURL.wmf_wiki else {
+            failure(WikidataPublishingError.invalidArticleURL)
             return
         }
-        publish(newWikidataDescription: newWikidataDescription, forPageWithTitle: title, language: language, wiki: wiki, completion: completion)
+        publish(newWikidataDescription: newWikidataDescription, forPageWithTitle: title, language: language, wiki: wiki, success: success, failure: failure)
     }
 
     /// Publish new wikidata description.
@@ -64,17 +74,30 @@ extension WikidataAPIResult {
     ///   - language: language code of the page's wiki, e.g., "en".
     ///   - wiki: wiki of the page to be updated, e.g., "enwiki"
     ///   - completion: completion block called when operation is completed.
-    private func publish(newWikidataDescription: String, forPageWithTitle title: String, language: String, wiki: String, completion: @escaping (_ error: Error?) -> Void) {
+    private func publish(newWikidataDescription: String, forPageWithTitle title: String, language: String, wiki: String, success: @escaping Success, failure: @escaping Failure) {
         guard !isBlacklisted(language) else {
             //DDLog("Attempting to publish a wikidata description in a blacklisted language; aborting")
+            failure(WikidataPublishingError.blacklistedLanguage)
             return
         }
         let requestWithCSRFCompletion: (WikidataAPIResult?, URLResponse?, Error?) -> Void = { result, response, error in
-            guard error == nil else {
-                completion(error)
+            if let error = error {
+                failure(error)
                 return
             }
-            completion(result?.error)
+            guard let result = result else {
+                failure(WikidataPublishingError.apiResultNotParsedCorrectly)
+                return
+            }
+            if let error = result.error {
+                failure(error)
+                return
+            }
+            guard result.succeeded else {
+                failure(WikidataPublishingError.unknown)
+                return
+            }
+            success()
         }
         let queryParameters = ["action": "wbsetdescription",
                                "format": "json",
