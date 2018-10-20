@@ -65,43 +65,43 @@ class WikipediaUITests: XCTestCase {
     func testRecordAppScreenshots() {
 
 
-        // WECOME
-        wmf_snapshot("Welcome1")
-
-        app.wmf_tapFirstButton(withTranslationIn: ["welcome-intro-free-encyclopedia-more"])
-        wmf_snapshot("Welcome2")
-
-        app.wmf_tapFirstButton(withTranslationIn: ["welcome-explore-tell-me-more-done-button"])
-
-        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
-        wmf_snapshot("Welcome3")
-
-        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
-        wmf_snapshot("Welcome4")
-
-        app.wmf_tapFirstButton(withTranslationIn: ["welcome-languages-add-or-edit-button"])
-        wmf_snapshot("Welcome5")
-
-        app.wmf_tapFirstCloseButton()
-
-        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
-        wmf_snapshot("Welcome6")
-        
-        app.wmf_tapFirstSwitch(withTranslationIn: ["preference-title-eventlogging-opt-in"])
-        wmf_snapshot("Welcome7")
-
-        app.wmf_tapFirstButton(withTranslationIn: ["welcome-explore-continue-button"])
-
-
-        // Useful if you temporarily comment out the welcome screens above.
-        // app.wmf_tapFirstButton(withTranslationIn: ["button-skip"])
-
-
-        // Scroll down a ways then back up to increase odds that feed elements are in place and won't be freshing underneath us while the code below scrolls and attempts to tap on elements.
-        app.wmf_scrollDown(times: 20)
-        app.wmf_scrollToTop()
-
-
+//        // WECOME
+//        wmf_snapshot("Welcome1")
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["welcome-intro-free-encyclopedia-more"])
+//        wmf_snapshot("Welcome2")
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["welcome-explore-tell-me-more-done-button"])
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
+//        wmf_snapshot("Welcome3")
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
+//        wmf_snapshot("Welcome4")
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["welcome-languages-add-or-edit-button"])
+//        wmf_snapshot("Welcome5")
+//
+//        app.wmf_tapFirstCloseButton()
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["button-next"])
+//        wmf_snapshot("Welcome6")
+//
+//        app.wmf_tapFirstSwitch(withTranslationIn: ["preference-title-eventlogging-opt-in"])
+//        wmf_snapshot("Welcome7")
+//
+//        app.wmf_tapFirstButton(withTranslationIn: ["welcome-explore-continue-button"])
+//
+//
+//        // Useful if you temporarily comment out the welcome screens above.
+//        // app.wmf_tapFirstButton(withTranslationIn: ["button-skip"])
+//
+//
+//        // Scroll down a ways then back up to increase odds that feed elements are in place and won't be freshing underneath us while the code below scrolls and attempts to tap on elements.
+//        app.wmf_scrollDown(times: 20)
+//        app.wmf_scrollToTop()
+//
+//
         // EXPLORE
         app.wmf_tapFirstButton(withTranslationIn: ["home-title"])
         wmf_snapshot("Explore1")
@@ -110,39 +110,39 @@ class WikipediaUITests: XCTestCase {
 
         app.wmf_scrollToFirstElements(matching: .link, yOffset: iPhoneXSafeTopOffset, items:
             [
-                // Picture of the day / Gallery
-                ScrollItem(key: "explore-potd-heading") { element in
-                    self.wmf_snapshot("ExplorePicOfTheDay")
-                    element.wmf_tap()
-                    self.wmf_snapshot("Gallery")
-                    self.app.wmf_tapFirstCloseButton()
-                },
-
-                // Featured article
-                ScrollItem(key: "explore-featured-article-heading") { element in
-                    self.wmf_snapshot("ExploreFeaturedArticle")
-                },
-
-                // Top read
-                ScrollItem(key: "explore-most-read-generic-heading") { element in
-                    self.wmf_snapshot("ExploreMostRead")
-                    element.wmf_tap()
-                    self.wmf_snapshot("MostReadDetail")
-                    self.app.wmf_tapFirstCloseButton()
-                },
-
-                // On this day
-                ScrollItem(key: "on-this-day-title") { element in
-                    self.wmf_snapshot("ExploreOnThisDay")
-                    element.wmf_tap()
-                    self.wmf_snapshot("OnThisDayDetail")
-                    self.app.wmf_tapFirstCloseButton()
-                },
-                
-                // Nearby
-                ScrollItem(key: "explore-nearby-placeholder-heading") { element in
-                    self.wmf_snapshot("ExploreNearbyPlaces")
-                },
+//                // Picture of the day / Gallery
+//                ScrollItem(key: "explore-potd-heading") { element in
+//                    self.wmf_snapshot("ExplorePicOfTheDay")
+//                    element.wmf_tap()
+//                    self.wmf_snapshot("Gallery")
+//                    self.app.wmf_tapFirstCloseButton()
+//                },
+//
+//                // Featured article
+//                ScrollItem(key: "explore-featured-article-heading") { element in
+//                    self.wmf_snapshot("ExploreFeaturedArticle")
+//                },
+//
+//                // Top read
+//                ScrollItem(key: "explore-most-read-generic-heading") { element in
+//                    self.wmf_snapshot("ExploreMostRead")
+//                    element.wmf_tap()
+//                    self.wmf_snapshot("MostReadDetail")
+//                    self.app.wmf_tapFirstCloseButton()
+//                },
+//
+//                // On this day
+//                ScrollItem(key: "on-this-day-title") { element in
+//                    self.wmf_snapshot("ExploreOnThisDay")
+//                    element.wmf_tap()
+//                    self.wmf_snapshot("OnThisDayDetail")
+//                    self.app.wmf_tapFirstCloseButton()
+//                },
+//
+//                // Nearby
+//                ScrollItem(key: "explore-nearby-placeholder-heading") { element in
+//                    self.wmf_snapshot("ExploreNearbyPlaces")
+//                },
                 
                 // Random article
                 ScrollItem(key: "explore-random-article-heading") { element in
@@ -152,6 +152,37 @@ class WikipediaUITests: XCTestCase {
                     self.wmf_snapshot("RandomDetail")
                     self.app.wmf_tapFirstButton(withTranslationIn: ["button-save-for-later"])
                     self.wmf_snapshot("RandomDetailSaved")
+                    
+                    
+//add description editing here? hmm letter "a" is protected...
+//  would need to repeatedly tap random until one with editible descrip is found... (and tap "W" to go back instead of nav back button)
+
+                    
+//reference taps too?
+//  need repeated tap random too? until article with a ref link such as '[1]' is found in first screen of text? or scroll down at least a couple times?
+                
+                    
+                    
+                    
+                    
+                    
+                    
+                    //for i in 0...9 {
+                        self.app.webViews.element(boundBy: 0).wmf_waitUntilExists(timeout: 1.0)?.wmf_scrollDown()
+                        let aa = self.app.webViews.staticTexts.containing(NSPredicate(format: "label ==[cd] '[1]'")).element(boundBy: 0).wmf_waitUntilExists(timeout: 1)
+                        aa?.wmf_tap()
+                    //}
+
+
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     self.app.wmf_tapFirstNavigationBarBackButton()
                 },
                 /*
@@ -163,13 +194,13 @@ class WikipediaUITests: XCTestCase {
                     self.app.wmf_tapFirstNavigationBarBackButton()
                 },
                 */
-                // In the news
-                ScrollItem(key: "in-the-news-title") { element in
-                    self.wmf_snapshot("ExploreInTheNews")
-                    element.wmf_tap()
-                    self.wmf_snapshot("InTheNewsDetail")
-                    self.app.wmf_tapFirstCloseButton()
-                }
+//                // In the news
+//                ScrollItem(key: "in-the-news-title") { element in
+//                    self.wmf_snapshot("ExploreInTheNews")
+//                    element.wmf_tap()
+//                    self.wmf_snapshot("InTheNewsDetail")
+//                    self.app.wmf_tapFirstCloseButton()
+//                }
             ]
         )
 
