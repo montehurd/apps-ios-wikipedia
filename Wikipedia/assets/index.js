@@ -242,12 +242,38 @@ let FindInPageResultCount = 0
 let FindInPageResultMatches = []
 let FindInPagePreviousFocusMatchSpanId = null
 
+const rectContainsRect = (a, b) => a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom
+
 const recursivelyHighlightSearchTermInTextNodesStartingWithElement = (element, searchTerm) => {
   if (element) {
     if (element.nodeType == 3) {            // Text node
       while (true) {
         const value = element.nodeValue  // Search for searchTerm in text node
         const idx = value.toLowerCase().indexOf(searchTerm)
+
+
+
+/*
+// Use range based appoach instead so we don't unnecessarily add spans which have to be removed later?
+// would i need to keep an array of ranges so they could be detatched easily later?
+        var range = document.createRange()
+        range.setStart(element, idx)
+        range.setEnd(element, searchTerm.length)
+        const rect = range.getBoundingClientRect()
+        if(rect.width > 0 && rect.height > 0){
+
+          const matchIsActuallyOnscreen = rectContainsRect(range.getBoundingClientRect(), element.getBoundingClientRect())
+          if(!matchIsActuallyOnscreen){
+            break
+          }
+          // var span2 = document.createElement('span')
+          // span2.style.backgroundColor = 'red'
+          // range.surroundContents(span2)
+        }
+        range.detach()
+*/
+
+
 
         if (idx < 0) break
 
@@ -262,10 +288,30 @@ const recursivelyHighlightSearchTermInTextNodesStartingWithElement = (element, s
         element.parentNode.insertBefore(span, next)
         element.parentNode.insertBefore(text, next)
         element = text
+/*
+//BAD because causes doc reflows! (search for 'a' on obama article)
+        // Text node elements with 'text-overflow: ellipsis;' can truncate text. So we need a way to
+        // detect if a match is in elided text - i.e. after the ellipsis and thus not visible. By
+        // waiting until here where we've added a span around the match we can check if the match
+        // span's rect is contained by its parent element's rect - if so it's visible, otherwise we
+        // don't actually want to highlight the match.
+        const matchIsActuallyOnscreen = rectContainsRect(span.getBoundingClientRect(), span.parentElement.getBoundingClientRect())
+        if (!matchIsActuallyOnscreen) {
+          const text = span.removeChild(span.firstChild)
+          span.parentNode.insertBefore(text, span)
+          span.parentNode.removeChild(span)
+          break
+        }
+*/
         FindInPageResultCount++
       }
     } else if (element.nodeType == 1) {     // Element node
-      if (element.style.display != 'none' && element.nodeName.toLowerCase() != 'select') {
+
+      // Offset width and height are also checked so we can detect if element is hidden because its *parent* is hidden.
+//BAD cause offset width and height access can be expensive!
+      const isOnscreen = element.style.display != 'none' // && element.offsetWidth > 0 && element.offsetHeight > 0
+
+      if (isOnscreen && element.nodeName.toLowerCase() != 'select') {
         for (let i = element.childNodes.length - 1; i >= 0; i--) {
           recursivelyHighlightSearchTermInTextNodesStartingWithElement(element.childNodes[i], searchTerm)
         }
