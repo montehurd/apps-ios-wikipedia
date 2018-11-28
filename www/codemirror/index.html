@@ -12,9 +12,20 @@
 <style>
   body { height: 100vh; overflow: hidden; margin: 0;}
   .CodeMirror { height: 100vh; width: 100%; overflow: scroll; -webkit-overflow-scrolling: touch; border: 1px solid silver}
+  
+  textarea#editor {
+    display:block !important;
+    width: 100%;
+    height: 500px;
+  }
+  
 </style>
 
 <body>
+  
+  <form onsubmit="return false;">
+    <input type=submit value="Submit!">
+    
   <textarea id=editor>{{about|the type of website|other uses|Wiki (disambiguation)}}
 {{redirect|WikiNode|WikiNode of Wikipedia|Wikipedia:WikiNode|the app for the Apple iPad|WikiNodes}}
 {{pp-semi-indef}}
@@ -227,6 +238,7 @@ Wikis and their users can be held liable for certain activities that occur on th
 [[Category:Social information processing]]
 [[Category:Articles containing video clips]]
 </textarea>
+</form>
   <script>
     var config = JSON.parse(`
       {
@@ -472,5 +484,57 @@ Wikis and their users can be held liable for certain activities that occur on th
 			spellcheck: enableContentEditable,
 			viewportMargin: Infinity
     });
+
+    /* BINGO - token type at cursor! */
+    editor.on("cursorActivity", function(doc) {
+      var cursor = doc.getCursor()
+      //alert(`cursor.line = ${cursor.line} cursor.ch = ${cursor.ch}`);
+      alert(`token type = ${doc.getTokenTypeAt(cursor)}`);
+    });
+    
+    /*
+    try this button add on for example:
+    https://github.com/samdark/codemirror-buttons
+    
+    
+    
+    - make list of all these token types, then emit standardized events for what the cursor is in
+    - what about ranges?
+    - search add on (and jump to line): https://codemirror.net/doc/manual.html#addons
+    
+    gets the wikitext
+    editor.getValue()
+
+    sets the wikitext
+    editor.setValue("some wikitext")
+
+
+    extraKeys: {
+              Tab: function(cm) {
+                //cm.replaceSelection("");
+                
+                // cm.execCommand("undo");
+                // cm.execCommand("redo");
+                // cm.execCommand("goDocStart");
+                // cm.execCommand("goDocEnd");
+                // cm.execCommand("deleteLine");                  
+                // cm.execCommand("goLineStart");
+                // cm.execCommand("goLineEnd");
+                // cm.execCommand("goLineUp");
+                // cm.execCommand("goLineDown");
+                // cm.execCommand("goPageUp");
+                // cm.execCommand("goPageDown");
+                // cm.execCommand("goCharLeft");
+                // cm.execCommand("goCharRight");
+                // cm.execCommand("goWordLeft");
+                // cm.execCommand("goWordRight");
+                
+                // cm.execCommand("find");
+
+                cm.execCommand("goWordRight");
+                
+              },
+    */
+
   </script>
 </body>
