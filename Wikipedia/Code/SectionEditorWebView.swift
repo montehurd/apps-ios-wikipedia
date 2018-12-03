@@ -19,7 +19,8 @@ private class SectionEditorWebViewConfiguration: WKWebViewConfiguration, WKScrip
         setURLSchemeHandler(WMFURLSchemeHandler.shared(), forURLScheme: WMFURLSchemeHandlerScheme)
         
         let contentController = WKUserContentController()
-        contentController.add(self, name: "cursorActivity")
+        // contentController.add(self, name: "cursorActivity")
+        contentController.add(self, name: "selectedButtons")
         userContentController = contentController
     }
     

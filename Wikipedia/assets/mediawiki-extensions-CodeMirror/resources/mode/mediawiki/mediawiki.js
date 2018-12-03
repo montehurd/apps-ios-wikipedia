@@ -124,9 +124,10 @@
 				if ( stream.match( /[^&<[{~]+/ ) ) {
 					if ( stream.eol() ) {
 						stream.backUp( count );
-						state.tokenize = eatEnd( 'mw-section-header' );
+						state.tokenize = eatEnd( 'mw-section-header mw-section-header-equals-' + count );
 					}
-					return null; // style is null
+					return makeLocalStyle( `mw-section-header-text-${count}`, state );
+					//return null; // style is null
 				}
 				return eatWikiText( '', '' )( stream, state );
 			};
@@ -661,7 +662,7 @@
 								stream.backUp( tmp[ 2 ].length );
 								state.stack.push( state.tokenize );
 								state.tokenize = eatSectionHeader( tmp[ 3 ].length );
-								return 'mw-section-header line-cm-mw-section-' + ( tmp[ 1 ].length + 1 );
+								return 'mw-section-header line-cm-mw-section-' + ( tmp[ 1 ].length + 1 ) + ' mw-section-header-equals-' + tmp[ 3 ].length;
 							}
 							break;
 						case '*':
