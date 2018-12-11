@@ -78,8 +78,29 @@
       if (range1.start > range2.start + (range2.end - range2.start)) return false
       if (range2.start > range1.start + (range1.end - range1.start)) return false
       return true
+
+// const x1 = range1.start
+// const y1 = range1.end
+// 
+// const x2 = range2.start
+// const y2 = range2.end
+// 
+// const overlap = ( x2 > y1 || y2 < x1 ) ? 0 : (y2 >= y1 && x2 <= y1 ? y1 : y2) - ( x2 <= x1 && y2 >= x1 ? x1 : x2) + 1; //max 11 operations
+// return overlap > 0
     }
 
+
+
+// const rangesIntersect2 = (range1, range2) => {
+//   if (range1.start > range2.start + (range2.end - range2.start)) return false
+//   if (range2.start > range1.start + (range1.end - range1.start)) return false
+//   return true
+// }
+
+
+
+
+// TODO: make explicit class for this selection range info!
     const getSelectionRange = (doc) => {
       const fromCursor = doc.getCursor('from')
       const toCursor = doc.getCursor('to')
@@ -87,7 +108,8 @@
         start: fromCursor.ch,
         end: toCursor.ch,
         isSingleLine: (fromCursor.line === toCursor.line),
-        line: fromCursor.line
+        line: fromCursor.line,
+        selection: doc.getSelection()
       }
     }
     
@@ -212,6 +234,60 @@
         .forEach(supplementToken)
     }
 
+    const arraysAreEqual = (a1, a2) => {
+      if (a1.length !== a2.length) {
+        return false
+      }
+      let i = a1.length
+      while (i--) {
+          if (a1[i] !== a2[i]) return false
+      }
+      return true
+    }
+    
+    
+    
+    
+    
+    
+// instead of enriching tokens should this helper have a method for getting type info out of token, but the method would enrich
+// the retrieved types?    
+    class TokenHelper {
+      constructor(token, selectionRange) {
+        this.token = token
+        this.selectionRange = selectionRange
+      }
+      types() {
+        if (this.token.type === null) {
+          return []
+        }
+        return this.token.type
+          .split(' ')
+          .filter(s => s.trim().length > 0)
+      }
+      includesType(type) {
+        return this.types().includes(type) 
+      }
+      intersectsSelection() {
+        if (!this.selectionRange.isSingleLine) {
+          return false
+        }
+        return rangesIntersect(this.selectionRange, this.token)
+      }
+      includesSelection() {
+        if (this.token.string === null) {
+          return false
+        }
+        return this.token.string.includes(this.selectionRange.selection)
+      }
+    }
+    
+    
+    
+    
+    const singleDeepFlatten = a => [].concat(...a)
+    
+    
     const selectedButtons = (doc) => {  
       const selection = doc.getSelection()
       const multipleCharactersSelected = selection.length > 0
@@ -229,12 +305,151 @@
       
       let result = []
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      // if (
+      //   arraysAreEqual(typesArray, ['mw-apostrophes-bold', 'strong', 'mw-apostrophes-bold']) ||
+      //   arraysAreEqual(typesArray, ['mw-apostrophes-bold', 'strong']) ||
+      //   arraysAreEqual(typesArray, ['strong']) ||
+      //   arraysAreEqual(typesArray, ['strong', 'mw-apostrophes-bold'])
+      // ) {
+      // 
+
+const lineTokenHelpers = lineTokens.map(t => new TokenHelper(t, selectionRange))
+const lineTokenHelpersIntersectingSelection = lineTokenHelpers.filter(th => th.intersectsSelection())
+/*
+const lineTokenHelpersIntersectingSelection2 = lineTokenHelpersIntersectingSelection
+  .filter((th, index, array) => {
+    // if (selectionRange.end - selectionRange.start > 0) {
+    //   if (index === 0 || index === array.length - 1) {
+    //     return th.token.end !== selectionRange.start && th.token.start !== selectionRange.end
+    //   }
+    // }
+    
+// if (selectionRange.end - selectionRange.start === 0) {
+//   return true
+// }
+// if (index === 0 && th.token.end === selectionRange.start) {
+//   return false
+// }
+// if (index === array.length - 1 && th.token.start === selectionRange.end) {
+//   return false
+// }
+
+return !th.includesType('mw-apostrophes-bold')
+
+    
+    
+    return true
+  })
+*/
+  
+  
+
+//const aaa = lineTokenHelpersIntersectingSelection.map(th => th.types())
+const intersectingTokensTypesArray = singleDeepFlatten(lineTokenHelpersIntersectingSelection.map(th => th.types()))
+
+
+//const selectionHasOnlyOneType = (new Set(intersectingTokensTypesArray).size) === 1
+
+// const everyLineTokenHelperIntersectingSelectionHasType = (type) => {
+//   for (th of lineTokenHelpersIntersectingSelection) {
+//     if (!th.includesType(type)) {
+//       return false
+//     }
+//   }
+//   return true
+// }
+
+// }
+
+
+
+// EASIEST "no-boundaries crossed" check??? 
+// - ensure only 1 'strong' in typesArray
+// - ensure 'doc.getSelection()' string is a substring of the 'strong' token string
+/*
+const onlyOneLineTokenHelperOfTypeIntersectsSelection = (type) => {
+  const lineTokenHelpersOfTypeIntersectingSelection = lineTokenHelpersIntersectingSelection.filter(th => th.includesType(type))
+  if (lineTokenHelpersOfTypeIntersectingSelection.length !== 1) {
+    return false
+  }
+  return lineTokenHelpersOfTypeIntersectingSelection[0].includesSelection()
+}
+*/
+
+// const containsOnly = (array1, array2) => {
+//   if (array1.length === 0) {
+//     return false
+//   }
+//   return array1.every(elem => array2.includes(elem))
+// }
+
+const intersectingTokensTypesArray2 = intersectingTokensTypesArray.filter(s => {
+  return true //!s.startsWith('mw-')
+})
+const intersectingTokensTypesArray3 = Array.from(new Set(intersectingTokensTypesArray2))
+
+
+if (intersectingTokensTypesArray3.includes('strong')) {
+  // if (containsOnly(intersectingTokensTypesArray, ['mw-apostrophes-bold', 'strong'])) {
+    result.push(buttonPayload('bold'))
+  // }
+}
+
+if (intersectingTokensTypesArray3.includes('em')) {
+    result.push(buttonPayload('italic'))
+}
+
+
+
+
+
+
+
+
+
+/*
+      let strongTokens = intersectingTokens.filter(t => {
+        const type = t.type
+        if (type === null) {
+          return false
+        }
+        return type.includes('strong')
+      })
+      if (strongTokens.length === 1) {
+        const strongToken = strongTokens[0]
+        if (strongToken.string.includes(selection)) {
+          result.push(buttonPayload('bold'))          
+        }
+      }
+*/
+
+
+/*
       if (typesArray.includes('strong')) {
+        
+// EASIEST "no-boundaries crossed" check??? 
+// - ensure only 1 'strong' in typesArray
+// - ensure 'doc.getSelection()' string is a substring of the 'strong' token string
+// - if works generalize for other wikitext types?        
         result.push(buttonPayload('bold'))
       }
-      if (typesArray.includes('em')) {
-        result.push(buttonPayload('italic'))
-      }
+*/
+      // if (typesArray.includes('em')) {
+      //   result.push(buttonPayload('italic'))
+      // }
       if (typesArray.includes('mw-link-ground')) {
         result.push(buttonPayload('link'))
       }
@@ -265,11 +480,34 @@
         result.push(buttonPayload('signature', {depth: depth}))
       }
 
+
+
+
+
+/*
+const boldContentsToken = editor.getLineTokens(selectionRange.line, true)
+  .filter(t => {
+    return (selectionRange.start >= t.start && selectionRange.end <= t.end)
+  }) //THIS ^ is wrong! returns and array but below we assume it's a string
+const boldContentsTokenString = boldContentsToken.string
+const intersectingTokensString = intersectingTokens.map(t => {
+  return (t.string !== null) ? t.string : ''  
+})
+*/
+
+
+
+
       result.push(buttonPayload('debug', {
          tokensIntersectingSelectionStrings: intersectingTokens.map(token => token.string).join(''),
-         tokensIntersectingSelectionTypesArray: typesArray,
+         // tokensIntersectingSelectionTypesArray: typesArray,
          selectionRange: getSelectionRange(doc),
-         getSelectionText: selection
+         getSelectionText: selection,
+         tokensIntersectingSelectionTypesArray2: intersectingTokensTypesArray,
+         intersectingTokensTypesArray3: intersectingTokensTypesArray3
+         // aaa: aaa
+         // z_boldContentsTokenString: boldContentsTokenString,
+         // z_intersectingTokensString: intersectingTokensString
        }
       ))
      
@@ -375,7 +613,7 @@
       }
     }
 
-    // const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) => {return item.button === buttonType}).length > 0
+    const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) => {return item.button === buttonType}).length > 0
     wmf.commands = {
       focus: () => {
         editor.focus()
@@ -387,8 +625,32 @@
       cursorLeft: () => editor.execCommand('goCharLeft'),
       cursorRight: () => editor.execCommand('goCharRight'),
       bold: () => {
-        //const isBold = isButtonSelected('bold')
-        // if (!isBold) {
+        const isOn = isButtonSelected('bold')
+        if (isOn) {
+
+
+          
+          // const boldContentsToken = editor.getLineTokens(editor.getCursor().line, true).filter(t => {return (editor.getCursor('from').ch >= t.start && editor.getCursor('to').ch <= t.end )})
+// compare boldContentsToken 'string' to string from all tokens in tokensIntersectingSelection
+// ^ BUT we should probably do this up above as easier way to see if bold button should be enabled.
+
+          
+          
+          console.log('asdf')
+// can enrichment be modified to make it easier to turn off bold?
+// `isButtonSelected` ends up calling the code which enriches copies of current line tokens... they are copies
+// but maybe we can inspect the enriched tokens identifying relevants ones, then use their indices to get `live`
+// line tokens of respective indices...
+// 
+// pass enriched line tokens to `selectedButtons` so we can use/inspect them here w/o calling `selectedButtons`? 
+// experiment with further enrichment? 
+// but do remember we're gonna have to something like this to actually replace things... i think... :
+// 		var pos = editor.getCursor() // or {line , ch };
+//		var tok = editor.getTokenAt(pos);
+//		editor.replaceRange("string", {line: pos.line , ch:tok.start},{line:pos.line , ch:tok.end});
+
+
+          
           // editor.replaceSelection(`''' '''`)
           // editor.execCommand('goCharLeft')
           // editor.execCommand('goCharLeft')
@@ -396,8 +658,9 @@
           // editor.execCommand('goCharLeft')
           // const cursor = editor.getCursor()
           // editor.extendSelection(cursor, {line: cursor.line, ch: cursor.ch + 1})
-        // } else {
-        // }
+        } else {
+
+        }
       },
       italic: () => {
         console.log('italic')

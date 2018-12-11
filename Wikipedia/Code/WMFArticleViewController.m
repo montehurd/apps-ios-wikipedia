@@ -530,7 +530,7 @@ static const CGFloat WMFArticleViewControllerTableOfContentsSectionUpdateScrollD
         _showTableOfContentsToolbarItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"toc"]
                                                                            style:UIBarButtonItemStylePlain
                                                                           target:self
-                                                                          action:@selector(showTableOfContents:)];
+                                                                          action:nil/*@selector(showTableOfContents:)*/];
         _showTableOfContentsToolbarItem.accessibilityLabel = WMFLocalizedStringWithDefaultValue(@"table-of-contents-button-label", nil, nil, @"Table of contents", @"Accessibility label for the Table of Contents button\n{{Identical|Table of contents}}");
         return _showTableOfContentsToolbarItem;
     }
