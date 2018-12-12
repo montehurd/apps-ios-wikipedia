@@ -69,11 +69,14 @@ class TextFormattingInputViewController: UIInputViewController {
     }
 
     private func embedNavigationController() {
+//UIView.performWithoutAnimation {
+            
         addChild(embeddedNavigationController)
         embeddedNavigationController.view.frame = containerView.frame
         assert(containerView.subviews.isEmpty)
         containerView.addSubview(embeddedNavigationController.view)
         embeddedNavigationController.didMove(toParent: self)
+//}
     }
 
     private func addTopShadow() {

@@ -94,7 +94,9 @@ class TextFormattingProvidingTableViewController: UITableViewController, TextFor
     }
 
     @objc private func close(_ sender: UIBarButtonItem) {
+//UIView.performWithoutAnimation {
         delegate?.textFormattingProvidingDidTapCloseButton(self, button: sender)
+//}
     }
 }
 

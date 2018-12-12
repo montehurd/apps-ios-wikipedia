@@ -32,6 +32,8 @@ class DefaultEditToolbarView: EditToolbarView {
     override func awakeFromNib() {
         super.awakeFromNib()
         chevronButton.imageView?.contentMode = .scaleAspectFit
+layer.borderColor = UIColor.red.cgColor
+layer.borderWidth = 10
     }
 
     private func button(withTitle title: String, action: Selector) -> UIButton {

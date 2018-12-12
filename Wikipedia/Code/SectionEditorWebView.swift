@@ -11,8 +11,14 @@ class SectionEditorWebView: WKWebView {
     init() {
         super.init(frame: .zero, configuration: config)
         loadHTMLFromAssetsFile(codeMirrorIndexFileName, scrolledToFragment: nil)
-        scrollView.keyboardDismissMode = .interactive
+//        scrollView.keyboardDismissMode = .interactive
+//        scrollView.contentInsetAdjustmentBehavior = .always
         setKeyboardRequiresUserInteraction(false)
+        
+        
+scrollView.tag = 9999
+
+        
     }
 
     required init?(coder: NSCoder) {

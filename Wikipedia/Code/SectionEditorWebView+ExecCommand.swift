@@ -82,7 +82,21 @@ extension SectionEditorWebView {
     }
     
     @objc func focus(_ sender: Any) {
-        execCommand(for: .focus)
+//        UIView.performWithoutAnimation {
+//
+//        scrollView.isScrollEnabled = false
+//        let offset = scrollView.contentOffset
+//        dispatchOnMainQueueAfterDelayInSeconds(0.001) {
+            self.execCommand(for: .focus)
+//        }
+//        dispatchOnMainQueueAfterDelayInSeconds(0.002) {
+//            self.scrollView.isScrollEnabled = true
+//            self.scrollView.contentOffset = offset
+//
+//        }
+//
+//        }
+//
     }
     
     private func commandJS(for commandType: CodeMirrorCommandType) -> String {

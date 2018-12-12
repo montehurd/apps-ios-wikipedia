@@ -210,24 +210,82 @@ class SectionEditorWebViewWithEditToolbar: SectionEditorWebView {
     // MARK: - Showing input view
 
     func setInputViewHidden(type: TextFormattingInputViewController.InputViewType? = nil, hidden: Bool) {
+        
+        
+UIView.performWithoutAnimation {
         if hidden {
             inputAccessoryViewType = previousInputAccessoryViewType
         } else {
             inputAccessoryViewType = nil
         }
+    
+        //let animator = UIViewPropertyAnimator.init(duration: 0.3, curve: .easeInOut) {
+            self.resignFirstResponder()
+        //}
 
+        //animator.addCompletion { (_) in
+    
+dispatchOnMainQueueAfterDelayInSeconds(0.1) {
+            self.becomeFirstResponder()
+}
+
+        //}
+
+        inputViewType = type
+}
+
+        //animator.startAnimation()
+    }
+
+
+
+
+/*
+    func setInputViewHidden(type: TextFormattingInputViewController.InputViewType? = nil, hidden: Bool) {
+        if hidden {
+            inputAccessoryViewType = previousInputAccessoryViewType
+        } else {
+            inputAccessoryViewType = nil
+        }
+        
         let animator = UIViewPropertyAnimator.init(duration: 0.3, curve: .easeInOut) {
             self.resignFirstResponder()
         }
-
+        
         animator.addCompletion { (_) in
             self.becomeFirstResponder()
         }
-
+        
         inputViewType = type
-
+        
         animator.startAnimation()
     }
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 extension SectionEditorWebViewWithEditToolbar: DefaultEditToolbarViewDelegate {

@@ -45,7 +45,7 @@ class SectionEditorViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        registerForKeyboardNotifications()
+//        registerForKeyboardNotifications()
         enableProgressButton(changesMade)
     }
 
@@ -55,15 +55,19 @@ class SectionEditorViewController: UIViewController {
         super.viewWillDisappear(animated)
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
 
     private func configureWebView() {
         webView = SectionEditorWebViewWithEditToolbar()
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.wmf_addSubviewWithConstraintsToEdges(webView)
+//view.wmf_addSubview(webView, withConstraintsToEdgesWithInsets: UIEdgeInsets.init(top: 0, left: 0, bottom: 0, right: 50))
+webView.scrollView.borderWidth = 1
+webView.scrollView.borderColor = .blue
+
         webView.configureInputAccessoryViews()
     }
 
@@ -111,7 +115,7 @@ class SectionEditorViewController: UIViewController {
     private func enableProgressButton(_ enabled: Bool) {
         progressButton.isEnabled = enabled
     }
-
+/*
     private func scrollTextViewSoCursorNotUnderKeyboard(_ textView: UITextView) {
         guard
             !viewKeyboardRect.isNull,
@@ -133,6 +137,7 @@ class SectionEditorViewController: UIViewController {
 
         textView.scrollRectToVisible(newCursorRect, animated: true)
     }
+*/
 
     // MARK: - Keyboard
 
@@ -141,51 +146,51 @@ class SectionEditorViewController: UIViewController {
     // More info here:
     // https://developer.apple.com/library/ios/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html
 
-    private func registerForKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
+//    private func registerForKeyboardNotifications() {
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+//    }
 
-    @objc private func keyboardDidShow(_ notification: NSNotification) {
-        guard let info = notification.userInfo else {
-            return
-        }
-
-        guard let keyboardFrameEnd = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
-            return
-        }
-
-        let windowKeyboardRect = keyboardFrameEnd.cgRectValue
-        guard let viewKeyboardRect = view.window?.convert(windowKeyboardRect, to: view) else {
-            return
-        }
-
-        self.viewKeyboardRect = viewKeyboardRect
-
-        // This makes it so you can always scroll to the bottom of the text view's text
-        // even if the keyboard is onscreen.
-        let contentInset = UIEdgeInsets(top: 0, left: 0, bottom: viewKeyboardRect.size.height, right: 0)
-        setTextViewContentInset(contentInset)
-
-        // Mark the text view as needing a layout update so the inset changes above will
-        // be taken in to account when the cursor is scrolled onscreen.
-        webView.setNeedsLayout()
-        webView.layoutIfNeeded()
-
-        // Scroll cursor onscreen if needed.
-        //scrollTextViewSoCursorNotUnderKeyboard(textView)
-    }
-
-    @objc private func keyboardWillHide(_ notification: NSNotification) {
-        setTextViewContentInset(UIEdgeInsets.zero)
-    }
-
-    private func setTextViewContentInset(_ contentInset: UIEdgeInsets) {
-        webView.scrollView.contentInset = contentInset
-        webView.scrollView.scrollIndicatorInsets = contentInset
-
-        viewKeyboardRect = CGRect.null
-    }
+//    @objc private func keyboardDidShow(_ notification: NSNotification) {
+//        guard let info = notification.userInfo else {
+//            return
+//        }
+//
+//        guard let keyboardFrameEnd = info[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
+//            return
+//        }
+//
+//        let windowKeyboardRect = keyboardFrameEnd.cgRectValue
+//        guard let viewKeyboardRect = view.window?.convert(windowKeyboardRect, to: view) else {
+//            return
+//        }
+//
+//        self.viewKeyboardRect = viewKeyboardRect
+//
+//        // This makes it so you can always scroll to the bottom of the text view's text
+//        // even if the keyboard is onscreen.
+//        let contentInset = UIEdgeInsets(top: 0, left: 0, bottom: viewKeyboardRect.size.height, right: 0)
+//        setTextViewContentInset(contentInset)
+//
+//        // Mark the text view as needing a layout update so the inset changes above will
+//        // be taken in to account when the cursor is scrolled onscreen.
+//        webView.setNeedsLayout()
+//        webView.layoutIfNeeded()
+//
+//        // Scroll cursor onscreen if needed.
+//        //scrollTextViewSoCursorNotUnderKeyboard(textView)
+//    }
+//
+//    @objc private func keyboardWillHide(_ notification: NSNotification) {
+//        setTextViewContentInset(UIEdgeInsets.zero)
+//    }
+//
+//    private func setTextViewContentInset(_ contentInset: UIEdgeInsets) {
+//        webView.scrollView.contentInset = contentInset
+//        webView.scrollView.scrollIndicatorInsets = contentInset
+//
+//        viewKeyboardRect = CGRect.null
+//    }
 
     // MARK: - Accessibility
 
