@@ -31,6 +31,15 @@
     [super viewDidLoad];
 
     self.webView = [[SectionEditorWebViewWithTestingButtons alloc] init];
+
+    UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+    v.backgroundColor = [UIColor redColor];
+    self.webView.inputAccessoryView = v;
+
+    UIView *v2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 200)];
+    v2.backgroundColor = [UIColor yellowColor];
+    self.webView.inputView = v2;
+
     [self.view wmf_addSubviewWithConstraintsToEdges:self.webView];
     self.webView.navigationDelegate = self;
     [self.webView loadHTMLFromAssetsFile:@"mediawiki-extensions-CodeMirror/codemirror-index.html" scrolledToFragment:nil];
@@ -72,9 +81,10 @@
     // "loginWithSavedCredentials..." should help ensure the user will only appear to be logged in when
     // they reach the 'publish' screen if they actually still are logged in. (It uses the "currentlyLoggedInUserFetcher"
     // to try to ensure this.)
-    [[WMFAuthenticationManager sharedInstance] loginWithSavedCredentialsWithSuccess:^(WMFAccountLoginResult *_Nonnull success) {
-        DDLogDebug(@"\n\nSuccessfully logged in with saved credentials for user '%@'.\n\n", success.username);
-    }
+    [[WMFAuthenticationManager sharedInstance]
+        loginWithSavedCredentialsWithSuccess:^(WMFAccountLoginResult *_Nonnull success) {
+            DDLogDebug(@"\n\nSuccessfully logged in with saved credentials for user '%@'.\n\n", success.username);
+        }
         userAlreadyLoggedInHandler:^(WMFCurrentlyLoggedInUser *_Nonnull currentLoggedInHandler) {
             DDLogDebug(@"\n\nUser '%@' is already logged in.\n\n", currentLoggedInHandler.name);
         }
@@ -175,12 +185,14 @@
                 self.editTextView.attributedText = [self getAttributedString:revision];
                 //[self.editTextView performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0.4f];
 
-                [self.webView setupWithWikitext:revision useRichEditor:YES completionHandler:^(NSError *_Nullable error) {
-                    if (error) {
-                        DDLogError(@"Error getting wikitext: %@", error);
-                        return;
-                    }
-                }];
+                [self.webView setupWithWikitext:revision
+                                  useRichEditor:YES
+                              completionHandler:^(NSError *_Nullable error) {
+                                  if (error) {
+                                      DDLogError(@"Error getting wikitext: %@", error);
+                                      return;
+                                  }
+                              }];
 
             } break;
             case FETCH_FINAL_STATUS_CANCELLED: {
@@ -324,6 +336,27 @@
     [super didReceiveMemoryWarning];
     // [self.webView toggleRichEditor];
     // [self.webView becomeFirstResponder];
+
+    //    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+    //    v.backgroundColor = [UIColor redColor];
+    //    self.webView.inputAccessoryView = v;
+
+    //    self.webView.inputAccessoryView = nil;
+    //    NSLog(@"self.webView.inputAccessoryView = %@", );
+    NSLog(@"HI");
+
+    //    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+    //    v.backgroundColor = [UIColor blueColor];
+    //    self.webView.inputAccessoryView = v;
+    //
+    //
+    //    UIView* v2 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 200)];
+    //    v2.backgroundColor = [UIColor yellowColor];
+    //    self.webView.inputView = v2;
+
+    self.webView.inputView = nil;
+
+    [self.webView reloadInputViews];
 }
 
 - (void)webView:(SectionEditorWebViewWithTestingButtons *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation {
