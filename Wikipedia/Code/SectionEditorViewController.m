@@ -31,6 +31,13 @@
     [super viewDidLoad];
 
     self.webView = [[SectionEditorWebViewWithTestingButtons alloc] init];
+    
+    
+UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+v.backgroundColor = [UIColor redColor];
+self.webView.inputAccessoryView = v;
+
+    
     [self.view wmf_addSubviewWithConstraintsToEdges:self.webView];
     self.webView.navigationDelegate = self;
     [self.webView loadHTMLFromAssetsFile:@"mediawiki-extensions-CodeMirror/codemirror-index.html" scrolledToFragment:nil];
@@ -324,6 +331,26 @@
     [super didReceiveMemoryWarning];
     // [self.webView toggleRichEditor];
     // [self.webView becomeFirstResponder];
+    
+
+    
+    
+//    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+//    v.backgroundColor = [UIColor redColor];
+//    self.webView.inputAccessoryView = v;
+
+//    self.webView.inputAccessoryView = nil;
+//    NSLog(@"self.webView.inputAccessoryView = %@", );
+NSLog(@"HI");
+
+    
+    UIView* v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 50)];
+    v.backgroundColor = [UIColor blueColor];
+    self.webView.inputAccessoryView = v;
+//    self.webView.inputAccessoryView = nil;
+    [self.webView reloadInputViews];
+    
+    
 }
 
 - (void)webView:(SectionEditorWebViewWithTestingButtons *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation {

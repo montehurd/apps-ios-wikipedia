@@ -111,3 +111,116 @@ fileprivate extension SectionEditorWebView {
         method_setImplementation(method, imp_implementationWithBlock(block))
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// move this out to protocol extension?
+
+private let ContentViewPrefix = "WKContent"
+private var CustomInputAccessoryViewHandle: UInt8 = 0
+extension SectionEditorWebView {
+    
+    override func reloadInputViews() {
+        guard let contentView = contentView() else {
+            assertionFailure("Couldn't find content view")
+            return
+        }
+        contentView.reloadInputViews()
+    }
+    
+    override open var inputAccessoryView: UIView? {
+        get {
+            return getCustomInputAccessoryView()
+        }
+        set {
+            setCustomInputAccessoryView(newValue)
+        }
+    }
+    
+    private func add(selector: Selector, to target: AnyClass, origin: AnyClass, originSelector: Selector) {
+        guard
+            let newMethod = class_getInstanceMethod(origin, originSelector),
+            let typeEncoding = method_getTypeEncoding(newMethod)
+            else {
+                assertionFailure("Couldn't add method")
+                return
+        }
+        class_addMethod(target, selector, method_getImplementation(newMethod), typeEncoding)
+    }
+
+    private func contentView() -> UIView? {
+        return scrollView.subviews.first(where: {
+            return String(describing: type(of: $0)).hasPrefix(ContentViewPrefix)
+        })
+    }
+    
+    @objc private func setCustomInputAccessoryView(_ customView: UIView?) {
+        objc_setAssociatedObject(self, &CustomInputAccessoryViewHandle, customView, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+ 
+        guard let targetView = contentView() else {
+            assertionFailure("Couldn't find content view")
+            return
+        }
+
+        guard let newClass = classWithCustomAccessoryView(targetView: targetView) else {
+            assertionFailure("Couldn't get class")
+            return
+        }
+        object_setClass(targetView, newClass)
+    }
+
+    private func classWithCustomAccessoryView(targetView: UIView) -> AnyClass? {
+        let customViewClassName = "\(ContentViewPrefix)_CustomInputAccessoryView"
+        
+        let existingClass: AnyClass? = NSClassFromString(customViewClassName)
+        guard existingClass == nil else {
+            return existingClass
+        }
+
+        guard let newClass = objc_allocateClassPair(object_getClass(targetView), customViewClassName, 0) else {
+            assertionFailure("Couldn't get class")
+            return nil
+        }
+        
+        add(
+            selector: #selector(getter: UIResponder.inputAccessoryView),
+            to: newClass.self,
+            origin: SectionEditorWebView.self,
+            originSelector: #selector(getCustomInputAccessoryView)
+        )
+        
+        objc_registerClassPair(newClass)
+        
+        return newClass
+    }
+    
+    @objc private func getCustomInputAccessoryView() -> UIView? {
+        let webView = wmf_firstSuperviewOfType(SectionEditorWebView.self)
+        return objc_getAssociatedObject(webView as Any, &CustomInputAccessoryViewHandle) as? UIView
+    }
+}
