@@ -58,8 +58,8 @@ extension SectionEditorWebView {
     @objc func toggleUnorderedListSelection() {
         execCommand(for: .unorderedList)
     }
-    @objc func toggleHeadingSelection() {
-        execCommand(for: .heading)
+    @objc func setHeadingSelection(depth: Int) {
+        execCommand(for: .heading, depth: depth)
     }
     @objc func increaseIndentDepth() {
         execCommand(for: .increaseIndentDepth)
@@ -129,10 +129,10 @@ extension SectionEditorWebView {
         execCommand(for: .bigTextSize)
     }
 
-    private func commandJS(for commandType: CodeMirrorCommandType) -> String {
-        return "window.wmf.commands.\(commandType.rawValue)();"
+    private func commandJS(for commandType: CodeMirrorCommandType, depth: Int = 0) -> String {
+        return "window.wmf.commands.\(commandType.rawValue)(\(depth));"
     }
-    private func execCommand(for commandType: CodeMirrorCommandType) {
-        evaluateJavaScript(commandJS(for: commandType), completionHandler: nil)
+    private func execCommand(for commandType: CodeMirrorCommandType, depth: Int = 0) {
+        evaluateJavaScript(commandJS(for: commandType, depth: depth), completionHandler: nil)
     }
 }

@@ -376,6 +376,8 @@
     const italicMarkup = "''"
     const boldMarkup = "'''"
 
+const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) => {return item.button === buttonType}).length > 0
+
     wmf.commands = {
       focus: () => {
         editor.focus()
@@ -438,8 +440,11 @@
         // TODO: determine 'strikethrough' in selectedButtons
         toggleMarkup('strikethrough', '<s>', '</s>')
       },
-      heading: () => {
-        console.log('heading')
+      heading: (depth) => {
+        
+        const equals = '='.repeat(depth)
+        toggleMarkup('heading', equals, equals)
+        
       },
       increaseIndentDepth: () => {
         console.log('increaseIndentDepth')
