@@ -60,11 +60,19 @@
     const getSelectionRange = (doc) => {
       const fromCursor = doc.getCursor('from')
       const toCursor = doc.getCursor('to')
+
+      const start = fromCursor.ch
+      const end = toCursor.ch
+      const isSingleLine = (fromCursor.line === toCursor.line)
+      const line = fromCursor.line
+      const isSelectionMoreThanOneChar = !isSingleLine || (end - start) > 0
+
       return {
-        start: fromCursor.ch,
-        end: toCursor.ch,
-        isSingleLine: (fromCursor.line === toCursor.line),
-        line: fromCursor.line
+        start,
+        end,
+        isSingleLine,
+        line,
+        isSelectionMoreThanOneChar
       }
     }
     
@@ -191,7 +199,6 @@
 
     const selectedButtons = (doc) => {  
       const selection = doc.getSelection()
-      const multipleCharactersSelected = selection.length > 0
       const selectionRange = getSelectionRange(doc)
       const lineTokens = enrichedLineTokens(doc, selectionRange.line)
       
@@ -264,9 +271,7 @@
     const sendNativeMessages = (doc) => {
       // sends message to native land that selection has changed,
       // upon receipt native land should de-select all buttons
-      const selectionRange = getSelectionRange(doc)
-      const isSelectionMoreThanOneChar = !selectionRange.isSingleLine || (selectionRange.end - selectionRange.start) > 0
-      window.webkit.messageHandlers.selectionChanged.postMessage(isSelectionMoreThanOneChar)
+      window.webkit.messageHandlers.selectionChanged.postMessage(getSelectionRange(doc).isSelectionMoreThanOneChar)
 
       // sends message to native land about which buttons should be selected,
       // native land should assume only these buttons should appear selected
@@ -376,6 +381,17 @@
     const italicMarkup = "''"
     const boldMarkup = "'''"
 
+
+
+const selectionPayloadForButton = (buttonType) => {
+  const payloadsForButton = selectedButtons(editor).filter((item) => {return item.button === buttonType})
+  if (payloadsForButton.length === 0) {
+    return null
+  }
+  return payloadsForButton[0]
+}
+
+
     wmf.commands = {
       focus: () => {
         editor.focus()
@@ -439,9 +455,72 @@
         toggleMarkup('strikethrough', '<s>', '</s>')
       },
       heading: (depth) => {
+
+
+
+
+
+
+        const selectionRange = getSelectionRange(editor)
+
+        // Attempt to get details about any currenly selected heading.
+        const headingPayload = selectionPayloadForButton('heading')
+
+        // If cursor is in existing heading we'll have a payload telling us now many '=' it uses.
+        const isExistingHeadingSelected = headingPayload !== null
         
+        // First turn off existing selection heading.
+        if (isExistingHeadingSelected) {
+          // Expand selection to encompass current heading (you can't nest headings so this is better).
+          const lineTokens = enrichedLineTokens(editor, selectionRange.line)
+          const headerTextTokenIndex = indexOfFirstLineTokenWithType(lineTokens, 'mw-section-header-text')
+          if (headerTextTokenIndex) {
+            const headerTextToken = lineTokens[headerTextTokenIndex]
+            editor.setSelection({line: selectionRange.line, ch: headerTextToken.start}, {line: selectionRange.line, ch: headerTextToken.end})
+          }
+          
+          // Now remove the existing heading equals so the toggle at the end of the method will add the new amount of equals.
+          const currentDepth = headingPayload.info.depth
+          // But don't remove the existing heading equals if new depth is same as old.
+          // This way the toggle at the end of the method will remove all equals when we try to set the same number of equals that are already present.
+          if (currentDepth !== depth) {
+            const currentEquals = '='.repeat(currentDepth)
+            toggleMarkup('heading', currentEquals, currentEquals)
+          }          
+        }
+
+        // Move selection to own line and re-select it.
+        if (!isExistingHeadingSelected) {
+          
+          const startOfSelectionIsNotStartOfLine = selectionRange.start !== 0
+          const endOfSelectionIsNotEndOfLine = false//selectionRange.end !== editor.getLine(selectionRange.line).length
+          
+          if (startOfSelectionIsNotStartOfLine || endOfSelectionIsNotEndOfLine) {
+
+            const leadingBreak = startOfSelectionIsNotStartOfLine ? '\n' : ''
+            const trailingBreak = endOfSelectionIsNotEndOfLine ? '\n' : ''
+          
+            let from = {line: selectionRange.line, ch: selectionRange.start}
+            let to = {line: selectionRange.line, ch: selectionRange.end}
+            editor.replaceRange(`${leadingBreak}${editor.getSelection()}${trailingBreak}`, from, to)
+            from = {line: selectionRange.line + 1, ch: 0}
+            to = {line: selectionRange.line + 1, ch: selectionRange.end - selectionRange.start}
+            editor.setSelection(from, to)
+          
+          }
+          
+        }
+
+        // Next toggle heading for selected depth.
         const equals = '='.repeat(depth)
         toggleMarkup('heading', equals, equals)
+        
+        
+        
+        
+        
+        
+        
         
       },
       increaseIndentDepth: () => {
