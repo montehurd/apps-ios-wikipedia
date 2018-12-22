@@ -68,9 +68,21 @@ class SectionEditorViewController: UIViewController {
         return true
     }
 
+    private lazy var debugTextView: UITextView = {
+        let tv = UITextView(frame: CGRect(x: 0, y: 0, width: 50, height: 150))
+        tv.font = UIFont(name: "Helvetica Neue", size: 8)
+        tv.layer.borderColor = UIColor.lightGray.cgColor
+        tv.backgroundColor = UIColor(0xeeeeee)
+        tv.layer.borderWidth = 2
+        tv.alpha = 0.8
+        tv.layer.cornerRadius = 5
+        tv.clipsToBounds = true
+        return tv
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+view.addSubview(debugTextView)
         configureNavigationButtonItems()
 
         configureWebView()
@@ -108,6 +120,7 @@ class SectionEditorViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         progressButton.isEnabled = changesMade
+view.bringSubviewToFront(debugTextView)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -184,6 +197,9 @@ class SectionEditorViewController: UIViewController {
         guard let message = userInfo[SectionEditorWebViewConfiguration.WMFSectionEditorSelectionChangedSelectedButton] as? ButtonNeedsToBeSelectedMessage else {
             return
         }
+
+debugTextView.text = "\(debugTextView.text ?? "")\(message.type.rawValue)\n"
+        
         switch message.type {
         case .undo:
             undoButton.isEnabled = true
@@ -195,6 +211,9 @@ class SectionEditorViewController: UIViewController {
     }
 
     @objc private func textSelectionDidChange(_ notification: Notification) {
+        
+debugTextView.text = nil
+        
         undoButton.isEnabled = false
         redoButton.isEnabled = false
     }

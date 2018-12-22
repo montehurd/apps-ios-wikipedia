@@ -242,13 +242,13 @@
         result.push(buttonPayload('signature', {depth: depth}))
       }
 
-      result.push(buttonPayload('debug', {
-         tokensIntersectingSelectionStrings: intersectingTokens.map(token => token.string).join(''),
-         tokensIntersectingSelectionTypesArray: typesArray,
-         selectionRange: getSelectionRange(doc),
-         getSelectionText: selection
-       }
-      ))
+      // result.push(buttonPayload('debug', {
+      //    tokensIntersectingSelectionStrings: intersectingTokens.map(token => token.string).join(''),
+      //    tokensIntersectingSelectionTypesArray: typesArray,
+      //    selectionRange: getSelectionRange(doc),
+      //    getSelectionText: selection
+      //  }
+      // ))
      
       const historySize = doc.historySize()
       if (historySize.undo > 1) {
@@ -356,10 +356,17 @@
         }
       }
     }
+
+
+    const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) => {return item.button === buttonType}).length > 0
+
+
       
     const toggleMarkup = (button, openingMarkup, closingMarkup) => {
-      const hasMarkup = isSelectionWrappedWith(openingMarkup, closingMarkup)
-      if (hasMarkup) {
+      // const hasMarkup = isSelectionWrappedWith(openingMarkup, closingMarkup)
+      // if (hasMarkup) {
+      const isSelected = isButtonSelected(button)
+      if (isSelected) {
         unwrapSelectionWith(openingMarkup, closingMarkup)
       } else {
         wrapSelectionWith(openingMarkup, closingMarkup)
@@ -376,7 +383,7 @@
     const italicMarkup = "''"
     const boldMarkup = "'''"
 
-const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) => {return item.button === buttonType}).length > 0
+
 
     wmf.commands = {
       focus: () => {
@@ -392,13 +399,14 @@ const isButtonSelected = (buttonType) => selectedButtons(editor).filter((item) =
         toggleMarkup('bold', boldMarkup)
       },
       italic: () => {
-        if (isSelectionWrappedWith(boldMarkup + italicMarkup)) {
-          unwrapSelectionWith(italicMarkup)
-        } else if (isSelectionWrappedWith(boldMarkup)) {
-          wrapSelectionWith(italicMarkup)
-        } else {
-          toggleMarkup('italic', italicMarkup)
-        }
+        toggleMarkup('italic', italicMarkup)
+        // if (isSelectionWrappedWith(boldMarkup + italicMarkup)) {
+        //   unwrapSelectionWith(italicMarkup)
+        // } else if (isSelectionWrappedWith(boldMarkup)) {
+        //   wrapSelectionWith(italicMarkup)
+        // } else {
+        //   toggleMarkup('italic', italicMarkup)
+        // }
       },
       reference: () => {
         toggleMarkup('reference', '<ref>', '</ref>')
