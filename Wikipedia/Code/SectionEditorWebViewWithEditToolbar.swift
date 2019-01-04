@@ -165,6 +165,10 @@ class SectionEditorWebViewWithEditToolbar: SectionEditorWebView {
     // MARK: Notifications
 
     @objc private func textSelectionDidChange(_ notification: Notification) {
+
+// TEMP return to stay on big/small menu after selection
+return
+
         guard inputViewController == nil else {
             return
         }

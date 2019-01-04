@@ -124,7 +124,40 @@ class SectionEditorViewController: UIViewController {
         webView.configureInputAccessoryViews()
     }
 
+    override func didReceiveMemoryWarning() {
+        webView.undo()
+    }
+    
     private func loadWikitext() {
+        
+        let revision = """
+==heading==
+
+sample wikitext '''bold''' ''italic'' [[anchor]]
+
+<u>underline</u> <s>strike</s>
+
+<big>big</big>
+
+<small>small</small>
+
+ <ref>a<small>sample <big>bbb bbb2</big> sample2</small> reference</ref>
+
+"""
+        webView.setup(wikitext: revision) { (error) in
+            if let error = error {
+                assertionFailure(error.localizedDescription)
+            } else {
+                DispatchQueue.main.async {
+                    self.webView.focus()
+                    // TODO: Remove
+                    self.progressButton.isEnabled = true
+                }
+            }
+        }
+
+        
+return
         guard let section = section else {
             assertionFailure("Section should be set by now")
             return
