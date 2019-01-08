@@ -116,6 +116,13 @@ class SectionEditorWebViewConfiguration: WKWebViewConfiguration, WKScriptMessage
                 let ordered = buttonInfoDict?[ButtonInfoConstants.ordered.rawValue] as? Bool ?? false
                 if let buttonType = EditButtonType(rawValue: button) {
                     post(buttonNeedsToBeSelectedMessage: ButtonNeedsToBeSelectedMessage(type: buttonType, ordered: ordered, depth: depth))
+//if buttonType == .debug {
+//    if
+//        let buttonInfoDict = buttonInfoDict,
+//        let tagRangesIntersectingSelectionRange = buttonInfoDict["tagRangesIntersectingSelectionRange"] {
+//        print("\n\ntagRangesIntersectingSelectionRange = \(tagRangesIntersectingSelectionRange)\n\n")
+//    }
+//}
                 }
             }
         }
