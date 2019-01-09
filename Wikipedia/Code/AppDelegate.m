@@ -84,6 +84,16 @@ static NSTimeInterval const WMFBackgroundFetchInterval = 10800; // 3 Hours
 
     [self updateDynamicIconShortcutItems];
 
+    
+    
+    
+    
+WMFSectionEditorViewController *sectionEditVC = [[WMFSectionEditorViewController alloc] init];
+[vc presentViewController:sectionEditVC animated:NO completion:nil];
+
+    
+    
+    
     return YES;
 }
 
