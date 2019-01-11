@@ -324,14 +324,21 @@
      
       const listItemLineCallback = (char, depth, line) => {
         result.push(buttonPayload('li', {depth: depth, ordered: (char === '#')}))
-        if (depth > 1) {
-          result.push(buttonPayload('decreaseIndentDepth'))
-        }        
-        result.push(buttonPayload('increaseIndentDepth'))
+        // if (depth > 1) {
+        //   result.push(buttonPayload('decreaseIndentDepth'))
+        // }        
+        // result.push(buttonPayload('increaseIndentDepth'))
         return false // No need to continue (only need to send one 'li' message)
       }
       performCallBackForSelectedListItemLines(doc, '#', listItemLineCallback)
       performCallBackForSelectedListItemLines(doc, '*', listItemLineCallback)
+
+
+
+
+
+
+/*
 
       const historySize = doc.historySize()
       
@@ -345,7 +352,15 @@
       if (historySize.redo > 0) {
         result.push(buttonPayload('redo'))
       }
-        
+
+*/
+
+
+
+
+
+
+      
       return result
     }
 
@@ -357,6 +372,90 @@
       // sends message to native land about which buttons should be selected,
       // native land should assume only these buttons should appear selected
       window.webkit.messageHandlers.highlightTheseButtons.postMessage(selectedButtons(doc))
+      
+      
+
+
+
+
+
+
+
+const listPayload = selectionPayloadForButton('li') //TODO: get button info from 'selectedButtons(doc)' above 
+let shouldDisableDecreaseIndent = true
+let shouldDisableIncreaseIndent = true
+if (listPayload) {
+  const depth = listPayload.info.depth
+  if (depth > 1) { 
+    shouldDisableDecreaseIndent = false
+  }
+  shouldDisableIncreaseIndent = false
+}
+
+let buttonsToDisable = []
+
+if (shouldDisableDecreaseIndent) {
+  buttonsToDisable.push(buttonPayload('decreaseIndentDepth'))
+}
+if (shouldDisableIncreaseIndent) {
+  buttonsToDisable.push(buttonPayload('increaseIndentDepth'))
+}
+
+
+/*
+const historySize = doc.historySize()
+const changesMade = historySize.undo > 1
+if (changesMade) {
+  result.push(buttonPayload('undo'))
+}
+result.push(buttonPayload('changesMade', {changesMade: changesMade}))
+if (historySize.redo > 0) {
+  result.push(buttonPayload('redo'))
+}
+*/
+
+
+const historySize = doc.historySize()
+if (historySize.undo < 2) {
+  buttonsToDisable.push(buttonPayload('undo'))  
+
+buttonsToDisable.push(buttonPayload('progress'))
+
+}
+if (historySize.redo < 1) {
+  buttonsToDisable.push(buttonPayload('redo'))
+}
+
+
+
+/*
+const historySize = doc.historySize()
+
+const changesMade = historySize.undo > 1
+// if (changesMade) {
+//   result.push(buttonPayload('undo'))
+// }
+
+result.push(buttonPayload('changesMade', {changesMade: changesMade}))
+*/
+
+
+
+
+
+window.webkit.messageHandlers.disableTheseButtons.postMessage(buttonsToDisable)
+
+
+
+
+
+
+
+
+
+
+
+      
     }
         
     const applyTheme = (themeName) => {

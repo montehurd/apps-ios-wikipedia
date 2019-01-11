@@ -106,22 +106,39 @@ class SectionEditorNavigationItemController: NSObject, Themeable {
             undoButton
         ]
 
-        progressButton.isEnabled = false
+//        progressButton.isEnabled = false
     }
 
     func textSelectionDidChange(isRangeSelected: Bool) {
-        undoButton.isEnabled = false
-        redoButton.isEnabled = false
+
+undoButton.isEnabled = true
+redoButton.isEnabled = true
+progressButton.isEnabled = true
+//        undoButton.isEnabled = false
+//        redoButton.isEnabled = false
     }
 
-    func buttonSelectionDidChange(button: SectionEditorWebViewMessagingController.Button) {
+    func disableButton(button: SectionEditorWebViewMessagingController.Button) {
         switch button.kind {
         case .undo:
-            undoButton.isEnabled = true
+            undoButton.isEnabled = false
         case .redo:
-            redoButton.isEnabled = true
-        case .progress(let changesMade):
-            progressButton.isEnabled = changesMade
+            redoButton.isEnabled = false
+        case .progress:
+            progressButton.isEnabled = false
+        default:
+            break
+        }
+    }
+    
+    func buttonSelectionDidChange(button: SectionEditorWebViewMessagingController.Button) {
+        switch button.kind {
+//        case .undo:
+//            undoButton.isEnabled = true
+//        case .redo:
+//            redoButton.isEnabled = true
+//        case .progress(let changesMade):
+//            progressButton.isEnabled = changesMade
         default:
             break
         }
