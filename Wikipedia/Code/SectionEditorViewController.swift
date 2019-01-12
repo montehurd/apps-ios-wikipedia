@@ -58,10 +58,11 @@ class SectionEditorViewController: UIViewController {
     }
 
     private func configureWebView() {
-        guard let language = section?.article?.url.wmf_language else {
-            return
-        }
-        
+//        guard let language = section?.article?.url.wmf_language else {
+//            return
+//        }
+let language = "en"
+
         let configuration = WKWebViewConfiguration()
         let schemeHandler = WMFURLSchemeHandler.shared()
         configuration.setURLSchemeHandler(schemeHandler, forURLScheme: WMFURLSchemeHandlerScheme)
@@ -140,6 +141,35 @@ class SectionEditorViewController: UIViewController {
     }
 
     private func loadWikitext() {
+        
+        
+DispatchQueue.main.async {
+    self.wikitext = """
+
+==heading==
+
+* one
+*  two
+* three
+
+sample wikitext '''bold ''italic'' bold'''
+sample wikitext ''italic '''bold''' italic''
+
+sample wikitext '''bold''' ''italic'' [[anchor]]
+
+<u>underline</u> <s>strike</s>
+
+<big>big</big>
+
+<small>small</small>
+
+<ref>a<small>sample <big>bbb bbb2</big> sample2</small> reference</ref>
+
+"""
+    
+}
+return
+
         guard let section = section else {
             assertionFailure("Section should be set by now")
             return
@@ -158,6 +188,15 @@ class SectionEditorViewController: UIViewController {
         navigationController?.popViewController(animated: true)
         return true
     }
+    
+    
+    
+    override func didReceiveMemoryWarning() {
+        messagingController.undo()
+    }
+    
+    
+    
 }
 
 extension SectionEditorViewController: SectionEditorNavigationItemControllerDelegate {
