@@ -27,6 +27,8 @@ class EditSaveViewController: WMFScrollViewController, Themeable, UITextFieldDel
     @IBOutlet private var editSummaryVCContainer: UIView!
     private var borderWidth: CGFloat = 0.0
     @IBOutlet private var previewLicenseView: PreviewLicenseView!
+    @IBOutlet private var minorEditOptionsView: EditOptionsView!
+    @IBOutlet private var watchlistOptionsView: EditOptionsView!
     private var previewLicenseTapGestureRecognizer: UIGestureRecognizer?
 
     @IBOutlet private var scrollContainer: UIView!
@@ -110,6 +112,24 @@ class EditSaveViewController: WMFScrollViewController, Themeable, UITextFieldDel
         
         borderWidth = 1.0 / UIScreen.main.scale
 
+        
+        
+        
+        
+        minorEditOptionsView.label.text = WMFLocalizedStringWithDefaultValue("edit-minor-text", nil, nil, "This is a minor edit", "Text for minor edit label")
+        minorEditOptionsView.button.setTitle(WMFLocalizedStringWithDefaultValue("edit-minor-learn-more-text", nil, nil, "Learn more about minor edits", "Text for minor edits learn more button"), for: .normal)
+
+        
+        watchlistOptionsView.label.text = WMFLocalizedStringWithDefaultValue("edit-watch-this-page-text", nil, nil, "Watch this page", "Text for watch this page label")
+        watchlistOptionsView.button.setTitle(WMFLocalizedStringWithDefaultValue("edit-watch-list-learn-more-text", nil, nil, "Learn more about watch lists", "Text for watch lists learn more button"), for: .normal)
+
+        
+        
+        
+        
+        
+        
+        
         apply(theme: theme)
     }
 
@@ -328,6 +348,8 @@ class EditSaveViewController: WMFScrollViewController, Themeable, UITextFieldDel
         view.backgroundColor = theme.colors.paperBackground
         scrollView.backgroundColor = theme.colors.paperBackground
         previewLicenseView.apply(theme: theme)
+        minorEditOptionsView.apply(theme: theme)
+        watchlistOptionsView.apply(theme: theme)
         scrollContainer.backgroundColor = theme.colors.paperBackground
         captchaContainer.backgroundColor = theme.colors.paperBackground
     }
