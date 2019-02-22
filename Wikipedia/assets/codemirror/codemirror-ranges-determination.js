@@ -195,3 +195,22 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
   lineTokens.forEach(tokenWithEnrichedInHtmlTagArray)    
   return outputMarkupItems
 }
+
+
+
+
+
+
+
+
+
+
+const markupItemsForLine = (line) => {
+  const lineTokens = editor.getLineTokens(line, true)
+  const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens)
+  const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens)
+  return tagMarkupItems.concat(nonTagMarkupItems)
+}
+
+
+
