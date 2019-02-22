@@ -60,8 +60,13 @@ const showRangeDebuggingButtons = () => {
     const kickoff = () => {
       reset()
 
-      markupItems = markupItemsForLine(editor.getCursor().line)
+//NEW for tags
       // markupItems = tagMarkupItemsForLine(editor.getCursor().line)
+//OLD for non-tags
+      // markupItems = markupItemsForLine(editor.getCursor().line)
+//NEW for non-tags
+      markupItems = newNonTagMarkupItemsForLine(editor.getLineTokens(editor.getCursor().line, true))
+
 
       flickerTextForMarkupItemAtIndex(currentItemIndex)
     }

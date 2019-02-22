@@ -363,7 +363,8 @@ const getCloseTagStartTokenIndices = (lineTokens, openTagStartTokenIndices) => {
 
 
 
-
+// to test:
+// newNonTagMarkupItemsForLine(editor.getLineTokens(0, true))
 
 
 const newNonTagMarkupItemsForLine = (lineTokens) => {
