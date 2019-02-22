@@ -38,7 +38,7 @@ const showRangeDebuggingButtons = () => {
       if (currentItemIndex > (markupItems.length - 1)) {
         currentItemIndex = markupItems.length - 1
       }
-      flickerTextForMarkupItemAtIndex(currentItemIndex)    
+      highlightTextForMarkupItemAtIndex(currentItemIndex)    
       console.log('next')    
     })
 
@@ -48,7 +48,7 @@ const showRangeDebuggingButtons = () => {
       if (currentItemIndex < 0) {
         currentItemIndex = 0
       }
-      flickerTextForMarkupItemAtIndex(currentItemIndex)    
+      highlightTextForMarkupItemAtIndex(currentItemIndex)    
       console.log('prev')    
     })
 
@@ -61,14 +61,16 @@ const showRangeDebuggingButtons = () => {
       reset()
 
 //NEW for tags
-      // markupItems = tagMarkupItemsForLine(editor.getCursor().line)
+      const tagMarkupItems = tagMarkupItemsForLine(editor.getCursor().line)
 //OLD for non-tags
       // markupItems = markupItemsForLine(editor.getCursor().line)
 //NEW for non-tags
-      markupItems = newNonTagMarkupItemsForLine(editor.getLineTokens(editor.getCursor().line, true))
+      const nonTagMarkupItems = newNonTagMarkupItemsForLine(editor.getLineTokens(editor.getCursor().line, true))
+
+ markupItems = tagMarkupItems.concat(nonTagMarkupItems)
 
 
-      flickerTextForMarkupItemAtIndex(currentItemIndex)
+      highlightTextForMarkupItemAtIndex(currentItemIndex)
     }
 
     addButton('test outer', () => {
@@ -82,7 +84,7 @@ const showRangeDebuggingButtons = () => {
     })
   }
 
-  const flickerTextForMarkupItemAtIndex = (index) => {
+  const highlightTextForMarkupItemAtIndex = (index) => {
     const line = editor.getCursor().line
     const markupItem = markupItems[index]
     const range = useOuter ? markupItem.outer : markupItem.inner
