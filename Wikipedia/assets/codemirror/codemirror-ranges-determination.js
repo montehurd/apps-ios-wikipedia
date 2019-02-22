@@ -69,8 +69,9 @@ const getOpenTagStartTokenIndices = (lineTokens) => {
 
 const tagMarkupItemsForLineTokens = (lineTokens) => {
   const openTagStartTokenIndices = getOpenTagStartTokenIndices(lineTokens)    
-  const openTagEndTokenIndices = openTagStartTokenIndices.map(i => i + 2)
   const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
+  const openTagEndTokenIndices = openTagStartTokenIndices.map(i => i + 2)
+
   const closeTagStartTokenIndices = getCloseTagStartTokenIndices(lineTokens, openTagStartTokenIndices)    
   const closeTagEndTokenIndices = closeTagStartTokenIndices.map(i => i + 2)
 
