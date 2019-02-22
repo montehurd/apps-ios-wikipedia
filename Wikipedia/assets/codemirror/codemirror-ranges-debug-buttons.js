@@ -60,15 +60,12 @@ const showRangeDebuggingButtons = () => {
     const kickoff = () => {
       reset()
 
-//NEW for tags
-      const tagMarkupItems = tagMarkupItemsForLine(editor.getCursor().line)
-//OLD for non-tags
-      // markupItems = markupItemsForLine(editor.getCursor().line)
-//NEW for non-tags
-      const nonTagMarkupItems = newNonTagMarkupItemsForLine(editor.getLineTokens(editor.getCursor().line, true))
+      const lineTokens = editor.getLineTokens(editor.getCursor().line, true)
 
- markupItems = tagMarkupItems.concat(nonTagMarkupItems)
+      const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens)
+      const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens)
 
+      markupItems = tagMarkupItems.concat(nonTagMarkupItems)
 
       highlightTextForMarkupItemAtIndex(currentItemIndex)
     }
