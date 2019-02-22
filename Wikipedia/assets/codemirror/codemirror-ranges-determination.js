@@ -20,7 +20,9 @@ const union = (a, b) => new Set([...a, ...b])
 // - remove unused bits! signatures? indenting? 
 // - split out to separate files!
 // - add tests!
-
+// - handle html comments <!--h a-->
+// - bug: string below. tags after bold don't have range correctly determined. before works. also bug on 6.2
+//      a '''bbb''' ccc <u>ddd</u>
 
 // - returns set of types for token
 // - smooths out inconsistent nested bold and italic types
@@ -231,4 +233,94 @@ const markupItemsForLine = (line) => {
   }  
   return markupItemsForLineTokens(enrichedLineTokens2(editor.getLineTokens(line, true)))
     .map(replaceItemWithName)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const isTokenForTagBracket = (token) => tokenIncludesType(token, 'mw-htmltag-bracket') || tokenIncludesType(token, 'mw-exttag-bracket')
+const isTokenStartOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '<'
+const isTokenStartOfCloseTag = (token) => isTokenForTagBracket(token) && token.string === '</'  
+
+const getOpenTagStartTokenIndices = (lineTokens) => {
+  let openTagStartTokenIndices = []
+  const possiblyRecordOpenTagTokenIndex = (token, index) => {
+    if (isTokenStartOfOpenTag(token)) {
+      openTagStartTokenIndices.push(index)
+    }
+  }
+  lineTokens.forEach(possiblyRecordOpenTagTokenIndex)
+  return openTagStartTokenIndices
+}
+
+
+const tagMarkupItemsForLine = (line) => {
+
+  const lineTokens = editor.getLineTokens(line, true)
+  
+  const openTagStartTokenIndices = getOpenTagStartTokenIndices(lineTokens)    
+  const openTagEndTokenIndices = openTagStartTokenIndices.map(i => i + 2)
+  const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
+  const closeTagStartTokenIndices = getCloseTagStartTokenIndices(lineTokens, openTagStartTokenIndices)    
+  const closeTagEndTokenIndices = closeTagStartTokenIndices.map(i => i + 2)
+
+  let output = []
+  const tagCount = openTagStartTokenIndices.length
+  
+  for (let i = 0; i < tagCount; i++) { 
+    const openTagStartTokenIndex = openTagStartTokenIndices[i]
+    const tagTypeTokenIndex = tagTypeTokenIndices[i]
+    const openTagEndTokenIndex = openTagEndTokenIndices[i]
+    const closeTagStartTokenIndex = closeTagStartTokenIndices[i]
+    const closeTagEndTokenIndex = closeTagEndTokenIndices[i]
+
+    let outer = new ItemRange(lineTokens[openTagStartTokenIndex].start, lineTokens[closeTagEndTokenIndex].end)
+    let inner = new ItemRange(lineTokens[openTagEndTokenIndex].end, lineTokens[closeTagStartTokenIndex].start)
+    let tag = lineTokens[tagTypeTokenIndex].string
+    output.push(new MarkupItem(tag, inner, outer))
+  }
+  
+  return output
+
+}
+
+
+const getCloseTagStartTokenIndices = (lineTokens, openTagStartTokenIndices) => {
+  
+  let closeTagStartTokenIndices = []
+  
+  openTagStartTokenIndices.forEach(startOfOpenTagTokenIndex => {
+    let depth = 0
+    for (let i = startOfOpenTagTokenIndex + 1; i < lineTokens.length; i++) { 
+      let thisToken = lineTokens[i]
+      if (isTokenStartOfOpenTag(thisToken)){
+        depth = depth + 1
+      } else if (isTokenStartOfCloseTag(thisToken)) {
+        if (depth === 0) {
+          closeTagStartTokenIndices.push(i)
+          break
+        }
+        depth = depth - 1        
+      }
+    }
+    
+  })
+  
+  return closeTagStartTokenIndices
 }
