@@ -50,6 +50,7 @@ class ItemRange {
 
 const isTokenForTagBracket = (token) => tokenIncludesType(token, 'mw-htmltag-bracket') || tokenIncludesType(token, 'mw-exttag-bracket')
 const isTokenStartOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '<'
+const isTokenEndOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '>'  
 const isTokenStartOfCloseTag = (token) => isTokenForTagBracket(token) && token.string === '</'  
 
 
@@ -66,11 +67,19 @@ const getOpenTagStartTokenIndices = (lineTokens) => {
   return openTagStartTokenIndices
 }
 
+const getOpenTagEndTokenIndices = (lineTokens, openTagStartTokenIndices) => {
+  const getOpenTagEndTokenIndex = (openTagStartTokenIndex) => {
+    return lineTokens.findIndex((t, i) => {
+      return i > openTagStartTokenIndex && isTokenEndOfOpenTag(t)
+    })
+  }
+  return openTagStartTokenIndices.map(getOpenTagEndTokenIndex)
+}
 
 const tagMarkupItemsForLineTokens = (lineTokens) => {
   const openTagStartTokenIndices = getOpenTagStartTokenIndices(lineTokens)    
   const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
-  const openTagEndTokenIndices = openTagStartTokenIndices.map(i => i + 2)
+  const openTagEndTokenIndices = getOpenTagEndTokenIndices(lineTokens, openTagStartTokenIndices)
 
   const closeTagStartTokenIndices = getCloseTagStartTokenIndices(lineTokens, openTagStartTokenIndices)    
   const closeTagEndTokenIndices = closeTagStartTokenIndices.map(i => i + 2)
