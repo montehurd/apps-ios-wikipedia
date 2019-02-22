@@ -86,7 +86,7 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
 
     let outer = new ItemRange(lineTokens[openTagStartTokenIndex].start, lineTokens[closeTagEndTokenIndex].end)
     let inner = new ItemRange(lineTokens[openTagEndTokenIndex].end, lineTokens[closeTagStartTokenIndex].start)
-    let tag = lineTokens[tagTypeTokenIndex].string
+    let tag = lineTokens[tagTypeTokenIndex].string.trim()
     output.push(new MarkupItem(tag, inner, outer))
   }
   return output
@@ -178,7 +178,9 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
     }
     
     const updateMarkupItemRangeEnds = (type) => {
-      const markupItem = outputMarkupItems.find(markupItem => markupItem.item === type)
+      const markupItem = outputMarkupItems.find(markupItem => {
+        return markupItem.item === type && !markupItem.isComplete()
+      })
       if (markupItem) {
         markupItem.inner.end = token.start
         markupItem.outer.end = token.end
@@ -209,7 +211,12 @@ const markupItemsForLine = (line) => {
   const lineTokens = editor.getLineTokens(line, true)
   const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens)
   const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens)
-  return tagMarkupItems.concat(nonTagMarkupItems)
+  const markupItems = tagMarkupItems.concat(nonTagMarkupItems)
+  const markupItemsWithNames = markupItems.map(i => {
+    i.item = i.name()
+    return i
+  })
+  return markupItemsWithNames
 }
 
 
