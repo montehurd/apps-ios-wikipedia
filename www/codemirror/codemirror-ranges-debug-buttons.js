@@ -86,7 +86,7 @@ const showRangeDebuggingButtons = () => {
   }
 
   // could inject testing text here too
-  setTimeout(addTestingButtons, 2000)
+  setTimeout(addTestingButtons, 1000)
 }
 
 showRangeDebuggingButtons()

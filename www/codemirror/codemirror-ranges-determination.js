@@ -5,31 +5,34 @@ const union = (a, b) => new Set([...a, ...b])
 
 
 
+const buttonNameForType = (type) => {
+  if (type === 'mw-apostrophes-bold') {
+    return 'bold'
+  }
+  if (type === 'mw-section-header') {
+    return 'header'
+  }
+  if (type === 'mw-link-bracket') {
+    return 'link'
+  }
+  if (type === 'mw-template-bracket') {
+    return 'template'
+  }
+  if (type === 'mw-apostrophes-italic') {
+    return 'italic'
+  }
+  return type  
+}
+
+
 
 class MarkupItem {
-  constructor(item, inner, outer) {
-    this.item = item
+  constructor(type, inner, outer) {
+    this.type = type
     this.inner = inner
     this.outer = outer
+    this.buttonName = buttonNameForType(type)
   }
-  name() {
-    if (this.item === 'mw-apostrophes-bold') {
-        return 'bold'
-    }
-    if (this.item === 'mw-section-header') {
-        return 'header'
-    }
-    if (this.item === 'mw-link-bracket') {
-        return 'link'
-    }
-    if (this.item === 'mw-template-bracket') {
-        return 'template'
-    }
-    if (this.item === 'mw-apostrophes-italic') {
-        return 'italic'
-    }
-    return this.item
-  }  
   isComplete() {
     return this.inner.isComplete() && this.outer.isComplete()
   }
@@ -96,8 +99,8 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
 
     let outer = new ItemRange(lineTokens[openTagStartTokenIndex].start, lineTokens[closeTagEndTokenIndex].end)
     let inner = new ItemRange(lineTokens[openTagEndTokenIndex].end, lineTokens[closeTagStartTokenIndex].start)
-    let tag = lineTokens[tagTypeTokenIndex].string.trim()
-    output.push(new MarkupItem(tag, inner, outer))
+    let type = lineTokens[tagTypeTokenIndex].string.trim()
+    output.push(new MarkupItem(type, inner, outer))
   }
   return output
 }
@@ -189,7 +192,7 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
     
     const updateMarkupItemRangeEnds = (type) => {
       const markupItem = outputMarkupItems.find(markupItem => {
-        return markupItem.item === type && !markupItem.isComplete()
+        return markupItem.type === type && !markupItem.isComplete()
       })
       if (markupItem) {
         markupItem.inner.end = token.start
@@ -222,11 +225,7 @@ const markupItemsForLine = (line) => {
   const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens)
   const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens)
   const markupItems = tagMarkupItems.concat(nonTagMarkupItems)
-  const markupItemsWithNames = markupItems.map(i => {
-    i.item = i.name()
-    return i
-  })
-  return markupItemsWithNames
+  return markupItems
 }
 
 
