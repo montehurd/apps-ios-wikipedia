@@ -99,9 +99,9 @@ class MarkupItem {
     if (this.item === 'mw-apostrophes-italic') {
         return 'italic'
     }
-    if (this.item === 'mw-apostrophes-bold') {
-        return 'bold'
-    }
+    // if (this.item === 'mw-apostrophes-bold') {
+    //     return 'bold'
+    // }
     return this.item
   }
   
@@ -150,7 +150,7 @@ class ItemRange {
       
       const startAndStopTrackingMarkupItemsInToken = (token, index, tokens) => {
         const tags = new Set(token.state.InHtmlTag)
-        
+/*        
         // Fix for tags like 'ref', which mediawiki parsing curiously 
         // doesn't treat like other tags.
         if (token.state.extName !== false) {
@@ -161,7 +161,7 @@ class ItemRange {
         if (token.state.extState !== false) {
           token.state.extState.InHtmlTag.forEach(tags.add, tags)
         }
-
+*/
         const isNotAlreadyTrackingTag = (tag) => {
           return !trackedTags.has(tag)
         }
@@ -254,6 +254,24 @@ const markupItemsForLine = (line) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const isTokenForTagBracket = (token) => tokenIncludesType(token, 'mw-htmltag-bracket') || tokenIncludesType(token, 'mw-exttag-bracket')
 const isTokenStartOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '<'
 const isTokenStartOfCloseTag = (token) => isTokenForTagBracket(token) && token.string === '</'  
@@ -323,4 +341,68 @@ const getCloseTagStartTokenIndices = (lineTokens, openTagStartTokenIndices) => {
   })
   
   return closeTagStartTokenIndices
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const newNonTagMarkupItemsForLine = (lineTokens) => {
+  let trackedTypes = new Set()
+  const soughtTokenTypes = new Set(['mw-apostrophes-bold', 'mw-apostrophes-italic', 'mw-link-bracket', 'mw-section-header', 'mw-template-bracket'])
+  
+// TODO: rename this so it makes clear this is only for things that cant be nested inside themselves
+// - see if 'mw-template-bracket' has a nesting problem...
+// - later ensure new methods for unwrapping are not greedy if item is nested inside other item of same type!
+
+let markupItems = []
+
+  const tokenWithEnrichedInHtmlTagArray = (token, index, tokens) => {
+    const types = intersection(tokenTypes(token), soughtTokenTypes)
+    
+    const tagsToStopTracking = Array.from(intersection(trackedTypes, types))
+    const tagsToStartTracking = Array.from(difference(types, trackedTypes))
+
+    
+tagsToStartTracking.forEach(tag => {
+  const inner = new ItemRange(token.end, -1) 
+  const outer = new ItemRange(token.start, -1) 
+  const markupItem = new MarkupItem(tag, inner, outer)
+  markupItems.push(markupItem)
+})
+
+tagsToStopTracking.forEach(tag => {
+  const markupItem = markupItems.find(markupItem => markupItem.item === tag)
+  if (markupItem) {
+    markupItem.inner.end = token.start
+    markupItem.outer.end = token.end
+  }
+})
+  
+    tagsToStopTracking.forEach(tag => trackedTypes.delete(tag))
+    tagsToStartTracking.forEach(tag => trackedTypes.add(tag))
+  }
+
+  lineTokens.forEach(tokenWithEnrichedInHtmlTagArray)
+    
+  return markupItems
 }
