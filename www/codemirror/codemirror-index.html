@@ -36,10 +36,10 @@
 
 
 
-setTimeout(() => {
-  RangeHelper.rangeDebugging.showRangeDebuggingButtons()
-}, 1000)
-
+let showDebugButtons = () => {
+  RangeHelper.rangeDebugging.showRangeDebuggingButtons(editor)
+}
+setTimeout(showDebugButtons, 1000)
 
 //const markupItems = RangeHelper.rangeDetermination.markupItemsForLineTokens(editor.getLineTokens(1, true))
 

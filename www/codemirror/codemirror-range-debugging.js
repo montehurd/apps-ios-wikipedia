@@ -1,10 +1,10 @@
 const markupItemsForLineTokens = require('./codemirror-range-determination').markupItemsForLineTokens
 
-var markupItems = []
-var currentItemIndex = 0
-
-var highlightHandle = null
-var useOuter = true
+let markupItems = []
+let currentItemIndex = 0
+let highlightHandle = null
+let useOuter = true
+let codeMirror = null
 
 const addButton = (title, tapClosure) => {
   const button = document.createElement('button')
@@ -31,11 +31,12 @@ const reset = () => {
 
 const kickoff = () => {
   reset()
-  markupItems = markupItemsForLineTokens(editor.getLineTokens(editor.getCursor().line, true))
+  markupItems = markupItemsForLineTokens(codeMirror.getLineTokens(codeMirror.getCursor().line, true))
   highlightTextForMarkupItemAtIndex(currentItemIndex)
 }
 
-const showRangeDebuggingButtons = () => {
+const showRangeDebuggingButtons = (cm) => {
+  codeMirror = cm
   addButton('reset', () => {
     reset()
     currentItemIndex = 0
@@ -74,12 +75,12 @@ const showRangeDebuggingButtons = () => {
 }
 
 const highlightTextForMarkupItemAtIndex = (index) => {
-  const line = editor.getCursor().line
+  const line = codeMirror.getCursor().line
   const markupItem = markupItems[index]
   const range = useOuter ? markupItem.outer : markupItem.inner
 
   clearHighlightHandle()
-  highlightHandle = editor.markText({line: line, ch: range.start}, {line: line, ch: range.end}, {
+  highlightHandle = codeMirror.markText({line: line, ch: range.start}, {line: line, ch: range.end}, {
     className: 'testOuter'
   })
 }
