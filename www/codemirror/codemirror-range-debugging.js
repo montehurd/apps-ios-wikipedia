@@ -31,7 +31,9 @@ const reset = () => {
 
 const kickoff = () => {
   reset()
-  markupItems = markupItemsForLineTokens(codeMirror.getLineTokens(codeMirror.getCursor().line, true))
+  const line = codeMirror.getCursor().line
+  const lineTokens = codeMirror.getLineTokens(line, true)
+  markupItems = markupItemsForLineTokens(lineTokens, line)
   highlightTextForMarkupItemAtIndex(currentItemIndex)
 }
 
@@ -94,12 +96,12 @@ const highlightTextForMarkupItemAtIndex = (index) => {
   if (markupItems.length === 0) {
     return
   }
-  const line = codeMirror.getCursor().line
+
   const markupItem = markupItems[index]
-  const range = useOuter ? markupItem.outer : markupItem.inner
+  const range = useOuter ? markupItem.outerRange : markupItem.innerRange
 
   clearHighlightHandle()
-  highlightHandle = codeMirror.markText({line: line, ch: range.start}, {line: line, ch: range.end}, {
+  highlightHandle = codeMirror.markText(range.startLocation, range.endLocation, {
     className: rangeDebuggingCSSClassName
   })
 }

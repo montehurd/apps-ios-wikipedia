@@ -1,5 +1,6 @@
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
+const ItemLocation = require('./codemirror-range-objects').ItemLocation
 
 const isTokenForTagBracket = (token) => tokenIncludesType(token, 'mw-htmltag-bracket') || tokenIncludesType(token, 'mw-exttag-bracket')
 const isTokenStartOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '<'
@@ -26,7 +27,7 @@ const getOpenTagEndTokenIndices = (lineTokens, openTagStartTokenIndices) => {
   return openTagStartTokenIndices.map(getOpenTagEndTokenIndex)
 }
 
-const tagMarkupItemsForLineTokens = (lineTokens) => {
+const tagMarkupItemsForLineTokens = (lineTokens, line) => {
   const openTagStartTokenIndices = getOpenTagStartTokenIndices(lineTokens)    
   const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
   const openTagEndTokenIndices = getOpenTagEndTokenIndices(lineTokens, openTagStartTokenIndices)
@@ -44,8 +45,8 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
     const closeTagStartTokenIndex = closeTagStartTokenIndices[i]
     const closeTagEndTokenIndex = closeTagEndTokenIndices[i]
 
-    let outer = new ItemRange(lineTokens[openTagStartTokenIndex].start, lineTokens[closeTagEndTokenIndex].end)
-    let inner = new ItemRange(lineTokens[openTagEndTokenIndex].end, lineTokens[closeTagStartTokenIndex].start)
+    let outer = new ItemRange(new ItemLocation(line, lineTokens[openTagStartTokenIndex].start), new ItemLocation(line, lineTokens[closeTagEndTokenIndex].end))
+    let inner = new ItemRange(new ItemLocation(line, lineTokens[openTagEndTokenIndex].end), new ItemLocation(line, lineTokens[closeTagStartTokenIndex].start))
     let type = lineTokens[tagTypeTokenIndex].string.trim()
     output.push(new MarkupItem(type, inner, outer))
   }
