@@ -263,34 +263,33 @@ RangeHelper.rangeObjects = require('./codemirror-range-objects')
 window.RangeHelper = RangeHelper
 },{"./codemirror-range-debugging":1,"./codemirror-range-determination":4,"./codemirror-range-objects":6}],6:[function(require,module,exports){
 
-const buttonNameForType = (type) => {
-  if (type === 'mw-apostrophes-bold') {
-    return 'bold'
-  }
-  if (type === 'mw-section-header') {
-    return 'header'
-  }
-  if (type === 'mw-link-bracket') {
-    return 'link'
-  }
-  if (type === 'mw-template-bracket') {
-    return 'template'
-  }
-  if (type === 'mw-apostrophes-italic') {
-    return 'italic'
-  }
-  return type  
-}
-
 class MarkupItem {
   constructor(type, inner, outer) {
     this.type = type
     this.inner = inner
     this.outer = outer
-    this.buttonName = buttonNameForType(type)
+    this.buttonName = MarkupItem.buttonNameForType(type)
   }
   isComplete() {
     return this.inner.isComplete() && this.outer.isComplete()
+  }
+  static buttonNameForType(type) {
+    if (type === 'mw-apostrophes-bold') {
+      return 'bold'
+    }
+    if (type === 'mw-section-header') {
+      return 'header'
+    }
+    if (type === 'mw-link-bracket') {
+      return 'link'
+    }
+    if (type === 'mw-template-bracket') {
+      return 'template'
+    }
+    if (type === 'mw-apostrophes-italic') {
+      return 'italic'
+    }
+    return type  
   }
 }
 
