@@ -32,7 +32,9 @@ const reset = () => {
 
 const kickoff = () => {
   reset()
-  markupItems = markupItemsForLineTokens(codeMirror.getLineTokens(codeMirror.getCursor().line, true))
+  const line = codeMirror.getCursor().line
+  const lineTokens = codeMirror.getLineTokens(line, true)
+  markupItems = markupItemsForLineTokens(lineTokens, line)
   highlightTextForMarkupItemAtIndex(currentItemIndex)
 }
 
@@ -95,12 +97,12 @@ const highlightTextForMarkupItemAtIndex = (index) => {
   if (markupItems.length === 0) {
     return
   }
-  const line = codeMirror.getCursor().line
+
   const markupItem = markupItems[index]
-  const range = useOuter ? markupItem.outer : markupItem.inner
+  const range = useOuter ? markupItem.outerRange : markupItem.innerRange
 
   clearHighlightHandle()
-  highlightHandle = codeMirror.markText({line: line, ch: range.start}, {line: line, ch: range.end}, {
+  highlightHandle = codeMirror.markText(range.startLocation, range.endLocation, {
     className: rangeDebuggingCSSClassName
   })
 }
@@ -112,6 +114,7 @@ const intersection = require('./codemirror-set-utilities').intersection
 const difference = require('./codemirror-set-utilities').difference
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
+const ItemLocation = require('./codemirror-range-objects').ItemLocation
 
 // - returns set of types for token
 // - smooths out inconsistent nested bold and italic types
@@ -135,7 +138,7 @@ const tokenTypes = (token) => {
   return new Set(types)
 }
 
-const nonTagMarkupItemsForLineTokens = (lineTokens) => {
+const nonTagMarkupItemsForLineTokens = (lineTokens, line) => {
   const soughtTokenTypes = new Set(['mw-apostrophes-bold', 'mw-apostrophes-italic', 'mw-link-bracket', 'mw-section-header', 'mw-template-bracket'])  
 
   let trackedTypes = new Set()
@@ -149,8 +152,8 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
     const typesToStartTracking = Array.from(difference(types, trackedTypes))
     
     const addMarkupItemWithRangeStarts = (type) => {
-      const inner = new ItemRange(token.end, -1) 
-      const outer = new ItemRange(token.start, -1) 
+      const inner = new ItemRange(new ItemLocation(line, token.end), new ItemLocation(line, -1))
+      const outer = new ItemRange(new ItemLocation(line, token.start), new ItemLocation(line, -1))
       const markupItem = new MarkupItem(type, inner, outer)
       outputMarkupItems.push(markupItem)
     }
@@ -160,8 +163,8 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
         return markupItem.type === type && !markupItem.isComplete()
       })
       if (markupItem) {
-        markupItem.inner.end = token.start
-        markupItem.outer.end = token.end
+        markupItem.innerRange.endLocation.ch = token.start
+        markupItem.outerRange.endLocation.ch = token.end
       }
     }
     
@@ -181,6 +184,7 @@ exports.nonTagMarkupItemsForLineTokens = nonTagMarkupItemsForLineTokens
 },{"./codemirror-range-objects":6,"./codemirror-set-utilities":7}],3:[function(require,module,exports){
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
+const ItemLocation = require('./codemirror-range-objects').ItemLocation
 
 const isTokenForTagBracket = (token) => tokenIncludesType(token, 'mw-htmltag-bracket') || tokenIncludesType(token, 'mw-exttag-bracket')
 const isTokenStartOfOpenTag = (token) => isTokenForTagBracket(token) && token.string === '<'
@@ -207,7 +211,7 @@ const getOpenTagEndTokenIndices = (lineTokens, openTagStartTokenIndices) => {
   return openTagStartTokenIndices.map(getOpenTagEndTokenIndex)
 }
 
-const tagMarkupItemsForLineTokens = (lineTokens) => {
+const tagMarkupItemsForLineTokens = (lineTokens, line) => {
   const openTagStartTokenIndices = getOpenTagStartTokenIndices(lineTokens)    
   const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
   const openTagEndTokenIndices = getOpenTagEndTokenIndices(lineTokens, openTagStartTokenIndices)
@@ -225,8 +229,8 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
     const closeTagStartTokenIndex = closeTagStartTokenIndices[i]
     const closeTagEndTokenIndex = closeTagEndTokenIndices[i]
 
-    let outer = new ItemRange(lineTokens[openTagStartTokenIndex].start, lineTokens[closeTagEndTokenIndex].end)
-    let inner = new ItemRange(lineTokens[openTagEndTokenIndex].end, lineTokens[closeTagStartTokenIndex].start)
+    let outer = new ItemRange(new ItemLocation(line, lineTokens[openTagStartTokenIndex].start), new ItemLocation(line, lineTokens[closeTagEndTokenIndex].end))
+    let inner = new ItemRange(new ItemLocation(line, lineTokens[openTagEndTokenIndex].end), new ItemLocation(line, lineTokens[closeTagStartTokenIndex].start))
     let type = lineTokens[tagTypeTokenIndex].string.trim()
     output.push(new MarkupItem(type, inner, outer))
   }
@@ -263,9 +267,9 @@ exports.tagMarkupItemsForLineTokens = tagMarkupItemsForLineTokens
 const tagMarkupItemsForLineTokens = require('./codemirror-range-determination-tag').tagMarkupItemsForLineTokens
 const nonTagMarkupItemsForLineTokens = require('./codemirror-range-determination-non-tag').nonTagMarkupItemsForLineTokens
 
-const markupItemsForLineTokens = (lineTokens) => {
-  const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens)
-  const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens)
+const markupItemsForLineTokens = (lineTokens, line) => {
+  const tagMarkupItems = tagMarkupItemsForLineTokens(lineTokens, line)
+  const nonTagMarkupItems = nonTagMarkupItemsForLineTokens(lineTokens, line)
   const markupItems = tagMarkupItems.concat(nonTagMarkupItems)
   return markupItems
 }
@@ -283,14 +287,14 @@ window.RangeHelper = RangeHelper
 },{"./codemirror-range-debugging":1,"./codemirror-range-determination":4,"./codemirror-range-objects":6}],6:[function(require,module,exports){
 
 class MarkupItem {
-  constructor(type, inner, outer) {
+  constructor(type, innerRange, outerRange) {
     this.type = type
-    this.inner = inner
-    this.outer = outer
+    this.innerRange = innerRange
+    this.outerRange = outerRange
     this.buttonName = MarkupItem.buttonNameForType(type)
   }
   isComplete() {
-    return this.inner.isComplete() && this.outer.isComplete()
+    return this.innerRange.isComplete() && this.outerRange.isComplete()
   }
   static buttonNameForType(type) {
     if (type === 'mw-apostrophes-bold') {
@@ -313,17 +317,28 @@ class MarkupItem {
 }
 
 class ItemRange {
-  constructor(start, end) {
-    this.start = start
-    this.end = end
+  constructor(startLocation, endLocation) {
+    this.startLocation = startLocation
+    this.endLocation = endLocation
   }
   isComplete() {
-    return this.start !== -1 && this.end !== -1
+    return this.startLocation.isComplete() && this.endLocation.isComplete()
+  }
+}
+
+class ItemLocation {
+  constructor(line, ch) {
+    this.line = line
+    this.ch = ch
+  }
+  isComplete() {
+    return this.line !== -1 && this.ch !== -1
   }
 }
 
 exports.ItemRange = ItemRange
 exports.MarkupItem = MarkupItem
+exports.ItemLocation = ItemLocation
 
 },{}],7:[function(require,module,exports){
 

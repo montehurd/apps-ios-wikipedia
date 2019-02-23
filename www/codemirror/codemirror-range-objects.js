@@ -1,13 +1,13 @@
 
 class MarkupItem {
-  constructor(type, inner, outer) {
+  constructor(type, innerRange, outerRange) {
     this.type = type
-    this.inner = inner
-    this.outer = outer
+    this.innerRange = innerRange
+    this.outerRange = outerRange
     this.buttonName = MarkupItem.buttonNameForType(type)
   }
   isComplete() {
-    return this.inner.isComplete() && this.outer.isComplete()
+    return this.innerRange.isComplete() && this.outerRange.isComplete()
   }
   static buttonNameForType(type) {
     if (type === 'mw-apostrophes-bold') {
@@ -30,14 +30,25 @@ class MarkupItem {
 }
 
 class ItemRange {
-  constructor(start, end) {
-    this.start = start
-    this.end = end
+  constructor(startLocation, endLocation) {
+    this.startLocation = startLocation
+    this.endLocation = endLocation
   }
   isComplete() {
-    return this.start !== -1 && this.end !== -1
+    return this.startLocation.isComplete() && this.endLocation.isComplete()
+  }
+}
+
+class ItemLocation {
+  constructor(line, ch) {
+    this.line = line
+    this.ch = ch
+  }
+  isComplete() {
+    return this.line !== -1 && this.ch !== -1
   }
 }
 
 exports.ItemRange = ItemRange
 exports.MarkupItem = MarkupItem
+exports.ItemLocation = ItemLocation

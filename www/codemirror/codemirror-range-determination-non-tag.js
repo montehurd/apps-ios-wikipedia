@@ -2,6 +2,7 @@ const intersection = require('./codemirror-set-utilities').intersection
 const difference = require('./codemirror-set-utilities').difference
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
+const ItemLocation = require('./codemirror-range-objects').ItemLocation
 
 // - returns set of types for token
 // - smooths out inconsistent nested bold and italic types
@@ -25,7 +26,7 @@ const tokenTypes = (token) => {
   return new Set(types)
 }
 
-const nonTagMarkupItemsForLineTokens = (lineTokens) => {
+const nonTagMarkupItemsForLineTokens = (lineTokens, line) => {
   const soughtTokenTypes = new Set(['mw-apostrophes-bold', 'mw-apostrophes-italic', 'mw-link-bracket', 'mw-section-header', 'mw-template-bracket'])  
 
   let trackedTypes = new Set()
@@ -39,8 +40,8 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
     const typesToStartTracking = Array.from(difference(types, trackedTypes))
     
     const addMarkupItemWithRangeStarts = (type) => {
-      const inner = new ItemRange(token.end, -1) 
-      const outer = new ItemRange(token.start, -1) 
+      const inner = new ItemRange(new ItemLocation(line, token.end), new ItemLocation(line, -1))
+      const outer = new ItemRange(new ItemLocation(line, token.start), new ItemLocation(line, -1))
       const markupItem = new MarkupItem(type, inner, outer)
       outputMarkupItems.push(markupItem)
     }
@@ -50,8 +51,8 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
         return markupItem.type === type && !markupItem.isComplete()
       })
       if (markupItem) {
-        markupItem.inner.end = token.start
-        markupItem.outer.end = token.end
+        markupItem.innerRange.endLocation.ch = token.start
+        markupItem.outerRange.endLocation.ch = token.end
       }
     }
     
