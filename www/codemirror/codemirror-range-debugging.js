@@ -1,4 +1,5 @@
-// uncomment call to 'showRangeDebuggingButtons()' at bottom to use
+const rangesDetermination = require('./codemirror-range-determination')
+
 const showRangeDebuggingButtons = () => {
   
   var markupItems = []
@@ -59,7 +60,7 @@ const showRangeDebuggingButtons = () => {
 
     const kickoff = () => {
       reset()
-      markupItems = markupItemsForLine(editor.getCursor().line)
+      markupItems = rangesDetermination.markupItemsForLine(editor.getCursor().line)
       highlightTextForMarkupItemAtIndex(currentItemIndex)
     }
 
@@ -86,7 +87,7 @@ const showRangeDebuggingButtons = () => {
   }
 
   // could inject testing text here too
-  setTimeout(addTestingButtons, 2000)
+  setTimeout(addTestingButtons, 1000)
 }
 
-showRangeDebuggingButtons()
+exports.showRangeDebuggingButtons = showRangeDebuggingButtons

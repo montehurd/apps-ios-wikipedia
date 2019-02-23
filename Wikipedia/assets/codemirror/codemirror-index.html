@@ -17,10 +17,8 @@
 
 
 
-  <script src="codemirror-ranges-determination.js"></script>
+<script src="codemirror-bundle.js"></script>
 
-  
-<script src="codemirror-ranges-debug-buttons.js"></script>
 <style>
   .testOuter {background-color: #cccccc;}
   .testInner {background-color: #eedddd;}
@@ -34,6 +32,19 @@
 
 <body>
   <script>    
+  
+
+
+
+
+RangeHelper.rangeDebugging.showRangeDebuggingButtons()
+//const markupItems = RangeHelper.rangeDetermination.markupItemsForLine(1)
+
+
+
+
+  
+  
     let editor
 
     const rangesIntersect = (range1, range2) => {
