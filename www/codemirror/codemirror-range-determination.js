@@ -1,7 +1,5 @@
 
-const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
-const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
-const union = (a, b) => new Set([...a, ...b])
+const setUtilities = require('./codemirror-set-utilities')
 
 
 
@@ -178,10 +176,10 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
   
   const tokenWithEnrichedInHtmlTagArray = (token, index, tokens) => {
     
-    const types = intersection(tokenTypes(token), soughtTokenTypes)
+    const types = setUtilities.intersection(tokenTypes(token), soughtTokenTypes)
     
-    const typesToStopTracking = Array.from(intersection(trackedTypes, types))
-    const typesToStartTracking = Array.from(difference(types, trackedTypes))
+    const typesToStopTracking = Array.from(setUtilities.intersection(trackedTypes, types))
+    const typesToStartTracking = Array.from(setUtilities.difference(types, trackedTypes))
     
     const addMarkupItemWithRangeStarts = (type) => {
       const inner = new ItemRange(token.end, -1) 
@@ -230,3 +228,6 @@ const markupItemsForLine = (line) => {
 
 
 
+exports.markupItemsForLine = markupItemsForLine
+exports.ItemRange = ItemRange
+exports.MarkupItem = MarkupItem
