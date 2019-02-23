@@ -35,8 +35,24 @@ const kickoff = () => {
   highlightTextForMarkupItemAtIndex(currentItemIndex)
 }
 
+const rangeDebuggingCSSClassName = 'range-debugging'
+
+function addRangeDebuggingStyleOnce() {
+  const id = 'debugging-style-element'
+  if (document.getElementById(id)) {
+    return
+  }
+  const cssNode = document.createElement('style')
+  cssNode.id = id
+  cssNode.innerHTML = `.${rangeDebuggingCSSClassName} { background-color: #cccccc; }`
+  document.body.appendChild(cssNode)
+}
+
 const showRangeDebuggingButtonsForCursorLine = (cm) => {
   codeMirror = cm
+  
+  addRangeDebuggingStyleOnce()
+  
   addButton('reset', () => {
     reset()
     currentItemIndex = 0
@@ -81,7 +97,7 @@ const highlightTextForMarkupItemAtIndex = (index) => {
 
   clearHighlightHandle()
   highlightHandle = codeMirror.markText({line: line, ch: range.start}, {line: line, ch: range.end}, {
-    className: 'testOuter'
+    className: rangeDebuggingCSSClassName
   })
 }
 
