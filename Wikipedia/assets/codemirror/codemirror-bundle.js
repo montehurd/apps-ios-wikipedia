@@ -92,6 +92,9 @@ const showRangeDebuggingButtonsForCursorLine = (cm) => {
 }
 
 const highlightTextForMarkupItemAtIndex = (index) => {
+  if (markupItems.length === 0) {
+    return
+  }
   const line = codeMirror.getCursor().line
   const markupItem = markupItems[index]
   const range = useOuter ? markupItem.outer : markupItem.inner
