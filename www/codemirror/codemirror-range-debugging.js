@@ -1,4 +1,4 @@
-const rangesDetermination = require('./codemirror-range-determination')
+const markupItemsForLine = require('./codemirror-range-determination').markupItemsForLine
 
 const showRangeDebuggingButtons = () => {
   
@@ -60,7 +60,7 @@ const showRangeDebuggingButtons = () => {
 
     const kickoff = () => {
       reset()
-      markupItems = rangesDetermination.markupItemsForLine(editor.getCursor().line)
+      markupItems = markupItemsForLine(editor.getCursor().line)
       highlightTextForMarkupItemAtIndex(currentItemIndex)
     }
 
