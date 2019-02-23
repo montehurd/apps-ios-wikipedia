@@ -35,7 +35,7 @@ const kickoff = () => {
   highlightTextForMarkupItemAtIndex(currentItemIndex)
 }
 
-const showRangeDebuggingButtons = (cm) => {
+const showRangeDebuggingButtonsForCursorLine = (cm) => {
   codeMirror = cm
   addButton('reset', () => {
     reset()
@@ -85,4 +85,4 @@ const highlightTextForMarkupItemAtIndex = (index) => {
   })
 }
 
-exports.showRangeDebuggingButtons = showRangeDebuggingButtons
+exports.showRangeDebuggingButtonsForCursorLine = showRangeDebuggingButtonsForCursorLine
