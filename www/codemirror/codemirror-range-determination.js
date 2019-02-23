@@ -1,50 +1,8 @@
 
-const setUtilities = require('./codemirror-set-utilities')
-
-
-
-const buttonNameForType = (type) => {
-  if (type === 'mw-apostrophes-bold') {
-    return 'bold'
-  }
-  if (type === 'mw-section-header') {
-    return 'header'
-  }
-  if (type === 'mw-link-bracket') {
-    return 'link'
-  }
-  if (type === 'mw-template-bracket') {
-    return 'template'
-  }
-  if (type === 'mw-apostrophes-italic') {
-    return 'italic'
-  }
-  return type  
-}
-
-
-
-class MarkupItem {
-  constructor(type, inner, outer) {
-    this.type = type
-    this.inner = inner
-    this.outer = outer
-    this.buttonName = buttonNameForType(type)
-  }
-  isComplete() {
-    return this.inner.isComplete() && this.outer.isComplete()
-  }
-}
-
-class ItemRange {
-  constructor(start, end) {
-    this.start = start
-    this.end = end
-  }
-  isComplete() {
-    return this.start !== -1 && this.end !== -1
-  }
-}
+const intersection = require('./codemirror-set-utilities').intersection
+const difference = require('./codemirror-set-utilities').difference
+const ItemRange = require('./codemirror-range-objects').ItemRange
+const MarkupItem = require('./codemirror-range-objects').MarkupItem
 
 
 
@@ -176,10 +134,10 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
   
   const tokenWithEnrichedInHtmlTagArray = (token, index, tokens) => {
     
-    const types = setUtilities.intersection(tokenTypes(token), soughtTokenTypes)
+    const types = intersection(tokenTypes(token), soughtTokenTypes)
     
-    const typesToStopTracking = Array.from(setUtilities.intersection(trackedTypes, types))
-    const typesToStartTracking = Array.from(setUtilities.difference(types, trackedTypes))
+    const typesToStopTracking = Array.from(intersection(trackedTypes, types))
+    const typesToStartTracking = Array.from(difference(types, trackedTypes))
     
     const addMarkupItemWithRangeStarts = (type) => {
       const inner = new ItemRange(token.end, -1) 
@@ -229,5 +187,3 @@ const markupItemsForLine = (line) => {
 
 
 exports.markupItemsForLine = markupItemsForLine
-exports.ItemRange = ItemRange
-exports.MarkupItem = MarkupItem

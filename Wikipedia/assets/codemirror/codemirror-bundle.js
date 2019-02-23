@@ -1,5 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const rangesDetermination = require('./codemirror-range-determination')
+const markupItemsForLine = require('./codemirror-range-determination').markupItemsForLine
 
 const showRangeDebuggingButtons = () => {
   
@@ -61,7 +61,7 @@ const showRangeDebuggingButtons = () => {
 
     const kickoff = () => {
       reset()
-      markupItems = rangesDetermination.markupItemsForLine(editor.getCursor().line)
+      markupItems = markupItemsForLine(editor.getCursor().line)
       highlightTextForMarkupItemAtIndex(currentItemIndex)
     }
 
@@ -95,52 +95,10 @@ exports.showRangeDebuggingButtons = showRangeDebuggingButtons
 
 },{"./codemirror-range-determination":2}],2:[function(require,module,exports){
 
-const setUtilities = require('./codemirror-set-utilities')
-
-
-
-const buttonNameForType = (type) => {
-  if (type === 'mw-apostrophes-bold') {
-    return 'bold'
-  }
-  if (type === 'mw-section-header') {
-    return 'header'
-  }
-  if (type === 'mw-link-bracket') {
-    return 'link'
-  }
-  if (type === 'mw-template-bracket') {
-    return 'template'
-  }
-  if (type === 'mw-apostrophes-italic') {
-    return 'italic'
-  }
-  return type  
-}
-
-
-
-class MarkupItem {
-  constructor(type, inner, outer) {
-    this.type = type
-    this.inner = inner
-    this.outer = outer
-    this.buttonName = buttonNameForType(type)
-  }
-  isComplete() {
-    return this.inner.isComplete() && this.outer.isComplete()
-  }
-}
-
-class ItemRange {
-  constructor(start, end) {
-    this.start = start
-    this.end = end
-  }
-  isComplete() {
-    return this.start !== -1 && this.end !== -1
-  }
-}
+const intersection = require('./codemirror-set-utilities').intersection
+const difference = require('./codemirror-set-utilities').difference
+const ItemRange = require('./codemirror-range-objects').ItemRange
+const MarkupItem = require('./codemirror-range-objects').MarkupItem
 
 
 
@@ -272,10 +230,10 @@ const nonTagMarkupItemsForLineTokens = (lineTokens) => {
   
   const tokenWithEnrichedInHtmlTagArray = (token, index, tokens) => {
     
-    const types = setUtilities.intersection(tokenTypes(token), soughtTokenTypes)
+    const types = intersection(tokenTypes(token), soughtTokenTypes)
     
-    const typesToStopTracking = Array.from(setUtilities.intersection(trackedTypes, types))
-    const typesToStartTracking = Array.from(setUtilities.difference(types, trackedTypes))
+    const typesToStopTracking = Array.from(intersection(trackedTypes, types))
+    const typesToStartTracking = Array.from(difference(types, trackedTypes))
     
     const addMarkupItemWithRangeStarts = (type) => {
       const inner = new ItemRange(token.end, -1) 
@@ -325,17 +283,62 @@ const markupItemsForLine = (line) => {
 
 
 exports.markupItemsForLine = markupItemsForLine
-exports.ItemRange = ItemRange
-exports.MarkupItem = MarkupItem
 
-},{"./codemirror-set-utilities":4}],3:[function(require,module,exports){
+},{"./codemirror-range-objects":4,"./codemirror-set-utilities":5}],3:[function(require,module,exports){
 const RangeHelper = {}
 
 RangeHelper.rangeDebugging = require('./codemirror-range-debugging')
 RangeHelper.rangeDetermination = require('./codemirror-range-determination')
+RangeHelper.rangeObjects = require('./codemirror-range-objects')
 
 window.RangeHelper = RangeHelper
-},{"./codemirror-range-debugging":1,"./codemirror-range-determination":2}],4:[function(require,module,exports){
+},{"./codemirror-range-debugging":1,"./codemirror-range-determination":2,"./codemirror-range-objects":4}],4:[function(require,module,exports){
+
+const buttonNameForType = (type) => {
+  if (type === 'mw-apostrophes-bold') {
+    return 'bold'
+  }
+  if (type === 'mw-section-header') {
+    return 'header'
+  }
+  if (type === 'mw-link-bracket') {
+    return 'link'
+  }
+  if (type === 'mw-template-bracket') {
+    return 'template'
+  }
+  if (type === 'mw-apostrophes-italic') {
+    return 'italic'
+  }
+  return type  
+}
+
+class MarkupItem {
+  constructor(type, inner, outer) {
+    this.type = type
+    this.inner = inner
+    this.outer = outer
+    this.buttonName = buttonNameForType(type)
+  }
+  isComplete() {
+    return this.inner.isComplete() && this.outer.isComplete()
+  }
+}
+
+class ItemRange {
+  constructor(start, end) {
+    this.start = start
+    this.end = end
+  }
+  isComplete() {
+    return this.start !== -1 && this.end !== -1
+  }
+}
+
+exports.ItemRange = ItemRange
+exports.MarkupItem = MarkupItem
+
+},{}],5:[function(require,module,exports){
 
 const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
@@ -345,4 +348,4 @@ exports.intersection = intersection
 exports.difference = difference
 exports.union = union
 
-},{}]},{},[1,2,3,4]);
+},{}]},{},[1,2,3,4,5]);
