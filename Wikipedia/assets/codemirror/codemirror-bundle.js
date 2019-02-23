@@ -209,7 +209,7 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
   const tagTypeTokenIndices = openTagStartTokenIndices.map(i => i + 1)
   const openTagEndTokenIndices = getOpenTagEndTokenIndices(lineTokens, openTagStartTokenIndices)
 
-  const closeTagStartTokenIndices = getCloseTagStartTokenIndices(lineTokens, openTagStartTokenIndices)    
+  const closeTagStartTokenIndices = getCloseTagStartTokenIndices(lineTokens, openTagEndTokenIndices)    
   const closeTagEndTokenIndices = closeTagStartTokenIndices.map(i => i + 2)
 
   let output = []
@@ -230,12 +230,12 @@ const tagMarkupItemsForLineTokens = (lineTokens) => {
   return output
 }
 
-const getCloseTagStartTokenIndices = (lineTokens, openTagStartTokenIndices) => {
+const getCloseTagStartTokenIndices = (lineTokens, openTagEndTokenIndices) => {
   let closeTagStartTokenIndices = []
   
-  openTagStartTokenIndices.forEach(startOfOpenTagTokenIndex => {
+  openTagEndTokenIndices.forEach(openTagEndTokenIndex => {
     let depth = 0
-    for (let i = startOfOpenTagTokenIndex + 1; i < lineTokens.length; i++) { 
+    for (let i = openTagEndTokenIndex + 1; i < lineTokens.length; i++) { 
       let thisToken = lineTokens[i]
       if (isTokenStartOfOpenTag(thisToken)){
         depth = depth + 1
