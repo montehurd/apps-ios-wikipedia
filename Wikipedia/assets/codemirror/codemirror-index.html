@@ -14,11 +14,32 @@
   <script src="resources/addon/search/search.js"></script>
   <script src="resources/addon/search/searchcursor.js"></script>
   <script src="resources/addon/search/match-highlighter.js"></script>
+
+  <script src="codemirror-bundle.js"></script>
+
 </head>
 
 
 <body>
   <script>    
+  
+
+
+
+let showDebugButtons = () => {
+  RangeHelper.rangeDebugging.showRangeDebuggingButtonsForCursorLine(editor)
+}
+setTimeout(showDebugButtons, 1000)
+
+//const markupItems = RangeHelper.rangeDetermination.markupItemsForLineTokens(editor.getLineTokens(1, true))
+
+
+
+
+
+
+  
+  
     let editor
 
     const rangesIntersect = (range1, range2) => {
