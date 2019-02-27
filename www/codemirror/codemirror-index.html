@@ -31,7 +31,62 @@ let showDebugButtons = () => {
 }
 setTimeout(showDebugButtons, 1000)
 
-//const markupItems = RangeHelper.rangeDetermination.markupItemsForLineTokens(editor.getLineTokens(1, true))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const ItemLocation = RangeHelper.rangeObjects.ItemLocation
+const ItemRange = RangeHelper.rangeObjects.ItemRange
+
+const getSelectionRange2 = (doc) => {
+  const fromCursor = doc.getCursor('from')
+  const toCursor = doc.getCursor('to')
+  const fromLocation = new ItemLocation(fromCursor.line, fromCursor.ch)
+  const toLocation = new ItemLocation(toCursor.line, toCursor.ch)
+  const selectionRange = new ItemRange(fromLocation, toLocation)
+  return selectionRange
+}
+
+
+
+
+
+const sendNativeMessages2 = (doc) => {
+  const selectionRange = getSelectionRange2(doc)
+  
+  console.log(`
+    selectionRange:
+      from: ${selectionRange.startLocation.line}, ${selectionRange.startLocation.ch}
+      to: ${selectionRange.endLocation.line}, ${selectionRange.endLocation.ch}
+  `)
+  
+//  const tagRangesIntersectingSelectionRange = tagRanges.filter(tagRange => rangesIntersect(selectionRange, tagRange))
+  return selectionRange
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -402,6 +457,7 @@ setTimeout(showDebugButtons, 1000)
       }
       editor.on('cursorActivity', (doc) => {
         sendNativeMessages(doc)
+sendNativeMessages2(doc)
 
         clearTimeout(cursorActivityScrollTimer)
         cursorActivityScrollTimer = setTimeout(() => {

@@ -181,7 +181,7 @@ const nonTagMarkupItemsForLineTokens = (lineTokens, line) => {
 
 exports.nonTagMarkupItemsForLineTokens = nonTagMarkupItemsForLineTokens
 
-},{"./codemirror-range-objects":6,"./codemirror-set-utilities":7}],3:[function(require,module,exports){
+},{"./codemirror-range-objects":6,"./codemirror-set-utilities":8}],3:[function(require,module,exports){
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
 const ItemLocation = require('./codemirror-range-objects').ItemLocation
@@ -324,6 +324,34 @@ class ItemRange {
   isComplete() {
     return this.startLocation.isComplete() && this.endLocation.isComplete()
   }
+  
+  endsInsideRange(range) {
+    return (
+      this.endLocation.greaterThanOrEquals(range.startLocation)
+      &&
+      this.endLocation.lessThanOrEquals(range.endLocation)
+    )
+  }
+  
+  startsInsideRange(range) {
+    return (
+      this.startLocation.greaterThanOrEquals(range.startLocation)
+      &&
+      this.startLocation.lessThanOrEquals(range.endLocation)
+    )
+  }
+
+  intersectsRange(range) {
+    return (
+      this.endsInsideRange(range)
+      ||
+      this.startsInsideRange(range)
+      ||
+      range.endsInsideRange(this)
+      ||
+      range.startsInsideRange(this)
+    )
+  }
 }
 
 class ItemLocation {
@@ -334,6 +362,33 @@ class ItemLocation {
   isComplete() {
     return this.line !== -1 && this.ch !== -1
   }
+  greaterThan(location) {
+    if (this.line < location.line) {
+      return false
+    }
+    if (this.line === location.line && this.ch <= location.ch) {
+      return false
+    }
+    return true
+  }
+  lessThan(location) {
+    if (this.line > location.line) {
+      return false
+    }
+    if (this.line === location.line && this.ch >= location.ch) {
+      return false
+    }
+    return true
+  }
+  equals(location) {
+    return (this.line === location.line && this.ch === location.ch)
+  }
+  greaterThanOrEquals(location) {
+    return this.greaterThan(location) || this.equals(location)
+  }
+  lessThanOrEquals(location) {
+    return this.lessThan(location) || this.equals(location)
+  }
 }
 
 exports.ItemRange = ItemRange
@@ -341,6 +396,85 @@ exports.MarkupItem = MarkupItem
 exports.ItemLocation = ItemLocation
 
 },{}],7:[function(require,module,exports){
+// const ItemRange = require('./codemirror-range-objects').ItemRange
+// const ItemLocation = require('./codemirror-range-objects').ItemLocation
+
+
+
+
+editor.on('cursorActivity', (doc) => {
+console.log('wa')
+/*
+  sendNativeMessages(doc)
+
+  clearTimeout(cursorActivityScrollTimer)
+  cursorActivityScrollTimer = setTimeout(() => {
+    scrollCursorIntoViewIfNeeded()        
+  }, 25)
+*/
+})
+
+
+/*
+const rangesIntersect = (range1, range2) => {
+  if (range1.start > range2.start + (range2.end - range2.start)) return false
+  if (range2.start > range1.start + (range1.end - range1.start)) return false
+  // const isSelected = ((Math.abs(range1.start - range1.end) > 0) && (Math.abs(range2.start - range2.end) > 0))
+  // if ((range1.start === range2.end) || (range1.end === range2.start) && isSelected) return false
+  return true
+}
+
+const getSelectionRange = (doc) => {
+  const fromCursor = doc.getCursor('from')
+  const toCursor = doc.getCursor('to')
+
+  const start = fromCursor.ch
+  const end = toCursor.ch
+  const isSingleLine = (fromCursor.line === toCursor.line)
+  const line = fromCursor.line
+  const isRangeSelected = !isSingleLine || (end - start) > 0
+
+  return {
+    start,
+    end,
+    isSingleLine,
+    line,
+    isRangeSelected
+  }
+}
+
+const tokensIntersectingSelection = (selectionRange, lineTokens) => {
+  return lineTokens
+    .filter(token => {
+      return rangesIntersect(selectionRange, token)
+    })
+}
+*/
+
+
+
+
+// class ItemRange {
+//   constructor(startLocation, endLocation) {
+//     this.startLocation = startLocation
+//     this.endLocation = endLocation
+//   }
+//   isComplete() {
+//     return this.startLocation.isComplete() && this.endLocation.isComplete()
+//   }
+// }
+// 
+// class ItemLocation {
+//   constructor(line, ch) {
+//     this.line = line
+//     this.ch = ch
+//   }
+//   isComplete() {
+//     return this.line !== -1 && this.ch !== -1
+//   }
+// }
+
+},{}],8:[function(require,module,exports){
 
 const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
 const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
@@ -350,4 +484,4 @@ exports.intersection = intersection
 exports.difference = difference
 exports.union = union
 
-},{}]},{},[1,2,3,4,5,6,7]);
+},{}]},{},[1,2,3,4,5,6,7,8]);
