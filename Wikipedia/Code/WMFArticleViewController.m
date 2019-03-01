@@ -1654,6 +1654,22 @@ NSString *const WMFEditPublishedNotification = @"WMFEditPublishedNotification";
     [self shareAFactWithTextSnippet:text];
 }
 
+- (void)webViewControllerDidTapEditMenuItem:(WebViewController *)controller {
+    @weakify(self);
+    [self.webViewController.webView wmf_getSelectedTextEditInfoWithCompletionHandler:^(SelectedTextInfo* selectedTextInfo, NSError *error) {
+        @strongify(self);
+        if (error) {
+            return;
+        }
+        if (selectedTextInfo.isSelectedTextInTitleDescription) {
+            [self showTitleDescriptionEditor];
+        } else {
+            MWKSection *section = self.article.sections[selectedTextInfo.sectionID];
+            [self showEditorForSection:section selectedTextInfo:selectedTextInfo];
+        }
+    }];
+}
+
 - (void)updateTableOfContentsHighlightWithScrollView:(UIScrollView *)scrollView {
     self.sectionToRestoreScrollOffset = nil;
     @weakify(self);
@@ -1839,7 +1855,7 @@ NSString *const WMFEditPublishedNotification = @"WMFEditPublishedNotification";
         if ([self.article isWikidataDescriptionEditable] && [section isLeadSection] && self.article.entityDescription) {
             [self showEditSectionOrTitleDescriptionDialogForSection:section];
         } else {
-            [self showEditorForSection:section];
+            [self showEditorForSection:section selectedTextInfo:nil];
         }
     } else {
         ProtectedEditAttemptFunnel *funnel = [[ProtectedEditAttemptFunnel alloc] init];
@@ -1848,11 +1864,12 @@ NSString *const WMFEditPublishedNotification = @"WMFEditPublishedNotification";
     }
 }
 
-- (void)showEditorForSection:(MWKSection *)section {
+- (void)showEditorForSection:(MWKSection *)section selectedTextInfo:(nullable SelectedTextInfo *)selectedTextInfo {
     WMFSectionEditorViewController *sectionEditVC = [[WMFSectionEditorViewController alloc] init];
     sectionEditVC.section = section;
     sectionEditVC.delegate = self;
     sectionEditVC.editFunnel = self.editFunnel;
+    sectionEditVC.selectedTextInfo = selectedTextInfo;
     [self presentViewControllerEmbeddedInNavigationController:sectionEditVC];
 }
 
@@ -1918,7 +1935,7 @@ NSString *const WMFEditPublishedNotification = @"WMFEditPublishedNotification";
     [sheet addAction:[UIAlertAction actionWithTitle:WMFLocalizedStringWithDefaultValue(@"description-edit-pencil-introduction", nil, nil, @"Edit introduction", @"Title for button used to show article lead section editor")
                                               style:UIAlertActionStyleDefault
                                             handler:^(UIAlertAction *_Nonnull action) {
-                                                [self showEditorForSection:section];
+                                                [self showEditorForSection:section selectedTextInfo:nil];
                                             }]];
 
     [sheet addAction:[UIAlertAction actionWithTitle:[WMFCommonStrings cancelActionTitle] style:UIAlertActionStyleCancel handler:NULL]];

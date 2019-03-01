@@ -8,6 +8,7 @@ class SectionEditorViewController: UIViewController {
     @objc weak var delegate: SectionEditorViewControllerDelegate?
     
     @objc var section: MWKSection?
+    @objc var selectedTextInfo: SelectedTextInfo?
     
     private var webView: SectionEditorWebView!
     private let sectionFetcher = WikiTextSectionFetcher()

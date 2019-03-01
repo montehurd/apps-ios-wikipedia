@@ -243,3 +243,68 @@ extension WKWebView {
         }
     }
 }
+
+extension WKWebView {
+    private func selectedTextInfo(from dictionary: Dictionary<String, Any>) -> SelectedTextInfo? {
+        guard
+            let selectedText = dictionary["selectedText"] as? String,
+            let isSelectedTextInTitleDescription = dictionary["isSelectedTextInTitleDescription"] as? Bool,
+            let sectionID = dictionary["sectionID"] as? Int,
+            let textAfterSelectedText = dictionary["textAfterSelectedText"] as? String,
+            let textBeforeSelectedText = dictionary["textBeforeSelectedText"] as? String
+            else {
+                DDLogError("Error converting dictionary to SelectedTextInfo")
+                return nil
+        }
+        return SelectedTextInfo(selectedText: selectedText, isSelectedTextInTitleDescription: isSelectedTextInTitleDescription, sectionID: sectionID, textAfterSelectedText: textAfterSelectedText, textBeforeSelectedText: textBeforeSelectedText)
+    }
+    
+    @objc func wmf_getSelectedTextEditInfo(completionHandler: ((SelectedTextInfo?, Error?) -> Void)? = nil) {
+        evaluateJavaScript("window.wmf.editTextSelection.getSelectedTextEditInfo()") { (result, error) in
+            guard let error = error else {
+                guard let completionHandler = completionHandler else {
+                    return
+                }
+                guard
+                    let resultDict = result as? Dictionary<String, Any>,
+                    let selectedTextInfo = self.selectedTextInfo(from: resultDict)
+                else {
+                    DDLogError("Error handling 'getSelectedTextEditInfo()' dictionary response")
+                    return
+                }
+                
+                completionHandler(selectedTextInfo, nil)
+                return
+            }
+            DDLogError("Error when evaluating javascript on fetch and transform: \(error)")
+        }
+    }
+}
+
+@objcMembers class SelectedTextInfo: NSObject {
+    init(selectedText: String, isSelectedTextInTitleDescription: Bool, sectionID: Int, textAfterSelectedText: String, textBeforeSelectedText: String) {
+        self.selectedText = selectedText
+        self.isSelectedTextInTitleDescription = isSelectedTextInTitleDescription
+        self.sectionID = sectionID
+        self.textAfterSelectedText = textAfterSelectedText
+        self.textBeforeSelectedText = textBeforeSelectedText
+        super.init()
+    }
+    
+    public let selectedText: String
+    public let isSelectedTextInTitleDescription: Bool
+    public let sectionID: Int
+    public let textAfterSelectedText: String
+    public let textBeforeSelectedText: String
+    
+    override var description : String {
+        return """
+
+        selectedText = "\(selectedText)"
+        isSelectedTextInTitleDescription = \(isSelectedTextInTitleDescription)
+        sectionID = \(sectionID)
+        textAfterSelectedText = "\(textAfterSelectedText)"
+        textBeforeSelectedText = "\(textBeforeSelectedText)"
+        """
+    }
+}
