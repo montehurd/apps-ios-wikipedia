@@ -602,6 +602,128 @@
     wmf.setup = (language, direction, themeName, textSizeAdjustment, callback) => setupCodemirror(language, direction, themeName, textSizeAdjustment, callback)
     wmf.applyTheme = (themeName) => applyTheme(themeName)
 
+
+
+
+    // Once we wire up Browserify we can pass this the `SelectedTextInfo` js object instead of all of its properties separately.
+    wmf.highlightAndScrollToTextForSelectedTextInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+
+
+      const textarea = document.createElement('textarea')
+
+      textarea.innerHTML = `
+      selected =
+      ${selectedText}
+      before =
+      ${textBeforeSelectedText}
+      after =
+      ${textAfterSelectedText}
+      `
+
+      textarea.style = 'width:100vw;height:100px;margin-top:50px;'
+      document.body.insertBefore(textarea, document.body.firstChild)
+
+
+
+/*
+- reduce selectedText to just words
+- reduce textBeforeSelectedText to just last word
+- reduce textAfterSelectedText to just first word
+- make regex which matches those words with non-greedy .*? between words
+
+text.replace(/[\W_]+/g, ' ')
+
+*/
+
+const selectedText2 = selectedText.trim()
+const textBeforeSelectedText2 = textBeforeSelectedText.trim()
+const textAfterSelectedText2 = textAfterSelectedText.trim()
+
+const getWordsOnlyStringForString = (s) => s.replace(/[\W_]+/g, ' ').trim()
+
+const prevWords = getWordsOnlyStringForString(textBeforeSelectedText2).split(' ')
+const selectedWords = getWordsOnlyStringForString(selectedText2).split(' ')
+const nextWords = getWordsOnlyStringForString(textAfterSelectedText2).split(' ')
+
+const firstSelectedWord = selectedWords[0]
+const firstNextWord = nextWords[0]
+
+const getRegexStringForString = (s, lookAheadWord) => `\\b${getWordsOnlyStringForString(s).replace(/[\W_]+/g, '.*?').trim()}(?=.*${lookAheadWord})`
+
+
+
+let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, firstSelectedWord), 'i'))
+cursor1.find()
+let from = cursor1.to()
+
+// split into 2 `getSearchCursor` calls because of lack of JS regex lookbehind
+let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, firstNextWord), 'i'), from)
+cursor2.find()
+let to = cursor2.to()
+
+/*
+let to = null
+do {
+    const isAfterFrom = cursor2.to().line >= from.line && cursor2.to().ch > from.ch
+    if (isAfterFrom) { // keep going if the match precedes the 'from' match
+      to = cursor2.to()
+      break
+    }
+    cursor2.findNext()
+} while (true)
+*/
+
+//let to = cursor2.to()
+
+
+editor.markText(from, to, {css: "background-color: red"})
+
+
+//const s = `${selectedText.trim()}`.replace(/[\W_]+/g, '.*?')
+//const s2 = `(?<=${prevWord}) ${s} (?=${nextWord})`
+// const s2 = `${s} (?=${nextWord})`
+// 
+// let cursor = editor.getSearchCursor(new RegExp(s2, 'i')) // selectedText
+
+
+
+
+
+
+// const prevWords = textBeforeSelectedText.replace(/[\W_]+/g, ' ').trim().split(' ')
+// const prevWords2 = prevWords.replace(/[\W_]+/g, '.*?')
+// const r1 = `${prevWords2} (?=${nextWord})`
+
+
+
+
+/*
+do 2 searches 
+- one on the prevWords with a lookahead for the first highlighted word
+    end of the match will be start of our range
+- one on selectedText works with lookahead for first of nextWords
+    end of the match will be end of our range
+*/
+
+
+
+      // let cursor = editor.getSearchCursor(/was.*?in/gi) // selectedText
+      // cursor.find()
+      // editor.markText(cursor.from(), cursor.to(), {css: "background-color: red"})
+      // cursor.findNext()
+      // editor.markText(cursor.from(), cursor.to(), {css: "background-color: red"})
+
+      /*    
+            editor.state.query = selectedText
+            editor.execCommand('find')
+
+            findNext: () => editor.execCommand('findNext'),
+            findPrevious: () => editor.execCommand('findPrev'),
+            clearSearch: () => editor.execCommand('clearSearch'),
+      */  
+    }
+
+
     const italicMarkup = "''"
     const boldMarkup = "'''"
 

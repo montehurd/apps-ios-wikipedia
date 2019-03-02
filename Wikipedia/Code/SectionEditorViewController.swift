@@ -138,6 +138,11 @@ class SectionEditorViewController: UIViewController {
     
     func setWikitextToWebView(_ wikitext: String, completionHandler: ((Error?) -> Void)? = nil) {
         messagingController.setWikitext(wikitext, completionHandler: completionHandler)
+
+        guard let selectedTextInfo = selectedTextInfo else {
+            return
+        }
+        messagingController.highlightAndScrollToText(for: selectedTextInfo)
     }
     
     private func loadWikitext() {

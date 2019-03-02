@@ -121,6 +121,20 @@ class SectionEditorWebViewMessagingController: NSObject, WKScriptMessageHandler 
         }
     }
 
+    func highlightAndScrollToText(for selectedTextInfo: SelectedTextInfo, completionHandler: ((Error?) -> Void)? = nil) {
+        let escapedSelectedText = selectedTextInfo.selectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        let escapedTextBeforeSelectedText = selectedTextInfo.textBeforeSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        let escapedTextAfterSelectedText = selectedTextInfo.textAfterSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        webView.evaluateJavaScript("""
+            window.wmf.highlightAndScrollToTextForSelectedTextInfo(`\(escapedSelectedText)`, `\(escapedTextBeforeSelectedText)`, `\(escapedTextAfterSelectedText)`);
+        """) { (_, error) in
+            guard let completionHandler = completionHandler else {
+                return
+            }
+            completionHandler(error)
+        }
+    }
+
     func getWikitext(completionHandler: ((Any?, Error?) -> Void)? = nil) {
         webView.evaluateJavaScript("window.wmf.getWikitext();", completionHandler: completionHandler)
     }

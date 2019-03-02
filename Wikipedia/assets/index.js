@@ -236,8 +236,55 @@ const getSelectedTextEditInfo = () => {
 
   const selectedText = selection.toString()
   const fullAnchorNodeText = selection.anchorNode.textContent
-  const textBeforeSelectedText = selection.anchorNode.textContent.slice(0, selection.anchorOffset)
-  const textAfterSelectedText = selection.extentNode.textContent.slice(selection.extentOffset)
+
+
+
+
+
+
+  let textBeforeSelectedText = selection.anchorNode.textContent.slice(0, selection.anchorOffset)
+// ^ will be empty string if selection starts at beggining of anchorNode - need to back up and grab text from prev node in this case 
+
+// selection.getRangeAt(0).startContainer.previousSibling.textContent
+// selection.getRangeAt(0).startContainer.parentNode.previousSibling.textContent
+if (textBeforeSelectedText.length == 0) {
+  const previousSibling = selection.anchorNode.previousSibling
+  if (previousSibling) {
+    textBeforeSelectedText = previousSibling.textContent
+  }
+}
+if (textBeforeSelectedText.length == 0) {
+  const parentPreviousSibling = selection.anchorNode.parentNode.previousSibling
+  if (parentPreviousSibling) {
+    textBeforeSelectedText = parentPreviousSibling.textContent
+  }
+}
+
+
+
+
+  let textAfterSelectedText = selection.extentNode.textContent.slice(selection.extentOffset)
+// ^ will be empty string if selection ends at end of anchorNode - need to go forward and grab text from next node in this case 
+
+// selection.getRangeAt(0).endContainer.nextSibling.textContent
+// selection.getRangeAt(0).endContainer.parentNode.nextSibling.textContent
+if (textAfterSelectedText.length == 0) {
+  const nextSibling = selection.extentNode.nextSibling
+  if (nextSibling) {
+    textAfterSelectedText = nextSibling.textContent
+  }
+}
+if (textAfterSelectedText.length == 0) {
+  const parentNextSibling = selection.extentNode.parentNode.nextSibling
+  if (parentNextSibling) {
+    textAfterSelectedText = parentNextSibling.textContent
+  }
+}
+
+
+
+
+
 
   return new SelectedTextInfo(selectedText, isTitleDescriptionSelection, sectionID, textBeforeSelectedText, textAfterSelectedText)
 }
