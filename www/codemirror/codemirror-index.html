@@ -651,13 +651,18 @@ const firstNextWord = nextWords[0]
 const getRegexStringForString = (s, lookAheadWord) => `\\b${getWordsOnlyStringForString(s).replace(/[\W_]+/g, '.*?').trim()}(?=.*${lookAheadWord})`
 
 
+const test1 = selectedWords.concat(nextWords).join().replace(/[\W_]+/g, '.*?')
+// "Counties.*?and.*?losing.*?a.*?point.*?in.*?the.*?southwestern.*?corner.*?to" = $1
+const test2 = nextWords.join().replace(/[\W_]+/g, '.*?')
+// "and.*?losing.*?a.*?point.*?in.*?the.*?southwestern.*?corner.*?to" = $1
 
-let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, firstSelectedWord), 'i'))
+let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, test1/*firstSelectedWord*/), 'i'))
+// "\\band.*?Itasca(?=.*Counties.*?and.*?losing.*?a.*?point.*?in.*?the.*?southwestern.*?corner.*?to)" = $1
 cursor1.find()
 let from = cursor1.to()
 
 // split into 2 `getSearchCursor` calls because of lack of JS regex lookbehind
-let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, firstNextWord), 'i'), from)
+let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, test2/*firstNextWord*/), 'i'), from)
 cursor2.find()
 let to = cursor2.to()
 
