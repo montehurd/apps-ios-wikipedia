@@ -268,13 +268,33 @@ const getSelectedAndAdjacentTest = (sel) => {
       }
   }
 
+
+
+// The word 'created' in: "The county was created in 1857 and organized in 1871."
+
   range.setStartBefore(startEl.previousSibling || startEl.parentNode.previousSibling || sel.anchorNode)
   const beforeAndSelectedText = range.toString()
-  const textBeforeSelectedText = beforeAndSelectedText.slice(0, -selectedText.length)
+  let textBeforeSelectedText = beforeAndSelectedText.slice(0, -selectedText.length)
+// in textBeforeSelectedText remove anything before last line break
+// "test\n 123\n hahah".split('\n')["test\n 123\n hahah".split('\n').length-1]
+
+const aa = textBeforeSelectedText.split('\n')
+textBeforeSelectedText = aa[aa.length - 1]
+
+
 
   range.setEndAfter(endEl.nextSibling || endEl.parentNode.nextSibling || sel.focusNode)
   const beforeAndAfterAndSelectedText = range.toString()
-  const textAfterSelectedText = beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length)
+  let textAfterSelectedText = beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length)
+// in textAfterSelectedText remove anything after first line break
+// "test\n 123\n hahah".split('\n')[0]
+
+const bb = textAfterSelectedText.split('\n')
+textAfterSelectedText = bb[0]
+
+
+
+
 
   // Uncomment for debugging - actually changes the selection visibly.
   // sel.addRange(range)

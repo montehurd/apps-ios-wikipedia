@@ -605,20 +605,29 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
     // Once we wire up Browserify we can pass this the `SelectedTextInfo` js object instead of all of its properties separately.
     wmf.highlightAndScrollToTextForSelectedTextInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+      
+      
       const textarea = document.createElement('textarea')
       textarea.innerHTML = `
-      selected =
-      ${selectedText}
-      before =
       ${textBeforeSelectedText}
-      after =
+      ${selectedText}
       ${textAfterSelectedText}
       `
-
       textarea.style = 'width:100vw;height:100px;margin-top:50px;'
       document.body.insertBefore(textarea, document.body.firstChild)
+      
 
       const selectedText2 = selectedText.trim()
       const textBeforeSelectedText2 = textBeforeSelectedText.trim()
@@ -630,7 +639,7 @@
       const nextWords = getWordsOnlyStringForString(textAfterSelectedText2).split(' ')
 
       const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
-      const getRegexStringForString = (s, lookAheadWord) => `\\b${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
+      const getRegexStringForString = (s, lookAheadWord) => `${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
 
       const selectedWordsLookahead = getWildCardsForNonWords(selectedWords.concat(nextWords).join())
       const nextWordsLookahead = getWildCardsForNonWords(nextWords.join())
@@ -644,12 +653,26 @@
       cursor2.find()
       let to = cursor2.to()
 
+// On 'enwiki > Tamarack, MN > History'
+// To fix issue seen when highlighting the 'counties' word which is right after 'Pine' link:
+// - move 'from' forward until it's exactly on the first char of 'selectedText'
+// - move 'to' backward until it's exactly on the last char of 'selectedText'
 
-
+      let marker = null
       editor.setSelection(from, to)
       setTimeout(() => {
         scrollCursorIntoViewIfNeeded(true)
-        editor.markText(from, to, {css: "background-color: rgba(255,204,51,0.4)"})
+        marker = editor.markText(from, to, {
+          css: 'background-color: rgba(255,204,51,0.4)',
+          className: 'test123',
+          clearOnEnter: true,
+          inclusiveLeft: true,
+          inclusiveRight: true
+        })
+        // setTimeout(() => {
+        //   marker.clear()
+        //   window.getSelection().removeAllRanges()
+        // }, 2000)
         setTimeout(() => {
           window.getSelection().removeAllRanges()
         }, 10)
