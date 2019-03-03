@@ -644,7 +644,18 @@
       cursor2.find()
       let to = cursor2.to()
 
-      editor.markText(from, to, {css: "background-color: red"})
+
+
+      editor.setSelection(from, to)
+      setTimeout(() => {
+        scrollCursorIntoViewIfNeeded(true)
+        editor.markText(from, to, {css: "background-color: rgba(255,204,51,0.4)"})
+        setTimeout(() => {
+          window.getSelection().removeAllRanges()
+        }, 10)
+      }, 250)
+
+      
     }
 
 
@@ -778,8 +789,8 @@
     const cursorOffsetFromTopOfWebView = () => editor.cursorCoords(true, 'window').top
     const cursorOffsetFromTopOfKeyboard = () => editor.cursorCoords(false, 'window').bottom - webViewHeightNotCoveredByKeyboard()
 
-    const scrollCursorIntoViewIfNeeded = () => {
-      if (getSelectionRange(editor).isRangeSelected) {
+    const scrollCursorIntoViewIfNeeded = (force = false) => {
+      if (!force && getSelectionRange(editor).isRangeSelected) {
         return
       }
       const offset = verticalOffsetNeededToScrollCursorIntoView()
