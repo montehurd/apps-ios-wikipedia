@@ -275,9 +275,8 @@ const getSelectedAndAdjacentTest = (sel) => {
   range.setStartBefore(startEl.previousSibling || startEl.parentNode.previousSibling || sel.anchorNode)
   const beforeAndSelectedText = range.toString()
   let textBeforeSelectedText = beforeAndSelectedText.slice(0, -selectedText.length)
-// in textBeforeSelectedText remove anything before last line break
-// "test\n 123\n hahah".split('\n')["test\n 123\n hahah".split('\n').length-1]
 
+// in textBeforeSelectedText remove anything before last line break
 const aa = textBeforeSelectedText.split('\n')
 textBeforeSelectedText = aa[aa.length - 1]
 
@@ -286,9 +285,8 @@ textBeforeSelectedText = aa[aa.length - 1]
   range.setEndAfter(endEl.nextSibling || endEl.parentNode.nextSibling || sel.focusNode)
   const beforeAndAfterAndSelectedText = range.toString()
   let textAfterSelectedText = beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length)
-// in textAfterSelectedText remove anything after first line break
-// "test\n 123\n hahah".split('\n')[0]
 
+// in textAfterSelectedText remove anything after first line break
 const bb = textAfterSelectedText.split('\n')
 textAfterSelectedText = bb[0]
 

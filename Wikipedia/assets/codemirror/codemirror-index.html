@@ -628,6 +628,26 @@
       textarea.style = 'width:100vw;height:100px;margin-top:50px;'
       document.body.insertBefore(textarea, document.body.firstChild)
       
+// BUG:
+// On 'enwiki > Tamarack, MN > Geography'
+// - select the word 'area'
+//
+// has the following before/selected/after text:
+// U.S. Census Bureau, the county has a total 
+// area
+// of 1,995 square miles (5,170 km2
+//
+// problem is the '1,995 square miles (5,170 km2' part of the after string is template output which differs from its markup which is:
+//    '{{convert|1995|sqmi}}
+//
+// POSSIBLE FIX:
+//  re-do the search in a loop lopping off one word at the end of after text each time
+//    (^ note - if either 'to' or 'from' are found initially only need to loop/lop the other one)
+//  if that doesn't produce a result restore after text and do same thing with before text but lopping of words from beginning of before string
+//
+//  if that doesn't work blank whichever string is shortest (before or after) and loop/lop the other 
+//  then flip around if still no result
+
 
       const selectedText2 = selectedText.trim()
       const textBeforeSelectedText2 = textBeforeSelectedText.trim()
@@ -641,17 +661,31 @@
       const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
       const getRegexStringForString = (s, lookAheadWord) => `${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
 
-      const selectedWordsLookahead = getWildCardsForNonWords(selectedWords.concat(nextWords).join())
-      const nextWordsLookahead = getWildCardsForNonWords(nextWords.join())
 
+      const selectedWordsLookahead = getWildCardsForNonWords(selectedWords.concat(nextWords).join())
       let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, selectedWordsLookahead), 'i'))
       cursor1.find()
       let from = cursor1.to()
 
+      const nextWordsLookahead = getWildCardsForNonWords(nextWords.join())
       // split into 2 `getSearchCursor` calls because of lack of JS regex lookbehind
       let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, nextWordsLookahead), 'i'), textBeforeSelectedText2.length > 0 ? from : null)
       cursor2.find()
       let to = cursor2.to()
+
+/*
+if (to === undefined) {
+  do {
+    nextWords.pop()
+    
+  } while (nextWords.length > 0);
+}
+*/
+
+
+
+
+
 
 // On 'enwiki > Tamarack, MN > History'
 // To fix issue seen when highlighting the 'counties' word which is right after 'Pine' link:
