@@ -618,7 +618,7 @@
     // Once we wire up Browserify we can pass this the `SelectedTextInfo` js object instead of all of its properties separately.
     wmf.highlightAndScrollToTextForSelectedTextInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
       
-      
+      /*
       const textarea = document.createElement('textarea')
       textarea.innerHTML = `
       ${textBeforeSelectedText}
@@ -627,6 +627,8 @@
       `
       textarea.style = 'width:100vw;height:100px;margin-top:50px;'
       document.body.insertBefore(textarea, document.body.firstChild)
+      */
+      
       
 // BUG:
 // On 'enwiki > Tamarack, MN > Geography'
@@ -678,13 +680,34 @@
 
 
 //      let pattern = "\(a).*?(\(b)).*?\(c)" //"Aitkin.*?County.*?was.*?(established).*?in.*?1857.*?as.*?Aiken.*?County"
-const a = getWildCardsForNonWords(getWordsOnlyStringForString(textBeforeSelectedText.trim()))
+
+
+// Adjacent words are used to disambiguate search result.
+const numberOfAdjacentWordsToIncludeInSearch = 2
+
+const wordsBefore = getWordsOnlyStringForString(textBeforeSelectedText.trim()).split(' ')
+  .filter((e, i, a) => (a.length - i - 1) < numberOfAdjacentWordsToIncludeInSearch)
+
+const wordsAfter = getWordsOnlyStringForString(textAfterSelectedText.trim()).split(' ')
+  .filter((e, i) => i < numberOfAdjacentWordsToIncludeInSearch)
+
+const a = getWildCardsForNonWords(wordsBefore.join(' '))
 const b = getWildCardsForNonWords(getWordsOnlyStringForString(selectedText.trim()))
-const c = getWildCardsForNonWords(getWordsOnlyStringForString(textAfterSelectedText.trim()))
+const c = getWildCardsForNonWords(wordsAfter.join(' '))
 const p = `(.*?${a}.*)(${b}).*${c}`
-const r = new RegExp(p, 'is')
+const r = new RegExp(p, 's')
 const wikitext = editor.getValue()
 const o = wikitext.match(r)
+
+
+// ^ instead of just starting out with all the before and after wildcard text
+// add before words until the match fails, then add after words until match fails
+// that way it won't bail when it encounters template output delta
+// (for the 'area' bug outlined above on line 631)
+
+
+
+
 
 const linesBeforeSoughtMatch = o[1].split('\n')
 const startLine = linesBeforeSoughtMatch.length - 1 
@@ -693,7 +716,6 @@ const startCh = linesBeforeSoughtMatch.pop().length
 const linesInSoughtMatch = o[2].split('\n')
 const endLine = startLine + linesInSoughtMatch.length - 1
 const endCh = linesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
-
 
 let from = {line: startLine, ch: startCh}
 let to = {line: endLine, ch: endCh}
