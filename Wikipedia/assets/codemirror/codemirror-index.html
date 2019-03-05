@@ -649,19 +649,20 @@
 //  then flip around if still no result
 
 
-      const selectedText2 = selectedText.trim()
-      const textBeforeSelectedText2 = textBeforeSelectedText.trim()
-      const textAfterSelectedText2 = textAfterSelectedText.trim()
+      // const selectedText2 = selectedText.trim()
+      // const textBeforeSelectedText2 = textBeforeSelectedText.trim()
+      // const textAfterSelectedText2 = textAfterSelectedText.trim()
 
       const getWordsOnlyStringForString = (s) => s.replace(/[\W_]+/g, ' ').trim()
 
-      const selectedWords = getWordsOnlyStringForString(selectedText2).split(' ')
-      const nextWords = getWordsOnlyStringForString(textAfterSelectedText2).split(' ')
+      // const previousWords = getWordsOnlyStringForString(textBeforeSelectedText2).split(' ')
+      // const selectedWords = getWordsOnlyStringForString(selectedText2).split(' ')
+      // const nextWords = getWordsOnlyStringForString(textAfterSelectedText2).split(' ')
 
       const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
-      const getRegexStringForString = (s, lookAheadWord) => `${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
+      // const getRegexStringForString = (s, lookAheadWord) => `${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
 
-
+/*
       const selectedWordsLookahead = getWildCardsForNonWords(selectedWords.concat(nextWords).join())
       let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, selectedWordsLookahead), 'i'))
       cursor1.find()
@@ -672,6 +673,35 @@
       let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, nextWordsLookahead), 'i'), textBeforeSelectedText2.length > 0 ? from : null)
       cursor2.find()
       let to = cursor2.to()
+*/
+
+
+
+//      let pattern = "\(a).*?(\(b)).*?\(c)" //"Aitkin.*?County.*?was.*?(established).*?in.*?1857.*?as.*?Aiken.*?County"
+const a = getWildCardsForNonWords(getWordsOnlyStringForString(textBeforeSelectedText.trim()))
+const b = getWildCardsForNonWords(getWordsOnlyStringForString(selectedText.trim()))
+const c = getWildCardsForNonWords(getWordsOnlyStringForString(textAfterSelectedText.trim()))
+const p = `(.*?${a}.*)(${b}).*${c}`
+const r = new RegExp(p, 'is')
+const wikitext = editor.getValue()
+const o = wikitext.match(r)
+
+const linesBeforeSoughtMatch = o[1].split('\n')
+const startLine = linesBeforeSoughtMatch.length - 1 
+const startCh = linesBeforeSoughtMatch.pop().length
+
+const linesInSoughtMatch = o[2].split('\n')
+const endLine = startLine + linesInSoughtMatch.length - 1
+const endCh = linesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
+
+
+let from = {line: startLine, ch: startCh}
+let to = {line: endLine, ch: endCh}
+
+
+
+
+console.log("hi")
 
 /*
 if (to === undefined) {
