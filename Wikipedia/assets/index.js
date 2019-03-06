@@ -234,7 +234,7 @@ const getSelectedTextEditInfo = () => {
   }
   
   const selectedAndAdjacentText = getSelectedAndAdjacentText(selection)
-  
+
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,
     isTitleDescriptionSelection, 
@@ -289,6 +289,7 @@ const trimEverythingBeforeLastLineBreak = (s) => {
 }
 
 exports.getSelectedTextEditInfo = getSelectedTextEditInfo
+
 },{"./utilities":9}],5:[function(require,module,exports){
 //  Used by methods in "UIWebView+ElementLocation.h" category.
 
