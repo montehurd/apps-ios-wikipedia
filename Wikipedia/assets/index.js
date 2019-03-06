@@ -235,7 +235,7 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
   
-  const selectedAndAdjacentTest = getSelectedAndAdjacentTest(selection)
+  const selectedAndAdjacentTest = getSelectedAndAdjacentText(selection)
 
   return new SelectedTextInfo(
     selectedAndAdjacentTest['selectedText'], 
@@ -246,62 +246,46 @@ const getSelectedTextEditInfo = () => {
   )
 }
 
-// Ensure adjacent text extraction works for these tricky examples on 'en > Tamarack, MN > History':
-// Things to select and try:
-// - the first 'was', the second 'was'
-// - '. The current'
-// - 'Aiken County' (note - no 't', this is italic too)
-const getSelectedAndAdjacentTest = (sel) => {
-  const range = sel.getRangeAt(0)
+const getSelectedAndAdjacentText = (selection) => {
+  const range = selection.getRangeAt(0)
   const selectedText = range.toString()
 
-  let startEl = sel.anchorNode
-  if (startEl != range.commonAncestorContainer) {
-      while (startEl.parentNode != range.commonAncestorContainer) {
-          startEl = startEl.parentNode
+  let startNode = selection.anchorNode
+  if (startNode != range.commonAncestorContainer) {
+      while (startNode.parentNode != range.commonAncestorContainer) {
+          startNode = startNode.parentNode
       }
   }
-  let endEl = sel.focusNode
-  if (endEl != range.commonAncestorContainer) {
-      while (endEl.parentNode != range.commonAncestorContainer) {
-          endEl = endEl.parentNode
+  let endNode = selection.focusNode
+  if (endNode != range.commonAncestorContainer) {
+      while (endNode.parentNode != range.commonAncestorContainer) {
+          endNode = endNode.parentNode
       }
   }
 
-
-
-// The word 'created' in: "The county was created in 1857 and organized in 1871."
-
-  range.setStartBefore(startEl.previousSibling || startEl.parentNode.previousSibling || sel.anchorNode)
+  range.setStartBefore(startNode.previousSibling || startNode.parentNode.previousSibling || selection.anchorNode)
   const beforeAndSelectedText = range.toString()
-  let textBeforeSelectedText = beforeAndSelectedText.slice(0, -selectedText.length)
+  const textBeforeSelectedText = trimEverythingBeforeLastLineBreak(beforeAndSelectedText.slice(0, -selectedText.length))
 
-// in textBeforeSelectedText remove anything before last line break
-const aa = textBeforeSelectedText.split('\n')
-textBeforeSelectedText = aa[aa.length - 1]
-
-
-
-  range.setEndAfter(endEl.nextSibling || endEl.parentNode.nextSibling || sel.focusNode)
+  range.setEndAfter(endNode.nextSibling || endNode.parentNode.nextSibling || selection.focusNode)
   const beforeAndAfterAndSelectedText = range.toString()
-  let textAfterSelectedText = beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length)
-
-// in textAfterSelectedText remove anything after first line break
-const bb = textAfterSelectedText.split('\n')
-textAfterSelectedText = bb[0]
-
-
-
-
+  const textAfterSelectedText = trimEverythingAfterFirstLineBreak(beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length))
 
   // Uncomment for debugging - actually changes the selection visibly.
-  // sel.addRange(range)
+  // selection.addRange(range)
 
   return {
     selectedText,
     textBeforeSelectedText,
     textAfterSelectedText
   }
+}
+
+const trimEverythingAfterFirstLineBreak = (s) => s.split('\n')[0]  
+
+const trimEverythingBeforeLastLineBreak = (s) => {
+  const lines = s.split('\n')
+  return lines[lines.length - 1]
 }
 
 exports.getSelectedTextEditInfo = getSelectedTextEditInfo
