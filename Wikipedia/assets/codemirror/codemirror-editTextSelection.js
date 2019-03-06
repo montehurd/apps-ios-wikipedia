@@ -24,14 +24,11 @@ const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedTe
     return regex
 }
 
-const wikitextRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+const wikitextRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText, wikitext) => {
     const regex = wikitextRegexForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
-    const wikitext = editor.getValue()
     const match = wikitext.match(regex)
-
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
-
     const wikitextRange = getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
     return wikitextRange
 }
@@ -51,13 +48,13 @@ const getWikitextRangeToSelect = (wikitextBeforeSelection, wikitextSelection) =>
   return {from, to}
 }
 
-const scrollToAndHighlightRange = (range) => {
+const scrollToAndHighlightRange = (range, codemirror) => {
   let marker = null
   // Temporarily set selection so we can use existing `scrollCursorIntoViewIfNeeded` method to bring the selection on-screen.
-  editor.setSelection(range.from, range.to)
+  codemirror.setSelection(range.from, range.to)
   setTimeout(() => {
     scrollCursorIntoViewIfNeeded(true)
-    marker = editor.markText(range.from, range.to, {
+    marker = codemirror.markText(range.from, range.to, {
       css: 'background-color: rgba(255, 204, 51, 0.4)', // Can use 'className' (vs 'css') if needed.
       clearOnEnter: true,
       inclusiveLeft: true,
@@ -76,6 +73,7 @@ const scrollToAndHighlightRange = (range) => {
 }
 
 const highlightAndScrollToWikitextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
-  scrollToAndHighlightRange(rangeToHighlight)
+  const wikitext = editor.getValue()
+  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText, wikitext)
+  scrollToAndHighlightRange(rangeToHighlight, editor)
 }
