@@ -617,148 +617,55 @@
 
     // Once we wire up Browserify we can pass this the `SelectedTextInfo` js object instead of all of its properties separately.
     wmf.highlightAndScrollToTextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-      
-      /*
-      const textarea = document.createElement('textarea')
-      textarea.innerHTML = `
-      ${textBeforeSelectedText}
-      ${selectedText}
-      ${textAfterSelectedText}
-      `
-      textarea.style = 'width:100vw;height:100px;margin-top:50px;'
-      document.body.insertBefore(textarea, document.body.firstChild)
-      */
-      
-      
-// BUG:
-// On 'enwiki > Tamarack, MN > Geography'
-// - select the word 'area'
-//
-// has the following before/selected/after text:
-// U.S. Census Bureau, the county has a total 
-// area
-// of 1,995 square miles (5,170 km2
-//
-// problem is the '1,995 square miles (5,170 km2' part of the after string is template output which differs from its markup which is:
-//    '{{convert|1995|sqmi}}
-//
-// POSSIBLE FIX:
-//  re-do the search in a loop lopping off one word at the end of after text each time
-//    (^ note - if either 'to' or 'from' are found initially only need to loop/lop the other one)
-//  if that doesn't produce a result restore after text and do same thing with before text but lopping of words from beginning of before string
-//
-//  if that doesn't work blank whichever string is shortest (before or after) and loop/lop the other 
-//  then flip around if still no result
-
-
-      // const selectedText2 = selectedText.trim()
-      // const textBeforeSelectedText2 = textBeforeSelectedText.trim()
-      // const textAfterSelectedText2 = textAfterSelectedText.trim()
 
       const getWordsOnlyStringForString = (s) => s.replace(/[\W_]+/g, ' ').trim()
-
-      // const previousWords = getWordsOnlyStringForString(textBeforeSelectedText2).split(' ')
-      // const selectedWords = getWordsOnlyStringForString(selectedText2).split(' ')
-      // const nextWords = getWordsOnlyStringForString(textAfterSelectedText2).split(' ')
-
       const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
-      // const getRegexStringForString = (s, lookAheadWord) => `${getWildCardsForNonWords(getWordsOnlyStringForString(s)).trim()}(?=.*${lookAheadWord})`
 
-/*
-      const selectedWordsLookahead = getWildCardsForNonWords(selectedWords.concat(nextWords).join())
-      let cursor1 = editor.getSearchCursor(new RegExp(getRegexStringForString(textBeforeSelectedText2, selectedWordsLookahead), 'i'))
-      cursor1.find()
-      let from = cursor1.to()
+      // Adjacent words are used to disambiguate search result.
+      const numberOfAdjacentWordsToIncludeInSearch = 2
 
-      const nextWordsLookahead = getWildCardsForNonWords(nextWords.join())
-      // split into 2 `getSearchCursor` calls because of lack of JS regex lookbehind
-      let cursor2 = editor.getSearchCursor(new RegExp(getRegexStringForString(selectedText2, nextWordsLookahead), 'i'), textBeforeSelectedText2.length > 0 ? from : null)
-      cursor2.find()
-      let to = cursor2.to()
-*/
+      const wordsBefore = getWordsOnlyStringForString(textBeforeSelectedText.trim()).split(' ')
+        .filter((e, i, a) => (a.length - i - 1) < numberOfAdjacentWordsToIncludeInSearch)
 
+      const wordsAfter = getWordsOnlyStringForString(textAfterSelectedText.trim()).split(' ')
+        .filter((e, i) => i < numberOfAdjacentWordsToIncludeInSearch)
 
+      const beforeString = getWildCardsForNonWords(wordsBefore.join(' '))
+      const selectionString = getWildCardsForNonWords(getWordsOnlyStringForString(selectedText.trim()))
+      const afterString = getWildCardsForNonWords(wordsAfter.join(' '))
+      const pattern = `(.*?${beforeString}.*)(${selectionString}).*${afterString}`
+      const regex = new RegExp(pattern, 's')
+      const wikitext = editor.getValue()
+      const match = wikitext.match(regex)
 
-//      let pattern = "\(a).*?(\(b)).*?\(c)" //"Aitkin.*?County.*?was.*?(established).*?in.*?1857.*?as.*?Aiken.*?County"
+      const linesBeforeSoughtMatch = match[1].split('\n')
+      const startLine = linesBeforeSoughtMatch.length - 1 
+      const startCh = linesBeforeSoughtMatch.pop().length
 
+      const linesInSoughtMatch = match[2].split('\n')
+      const endLine = startLine + linesInSoughtMatch.length - 1
+      const endCh = linesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
 
-// Adjacent words are used to disambiguate search result.
-const numberOfAdjacentWordsToIncludeInSearch = 2
+      let from = {line: startLine, ch: startCh}
+      let to = {line: endLine, ch: endCh}
 
-const wordsBefore = getWordsOnlyStringForString(textBeforeSelectedText.trim()).split(' ')
-  .filter((e, i, a) => (a.length - i - 1) < numberOfAdjacentWordsToIncludeInSearch)
-
-const wordsAfter = getWordsOnlyStringForString(textAfterSelectedText.trim()).split(' ')
-  .filter((e, i) => i < numberOfAdjacentWordsToIncludeInSearch)
-
-const a = getWildCardsForNonWords(wordsBefore.join(' '))
-const b = getWildCardsForNonWords(getWordsOnlyStringForString(selectedText.trim()))
-const c = getWildCardsForNonWords(wordsAfter.join(' '))
-const p = `(.*?${a}.*)(${b}).*${c}`
-const r = new RegExp(p, 's')
-const wikitext = editor.getValue()
-const o = wikitext.match(r)
-
-
-// ^ instead of just starting out with all the before and after wildcard text
-// add before words until the match fails, then add after words until match fails
-// that way it won't bail when it encounters template output delta
-// (for the 'area' bug outlined above on line 631)
-
-
-
-
-
-const linesBeforeSoughtMatch = o[1].split('\n')
-const startLine = linesBeforeSoughtMatch.length - 1 
-const startCh = linesBeforeSoughtMatch.pop().length
-
-const linesInSoughtMatch = o[2].split('\n')
-const endLine = startLine + linesInSoughtMatch.length - 1
-const endCh = linesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
-
-let from = {line: startLine, ch: startCh}
-let to = {line: endLine, ch: endCh}
-
-
-
-
-console.log("hi")
-
-/*
-if (to === undefined) {
-  do {
-    nextWords.pop()
-    
-  } while (nextWords.length > 0);
-}
-*/
-
-
-
-
-
-
-// On 'enwiki > Tamarack, MN > History'
-// To fix issue seen when highlighting the 'counties' word which is right after 'Pine' link:
-// - move 'from' forward until it's exactly on the first char of 'selectedText'
-// - move 'to' backward until it's exactly on the last char of 'selectedText'
 
       let marker = null
       editor.setSelection(from, to)
       setTimeout(() => {
         scrollCursorIntoViewIfNeeded(true)
         marker = editor.markText(from, to, {
-          css: 'background-color: rgba(255,204,51,0.4)',
-          className: 'test123',
+          css: 'background-color: rgba(255,204,51,0.4)', // Can use 'className' (vs 'css') if needed.
           clearOnEnter: true,
           inclusiveLeft: true,
           inclusiveRight: true
         })
-        // setTimeout(() => {
-        //   marker.clear()
-        //   window.getSelection().removeAllRanges()
-        // }, 2000)
+        /*
+        setTimeout(() => {
+         marker.clear()
+         window.getSelection().removeAllRanges()
+        }, 2000)
+        */
         setTimeout(() => {
           window.getSelection().removeAllRanges()
         }, 10)
