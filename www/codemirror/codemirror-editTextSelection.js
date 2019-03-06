@@ -41,15 +41,15 @@ const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedT
     const wikitext = editor.getValue()
     const match = wikitext.match(regex)
 
-    const wikitextStringBeforeSoughtMatch = match[1]
-    const wikitextLinesBeforeSoughtMatch = wikitextStringBeforeSoughtMatch.split('\n')
-    const startLine = wikitextLinesBeforeSoughtMatch.length - 1 
-    const startCh = wikitextLinesBeforeSoughtMatch.pop().length
+    const wikitextBeforeSelectionMatch = match[1]
+    const wikitextBeforeSelectionMatchLines = wikitextBeforeSelectionMatch.split('\n')
+    const startLine = wikitextBeforeSelectionMatchLines.length - 1 
+    const startCh = wikitextBeforeSelectionMatchLines.pop().length
 
-    const wikitextStringInSoughtMatch = match[2]
-    const wikitextLinesInSoughtMatch = wikitextStringInSoughtMatch.split('\n')
-    const endLine = startLine + wikitextLinesInSoughtMatch.length - 1
-    const endCh = wikitextLinesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
+    const wikitextSelectionMatch = match[2]
+    const wikitextSelectionMatchLines = wikitextSelectionMatch.split('\n')
+    const endLine = startLine + wikitextSelectionMatchLines.length - 1
+    const endCh = wikitextSelectionMatchLines.pop().length + (startLine === endLine ? startCh : 0)
 
     let from = {line: startLine, ch: startCh}
     let to = {line: endLine, ch: endCh}
