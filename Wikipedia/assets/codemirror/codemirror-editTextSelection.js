@@ -1,23 +1,5 @@
 
-/*
-break out content of highlightAndScrollToTextForSelectedTextEditInfo below
-- file called 'CodeMirror-EditSelectionJavascript.js'
-- put in www code mirror folder and ensure it gets copied to assets
-- reference the file with a script tag above
-
-leave wmf.highlightAndScrollToTextForSelectedTextEditInfo in place, but have it call 2 
-methods in the 'CodeMirror-EditSelectionJavascript.js' file:
-
-- highlightRangeForSelectedTextEditInfo
-- scrollToAndHighlightRange
-
-
-- on pr document edge cases from notes.txt (including 1st paragraph relocation issue)
-
-*/
-
-
-const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
     const getWordsOnlyStringForString = (s) => s.replace(/[\W_]+/g, ' ').trim()
     const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
 
@@ -38,13 +20,20 @@ const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedT
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'
     const pattern = `(${beforeStringPattern})(${selectionString}).*${afterString}`
     const regex = new RegExp(pattern, 's')
+
+    return regex
+}
+
+const wikitextRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+    const regex = wikitextRegexForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
     const wikitext = editor.getValue()
     const match = wikitext.match(regex)
 
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
 
-    return getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
+    const wikitextRange = getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
+    return wikitextRange
 }
 
 const getWikitextRangeToSelect = (wikitextBeforeSelection, wikitextSelection) => {
@@ -86,7 +75,7 @@ const scrollToAndHighlightRange = (range) => {
   }, 250)
 }
 
-const highlightAndScrollToTextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-  const rangeToHighlight = highlightRangeForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
+const highlightAndScrollToWikitextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
   scrollToAndHighlightRange(rangeToHighlight)
 }
