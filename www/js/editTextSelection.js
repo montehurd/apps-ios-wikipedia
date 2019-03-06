@@ -1,6 +1,6 @@
 const utilities = require('./utilities')
 
-class SelectedTextInfo {
+class SelectedTextEditInfo {
   constructor(selectedText, isSelectedTextInTitleDescription, sectionID, textBeforeSelectedText, textAfterSelectedText) {
     this.selectedText = selectedText
     this.isSelectedTextInTitleDescription = isSelectedTextInTitleDescription
@@ -31,7 +31,7 @@ const getSelectedTextEditInfo = () => {
   
   const selectedAndAdjacentTest = getSelectedAndAdjacentText(selection)
 
-  return new SelectedTextInfo(
+  return new SelectedTextEditInfo(
     selectedAndAdjacentTest['selectedText'], 
     isTitleDescriptionSelection, 
     sectionID, 

@@ -206,7 +206,7 @@ document.addEventListener('click', event => {
 },{"./utilities":9,"wikimedia-page-library":1}],4:[function(require,module,exports){
 const utilities = require('./utilities')
 
-class SelectedTextInfo {
+class SelectedTextEditInfo {
   constructor(selectedText, isSelectedTextInTitleDescription, sectionID, textBeforeSelectedText, textAfterSelectedText) {
     this.selectedText = selectedText
     this.isSelectedTextInTitleDescription = isSelectedTextInTitleDescription
@@ -237,7 +237,7 @@ const getSelectedTextEditInfo = () => {
   
   const selectedAndAdjacentTest = getSelectedAndAdjacentText(selection)
 
-  return new SelectedTextInfo(
+  return new SelectedTextEditInfo(
     selectedAndAdjacentTest['selectedText'], 
     isTitleDescriptionSelection, 
     sectionID, 

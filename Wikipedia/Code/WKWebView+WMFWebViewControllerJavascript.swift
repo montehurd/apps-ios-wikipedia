@@ -245,7 +245,7 @@ extension WKWebView {
 }
 
 extension WKWebView {
-    private func selectedTextInfo(from dictionary: Dictionary<String, Any>) -> SelectedTextInfo? {
+    private func selectedTextEditInfo(from dictionary: Dictionary<String, Any>) -> SelectedTextEditInfo? {
         guard
             let selectedText = dictionary["selectedText"] as? String,
             let isSelectedTextInTitleDescription = dictionary["isSelectedTextInTitleDescription"] as? Bool,
@@ -253,13 +253,13 @@ extension WKWebView {
             let textAfterSelectedText = dictionary["textAfterSelectedText"] as? String,
             let textBeforeSelectedText = dictionary["textBeforeSelectedText"] as? String
             else {
-                DDLogError("Error converting dictionary to SelectedTextInfo")
+                DDLogError("Error converting dictionary to SelectedTextEditInfo")
                 return nil
         }
-        return SelectedTextInfo(selectedText: selectedText, isSelectedTextInTitleDescription: isSelectedTextInTitleDescription, sectionID: sectionID, textAfterSelectedText: textAfterSelectedText, textBeforeSelectedText: textBeforeSelectedText)
+        return SelectedTextEditInfo(selectedText: selectedText, isSelectedTextInTitleDescription: isSelectedTextInTitleDescription, sectionID: sectionID, textAfterSelectedText: textAfterSelectedText, textBeforeSelectedText: textBeforeSelectedText)
     }
     
-    @objc func wmf_getSelectedTextEditInfo(completionHandler: ((SelectedTextInfo?, Error?) -> Void)? = nil) {
+    @objc func wmf_getSelectedTextEditInfo(completionHandler: ((SelectedTextEditInfo?, Error?) -> Void)? = nil) {
         evaluateJavaScript("window.wmf.editTextSelection.getSelectedTextEditInfo()") { (result, error) in
             guard let error = error else {
                 guard let completionHandler = completionHandler else {
@@ -267,13 +267,13 @@ extension WKWebView {
                 }
                 guard
                     let resultDict = result as? Dictionary<String, Any>,
-                    let selectedTextInfo = self.selectedTextInfo(from: resultDict)
+                    let selectedTextEditInfo = self.selectedTextEditInfo(from: resultDict)
                 else {
                     DDLogError("Error handling 'getSelectedTextEditInfo()' dictionary response")
                     return
                 }
                 
-                completionHandler(selectedTextInfo, nil)
+                completionHandler(selectedTextEditInfo, nil)
                 return
             }
             DDLogError("Error when evaluating javascript on fetch and transform: \(error)")
@@ -281,7 +281,7 @@ extension WKWebView {
     }
 }
 
-@objcMembers class SelectedTextInfo: NSObject {
+@objcMembers class SelectedTextEditInfo: NSObject {
     init(selectedText: String, isSelectedTextInTitleDescription: Bool, sectionID: Int, textAfterSelectedText: String, textBeforeSelectedText: String) {
         self.selectedText = selectedText
         self.isSelectedTextInTitleDescription = isSelectedTextInTitleDescription
