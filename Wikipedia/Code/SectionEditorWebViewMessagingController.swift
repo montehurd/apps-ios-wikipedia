@@ -122,9 +122,10 @@ class SectionEditorWebViewMessagingController: NSObject, WKScriptMessageHandler 
     }
 
     func highlightAndScrollToText(for selectedTextEditInfo: SelectedTextEditInfo, completionHandler: ((Error?) -> Void)? = nil) {
-        let escapedSelectedText = selectedTextEditInfo.selectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
-        let escapedTextBeforeSelectedText = selectedTextEditInfo.textBeforeSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
-        let escapedTextAfterSelectedText = selectedTextEditInfo.textAfterSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        let selectedAndAdjacentText = selectedTextEditInfo.selectedAndAdjacentText
+        let escapedSelectedText = selectedAndAdjacentText.selectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        let escapedTextBeforeSelectedText = selectedAndAdjacentText.textBeforeSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
+        let escapedTextAfterSelectedText = selectedAndAdjacentText.textAfterSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
         webView.evaluateJavaScript("""
             window.wmf.highlightAndScrollToTextForSelectedTextEditInfo(`\(escapedSelectedText)`, `\(escapedTextBeforeSelectedText)`, `\(escapedTextAfterSelectedText)`);
         """) { (_, error) in

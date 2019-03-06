@@ -1,12 +1,10 @@
 const utilities = require('./utilities')
 
 class SelectedTextEditInfo {
-  constructor(selectedText, isSelectedTextInTitleDescription, sectionID, textBeforeSelectedText, textAfterSelectedText) {
-    this.selectedText = selectedText
+  constructor(selectedAndAdjacentText, isSelectedTextInTitleDescription, sectionID) {
+    this.selectedAndAdjacentText = selectedAndAdjacentText
     this.isSelectedTextInTitleDescription = isSelectedTextInTitleDescription
     this.sectionID = sectionID
-    this.textBeforeSelectedText = textBeforeSelectedText
-    this.textAfterSelectedText = textAfterSelectedText
   }
 }
 
@@ -29,15 +27,21 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
   
-  const selectedAndAdjacentTest = getSelectedAndAdjacentText(selection)
+  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection)
 
   return new SelectedTextEditInfo(
-    selectedAndAdjacentTest['selectedText'], 
+    selectedAndAdjacentText,
     isTitleDescriptionSelection, 
-    sectionID, 
-    selectedAndAdjacentTest['textBeforeSelectedText'], 
-    selectedAndAdjacentTest['textAfterSelectedText']
+    sectionID
   )
+}
+
+class SelectedAndAdjacentText {
+  constructor(selectedText, textBeforeSelectedText, textAfterSelectedText) {
+    this.selectedText = selectedText
+    this.textBeforeSelectedText = textBeforeSelectedText
+    this.textAfterSelectedText = textAfterSelectedText
+  }
 }
 
 const getSelectedAndAdjacentText = (selection) => {
@@ -68,11 +72,7 @@ const getSelectedAndAdjacentText = (selection) => {
   // Uncomment for debugging - actually changes the selection visibly.
   // selection.addRange(range)
 
-  return {
-    selectedText,
-    textBeforeSelectedText,
-    textAfterSelectedText
-  }
+  return new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
 }
 
 const trimEverythingAfterFirstLineBreak = (s) => s.split('\n')[0]  
