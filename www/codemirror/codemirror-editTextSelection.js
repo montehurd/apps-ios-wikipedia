@@ -33,19 +33,23 @@ const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedT
     const beforeString = getWildCardsForNonWords(wordsBefore.join(' '))
     const selectionString = getWildCardsForNonWords(getWordsOnlyStringForString(selectedText.trim()))
     const afterString = getWildCardsForNonWords(wordsAfter.join(' '))
+
+    // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'
     const pattern = `(${beforeStringPattern})(${selectionString}).*${afterString}`
     const regex = new RegExp(pattern, 's')
     const wikitext = editor.getValue()
     const match = wikitext.match(regex)
 
-    const linesBeforeSoughtMatch = match[1].split('\n')
-    const startLine = linesBeforeSoughtMatch.length - 1 
-    const startCh = linesBeforeSoughtMatch.pop().length
+    const wikitextStringBeforeSoughtMatch = match[1]
+    const wikitextLinesBeforeSoughtMatch = wikitextStringBeforeSoughtMatch.split('\n')
+    const startLine = wikitextLinesBeforeSoughtMatch.length - 1 
+    const startCh = wikitextLinesBeforeSoughtMatch.pop().length
 
-    const linesInSoughtMatch = match[2].split('\n')
-    const endLine = startLine + linesInSoughtMatch.length - 1
-    const endCh = linesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
+    const wikitextStringInSoughtMatch = match[2]
+    const wikitextLinesInSoughtMatch = wikitextStringInSoughtMatch.split('\n')
+    const endLine = startLine + wikitextLinesInSoughtMatch.length - 1
+    const endCh = wikitextLinesInSoughtMatch.pop().length + (startLine === endLine ? startCh : 0)
 
     let from = {line: startLine, ch: startCh}
     let to = {line: endLine, ch: endCh}
@@ -58,6 +62,7 @@ const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedT
 
 const scrollToAndHighlightRange = (range) => {
   let marker = null
+  // Temporarily set selection so we can use existing `scrollCursorIntoViewIfNeeded` method to bring the selection on-screen.
   editor.setSelection(range.from, range.to)
   setTimeout(() => {
     scrollCursorIntoViewIfNeeded(true)
