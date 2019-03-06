@@ -41,23 +41,25 @@ const highlightRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedT
     const wikitext = editor.getValue()
     const match = wikitext.match(regex)
 
-    const wikitextBeforeSelectionMatch = match[1]
-    const wikitextBeforeSelectionMatchLines = wikitextBeforeSelectionMatch.split('\n')
-    const startLine = wikitextBeforeSelectionMatchLines.length - 1 
-    const startCh = wikitextBeforeSelectionMatchLines.pop().length
+    const matchedWikitextBeforeSelection = match[1]
+    const matchedWikitextSelection = match[2]
 
-    const wikitextSelectionMatch = match[2]
-    const wikitextSelectionMatchLines = wikitextSelectionMatch.split('\n')
-    const endLine = startLine + wikitextSelectionMatchLines.length - 1
-    const endCh = wikitextSelectionMatchLines.pop().length + (startLine === endLine ? startCh : 0)
+    return getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
+}
 
-    let from = {line: startLine, ch: startCh}
-    let to = {line: endLine, ch: endCh}
-    
-    return {
-      from,
-      to
-    }
+const getWikitextRangeToSelect = (wikitextBeforeSelection, wikitextSelection) => {
+  const wikitextBeforeSelectionLines = wikitextBeforeSelection.split('\n')
+  const startLine = wikitextBeforeSelectionLines.length - 1 
+  const startCh = wikitextBeforeSelectionLines.pop().length
+
+  const wikitextSelectionLines = wikitextSelection.split('\n')
+  const endLine = startLine + wikitextSelectionLines.length - 1
+  const endCh = wikitextSelectionLines.pop().length + (startLine === endLine ? startCh : 0)
+
+  let from = {line: startLine, ch: startCh}
+  let to = {line: endLine, ch: endCh}
+  
+  return {from, to}
 }
 
 const scrollToAndHighlightRange = (range) => {
