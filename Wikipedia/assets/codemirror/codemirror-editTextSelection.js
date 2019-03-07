@@ -105,9 +105,9 @@ const scrollToAndHighlightRange = (range, codemirror) => {
     })
     /*
     setTimeout(() => {
-     marker.clear()
-     window.getSelection().removeAllRanges()
-    }, 2000)
+      marker.clear()
+      window.getSelection().removeAllRanges()
+    }, 3000)
     */
     setTimeout(() => {
       window.getSelection().removeAllRanges()
