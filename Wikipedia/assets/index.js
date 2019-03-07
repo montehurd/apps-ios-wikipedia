@@ -233,7 +233,7 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
 
-  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection).reducedToSpaceSeparatedWordsOnly()
+  const selectedAndAdjacentText = getSelectedAndAdjacentText().reducedToSpaceSeparatedWordsOnly()
 
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,
@@ -241,6 +241,9 @@ const getSelectedTextEditInfo = () => {
     sectionID
   )
 }
+
+const stringWithoutParenthesisForString = s => s.replace(/\([^\(\)]*\)/g, ' ')
+const stringWithoutReferenceForString = s => s.replace(/\[[^\[\]]*\]/g, ' ')
 
 // Reminder: after we start using broswerify for code mirror bits DRY this up with the `SelectedAndAdjacentText` class in `codemirror-editTextSelection.js`
 class SelectedAndAdjacentText {
@@ -252,8 +255,7 @@ class SelectedAndAdjacentText {
   // Reduces to space separated words only and only keeps a couple adjacent before and after words.
   reducedToSpaceSeparatedWordsOnly() {
     const separator = ' '
-    const stringWithoutReferencesForString = s => s.replace(/\[.*?\]/g, '')
-    const wordsOnlyForString = s => stringWithoutReferencesForString(s).replace(/[\W]+/g, separator).trim().split(separator)
+    const wordsOnlyForString = s => stringWithoutParenthesisForString(stringWithoutReferenceForString(s)).replace(/[\W]+/g, separator).trim().split(separator)
 
     return new SelectedAndAdjacentText(
       wordsOnlyForString(this.selectedText).join(separator),
@@ -271,34 +273,16 @@ const nodeOrNullIfCollapsedTableWrapper = node => {
   return node
 }
 
-const getSelectedAndAdjacentText = selection => {
+const getSelectedAndAdjacentText = () => {
+  const selection = window.getSelection()
   const range = selection.getRangeAt(0)
   const selectedText = range.toString()
-
-  let startNode = selection.anchorNode
-  if (startNode != range.commonAncestorContainer) {
-    while (startNode.parentNode != range.commonAncestorContainer) {
-      startNode = startNode.parentNode
-    }
-  }
-  let endNode = selection.focusNode
-  if (endNode != range.commonAncestorContainer) {
-    while (endNode.parentNode != range.commonAncestorContainer) {
-      endNode = endNode.parentNode
-    }
-  }
-
-  range.setStartBefore(startNode.previousSibling || nodeOrNullIfCollapsedTableWrapper(startNode.parentNode.previousSibling) || selection.anchorNode)
-  const beforeAndSelectedText = range.toString()
-  const textBeforeSelectedText = trimEverythingBeforeLastLineBreak(beforeAndSelectedText.slice(0, -selectedText.length))
-
-  range.setEndAfter(endNode.nextSibling || nodeOrNullIfCollapsedTableWrapper(endNode.parentNode.nextSibling) || selection.focusNode)
-  const beforeAndAfterAndSelectedText = range.toString()
-  const textAfterSelectedText = trimEverythingAfterFirstLineBreak(beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length))
-
-  // Uncomment for debugging - actually changes the selection visibly.
-  // selection.addRange(range)
-
+  selection.modify('extend', 'backward', 'sentenceboundary')
+  const textBeforeSelectedText = window.getSelection().getRangeAt(0).toString().slice(0, -selectedText.length)
+  selection.modify('extend', 'forward', 'sentenceboundary')
+  const textAfterSelectedText = window.getSelection().getRangeAt(0).toString()
+  window.getSelection().removeAllRanges()
+  window.getSelection().addRange(range)
   return new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
 }
 
