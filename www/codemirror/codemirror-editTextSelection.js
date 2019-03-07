@@ -6,7 +6,7 @@ class SelectedAndAdjacentText {
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-  wikitextRegex() {
+  regexForLocatingSelectedTextInWikitext() {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
     const atLeastOneNonWordPattern = '\\W+'
@@ -24,7 +24,7 @@ class SelectedAndAdjacentText {
 }
 
 const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
-    const regex = selectedAndAdjacentText.wikitextRegex()
+    const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext()
     const match = wikitext.match(regex)
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
