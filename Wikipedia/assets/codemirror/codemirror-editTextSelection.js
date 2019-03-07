@@ -2,31 +2,23 @@
 // Reduce SelectedTextEditInfo to words only and only keep a couple words before and after.
 // QUESTION: should this logic move to the code which extracts these strings so we don't relay unneeded things?
 const reduceSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-  const getWordsOnlyStringForString = (s) => s.replace(/[\W]+/g, ' ').trim()
+  const wordsOnlyForString = (s) => s.replace(/[\W]+/g, ' ').trim().split(' ')
 
   // Adjacent words are used to disambiguate search result.
   const numberOfAdjacentWordsToIncludeInSearch = 2
 
   // Keep only the last 'numberOfAdjacentWordsToIncludeInSearch' words of 'textBeforeSelectedText'
   const shouldKeepWordBeforeSelection = (e, i, a) => (a.length - i - 1) < numberOfAdjacentWordsToIncludeInSearch
-  const reducedTextBeforeSelectedText = getWordsOnlyStringForString(textBeforeSelectedText.trim())
-    .split(' ')
-    .filter(shouldKeepWordBeforeSelection)
-    .join(' ')
-  
-  const reducedSelectedText = getWordsOnlyStringForString(selectedText.trim())
-  
+  const reducedTextBeforeSelectedText = wordsOnlyForString(textBeforeSelectedText).filter(shouldKeepWordBeforeSelection)
+    
   // Keep only the first 'numberOfAdjacentWordsToIncludeInSearch' words of 'textAfterSelectedText'
   const shouldKeepWordAfterSelection = (e, i) => i < numberOfAdjacentWordsToIncludeInSearch
-  const reducedTextAfterSelectedText = getWordsOnlyStringForString(textAfterSelectedText.trim())
-    .split(' ')
-    .filter(shouldKeepWordAfterSelection)
-    .join(' ')
+  const reducedTextAfterSelectedText = wordsOnlyForString(textAfterSelectedText).filter(shouldKeepWordAfterSelection)
   
   return {
-    textBeforeSelectedText: reducedTextBeforeSelectedText,
-    selectedText: reducedSelectedText,
-    textAfterSelectedText: reducedTextAfterSelectedText
+    textBeforeSelectedText: reducedTextBeforeSelectedText.join(' '),
+    selectedText: wordsOnlyForString(selectedText).join(' '),
+    textAfterSelectedText: reducedTextAfterSelectedText.join(' ')
   }
 }
 
