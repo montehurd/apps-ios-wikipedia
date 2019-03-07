@@ -46,7 +46,13 @@ class SelectedAndAdjacentText {
   // Reduces to space separated words only and only keeps a couple adjacent before and after words.
   reducedToSpaceSeparatedWordsOnly() {
     const separator = ' '
-    const wordsOnlyForString = (s) => s.replace(/[\W]+/g, separator).trim().split(separator)
+    const wordsOnlyForString = (s) => {
+      return s
+        .replace(/\[.*?\]/g, '') // Strip references
+        .replace(/[\W]+/g, separator)
+        .trim()
+        .split(separator)
+    }
     // Adjacent words are used to disambiguate search result.
     const maxAdjacentWordsToKeep = 2
     // Keep only the last 'maxAdjacentWordsToKeep' words of 'textBeforeSelectedText'
