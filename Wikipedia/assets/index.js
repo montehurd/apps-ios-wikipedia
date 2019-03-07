@@ -233,7 +233,7 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
   
-  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection).reduced()
+  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection).reducedToSpaceSeparatedWordsOnly()
 
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,
@@ -248,8 +248,8 @@ class SelectedAndAdjacentText {
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-  // Reduces to space separated words only and only keeps a couple adjacent words.
-  reduced() {
+  // Reduces to space separated words only and only keeps a couple adjacent before and after words.
+  reducedToSpaceSeparatedWordsOnly() {
     const separator = ' '
     const wordsOnlyForString = (s) => s.replace(/[\W]+/g, separator).trim().split(separator)
     // Adjacent words are used to disambiguate search result.
