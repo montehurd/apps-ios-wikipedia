@@ -8,7 +8,6 @@ class SelectedAndAdjacentText {
   }
 
   regexForLocatingSelectedTextInWikitext(wikitext) {
-
     const maxAdjacentWordsToUse = 4
     const getWorkingRegexWithMostAdjacentWords = (regexGetter) => {
       for (var i = maxAdjacentWordsToUse; i > 0; i--) {
@@ -19,17 +18,14 @@ class SelectedAndAdjacentText {
       }
       return null
     }
-
     const restrictiveRegex = getWorkingRegexWithMostAdjacentWords(this.getRestrictiveRegex.bind(this))
     if (restrictiveRegex) {
       return restrictiveRegex
     }
-
     const permissiveRegex = getWorkingRegexWithMostAdjacentWords(this.getPermissiveRegex.bind(this))
     if (permissiveRegex) {
       return permissiveRegex
     }
-
     return null
   }
 
@@ -69,15 +65,15 @@ class SelectedAndAdjacentText {
 }
 
 const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
-    const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext(wikitext)
-    if (regex === null) {
-      return null
-    }
-    const match = wikitext.match(regex)
-    const matchedWikitextBeforeSelection = match[1]
-    const matchedWikitextSelection = match[2]
-    const wikitextRange = getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
-    return wikitextRange
+  const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext(wikitext)
+  if (regex === null) {
+    return null
+  }
+  const match = wikitext.match(regex)
+  const matchedWikitextBeforeSelection = match[1]
+  const matchedWikitextSelection = match[2]
+  const wikitextRange = getWikitextRangeToSelect(matchedWikitextBeforeSelection, matchedWikitextSelection)
+  return wikitextRange
 }
 
 const getWikitextRangeToSelect = (wikitextBeforeSelection, wikitextSelection) => {
