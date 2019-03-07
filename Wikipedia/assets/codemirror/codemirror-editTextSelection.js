@@ -64,7 +64,7 @@ class SelectedAndAdjacentText {
   }
 }
 
-const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
+const wikitextRangeForSelectedAndAdjacentText = (selectedAndAdjacentText, wikitext) => {
   const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext(wikitext)
   if (regex === null) {
     return null
@@ -115,10 +115,10 @@ const scrollToAndHighlightRange = (range, codemirror) => {
   }, 250)
 }
 
-const highlightAndScrollToWikitextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+const highlightAndScrollToWikitextForSelectedAndAdjacentText = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
   const wikitext = editor.getValue()
   const selectedAndAdjacentText = new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
-  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedAndAdjacentText, wikitext)
+  const rangeToHighlight = wikitextRangeForSelectedAndAdjacentText(selectedAndAdjacentText, wikitext)
   if (rangeToHighlight === null) {
     return null
   }

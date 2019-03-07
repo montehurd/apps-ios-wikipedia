@@ -127,7 +127,7 @@ class SectionEditorWebViewMessagingController: NSObject, WKScriptMessageHandler 
         let escapedTextBeforeSelectedText = selectedAndAdjacentText.textBeforeSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
         let escapedTextAfterSelectedText = selectedAndAdjacentText.textAfterSelectedText.wmf_stringBySanitizingForBacktickDelimitedJavascript()
         webView.evaluateJavaScript("""
-            window.wmf.highlightAndScrollToWikitextForSelectedTextEditInfo(`\(escapedSelectedText)`, `\(escapedTextBeforeSelectedText)`, `\(escapedTextAfterSelectedText)`);
+            window.wmf.highlightAndScrollToWikitextForSelectedAndAdjacentText(`\(escapedSelectedText)`, `\(escapedTextBeforeSelectedText)`, `\(escapedTextAfterSelectedText)`);
         """) { (_, error) in
             guard let completionHandler = completionHandler else {
                 return
