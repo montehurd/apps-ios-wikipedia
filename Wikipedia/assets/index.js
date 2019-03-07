@@ -268,6 +268,15 @@ class SelectedAndAdjacentText {
   }
 }
 
+// Workaround for table collapsing html which doesn't exist in article wikitext.
+const nodeOrNullIfCollapsedTableWrapper = (node) => {
+  return node
+  if (node && node.classList && node.classList.contains('pagelib_collapse_table_container')) {
+    return null
+  }
+  return node
+}
+
 const getSelectedAndAdjacentText = (selection) => {
   const range = selection.getRangeAt(0)
   const selectedText = range.toString()
@@ -285,11 +294,11 @@ const getSelectedAndAdjacentText = (selection) => {
       }
   }
 
-  range.setStartBefore(startNode.previousSibling || startNode.parentNode.previousSibling || selection.anchorNode)
+  range.setStartBefore(startNode.previousSibling || nodeOrNullIfCollapsedTableWrapper(startNode.parentNode.previousSibling) || selection.anchorNode)
   const beforeAndSelectedText = range.toString()
   const textBeforeSelectedText = trimEverythingBeforeLastLineBreak(beforeAndSelectedText.slice(0, -selectedText.length))
 
-  range.setEndAfter(endNode.nextSibling || endNode.parentNode.nextSibling || selection.focusNode)
+  range.setEndAfter(endNode.nextSibling || nodeOrNullIfCollapsedTableWrapper(endNode.parentNode.nextSibling) || selection.focusNode)
   const beforeAndAfterAndSelectedText = range.toString()
   const textAfterSelectedText = trimEverythingAfterFirstLineBreak(beforeAndAfterAndSelectedText.slice(beforeAndSelectedText.length))
 
