@@ -60,9 +60,10 @@ class SelectedAndAdjacentText {
     const textBeforeSelectedTextPattern = replaceSpaceWith(wordsBefore, patternForSpace)
     const textAfterSelectedTextPattern = replaceSpaceWith(wordsAfter, patternForSpace)
 
+    const p = '(?:\\W+|.*)'
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
-    const beforePattern = textBeforeSelectedTextPattern.length > 0 ? `.*?${textBeforeSelectedTextPattern}.*` : '.*'
-    const pattern = `(${beforePattern})(${selectedTextPattern}).*${textAfterSelectedTextPattern}`
+    const beforePattern = textBeforeSelectedTextPattern.length > 0 ? `.*?${textBeforeSelectedTextPattern}${p}` : p
+    const pattern = `(${beforePattern})(${selectedTextPattern})${p}${textAfterSelectedTextPattern}`
     const regex = new RegExp(pattern, 's')
 
     return regex
