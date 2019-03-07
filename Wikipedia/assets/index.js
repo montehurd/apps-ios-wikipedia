@@ -232,12 +232,12 @@ const getSelectedTextEditInfo = () => {
   if (!isTitleDescriptionSelection) {
     sectionID = getSelectedTextSectionID(selection)
   }
-  
+
   const selectedAndAdjacentText = getSelectedAndAdjacentText(selection).reducedToSpaceSeparatedWordsOnly()
 
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,
-    isTitleDescriptionSelection, 
+    isTitleDescriptionSelection,
     sectionID
   )
 }
@@ -252,13 +252,9 @@ class SelectedAndAdjacentText {
   // Reduces to space separated words only and only keeps a couple adjacent before and after words.
   reducedToSpaceSeparatedWordsOnly() {
     const separator = ' '
-    const wordsOnlyForString = (s) => {
-      return s
-        .replace(/\[.*?\]/g, '') // Strip references
-        .replace(/[\W]+/g, separator)
-        .trim()
-        .split(separator)
-    }
+    const stringWithoutReferencesForString = s => s.replace(/\[.*?\]/g, '')
+    const wordsOnlyForString = s => stringWithoutReferencesForString(s).replace(/[\W]+/g, separator).trim().split(separator)
+
     return new SelectedAndAdjacentText(
       wordsOnlyForString(this.selectedText).join(separator),
       wordsOnlyForString(this.textBeforeSelectedText).join(separator),
@@ -268,28 +264,28 @@ class SelectedAndAdjacentText {
 }
 
 // Workaround for table collapsing html which doesn't exist in article wikitext.
-const nodeOrNullIfCollapsedTableWrapper = (node) => {
+const nodeOrNullIfCollapsedTableWrapper = node => {
   if (node && node.classList && node.classList.contains('pagelib_collapse_table_container')) {
     return null
   }
   return node
 }
 
-const getSelectedAndAdjacentText = (selection) => {
+const getSelectedAndAdjacentText = selection => {
   const range = selection.getRangeAt(0)
   const selectedText = range.toString()
 
   let startNode = selection.anchorNode
   if (startNode != range.commonAncestorContainer) {
-      while (startNode.parentNode != range.commonAncestorContainer) {
-          startNode = startNode.parentNode
-      }
+    while (startNode.parentNode != range.commonAncestorContainer) {
+      startNode = startNode.parentNode
+    }
   }
   let endNode = selection.focusNode
   if (endNode != range.commonAncestorContainer) {
-      while (endNode.parentNode != range.commonAncestorContainer) {
-          endNode = endNode.parentNode
-      }
+    while (endNode.parentNode != range.commonAncestorContainer) {
+      endNode = endNode.parentNode
+    }
   }
 
   range.setStartBefore(startNode.previousSibling || nodeOrNullIfCollapsedTableWrapper(startNode.parentNode.previousSibling) || selection.anchorNode)
@@ -306,15 +302,14 @@ const getSelectedAndAdjacentText = (selection) => {
   return new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
 }
 
-const trimEverythingAfterFirstLineBreak = (s) => s.split('\n')[0]  
+const trimEverythingAfterFirstLineBreak = s => s.split('\n')[0]
 
-const trimEverythingBeforeLastLineBreak = (s) => {
+const trimEverythingBeforeLastLineBreak = s => {
   const lines = s.split('\n')
   return lines[lines.length - 1]
 }
 
 exports.getSelectedTextEditInfo = getSelectedTextEditInfo
-
 },{"./utilities":9}],5:[function(require,module,exports){
 //  Used by methods in "UIWebView+ElementLocation.h" category.
 
