@@ -1,35 +1,10 @@
 
-// Reduce SelectedTextEditInfo to words only and only keep a couple words before and after.
-// QUESTION: should this logic move to the code which extracts these strings so we don't relay unneeded things?
-const reduceSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-  const wordsOnlyForString = (s) => s.replace(/[\W]+/g, ' ').trim().split(' ')
-
-  // Adjacent words are used to disambiguate search result.
-  const numberOfAdjacentWordsToIncludeInSearch = 2
-
-  // Keep only the last 'numberOfAdjacentWordsToIncludeInSearch' words of 'textBeforeSelectedText'
-  const shouldKeepWordBeforeSelection = (e, i, a) => (a.length - i - 1) < numberOfAdjacentWordsToIncludeInSearch
-  const reducedTextBeforeSelectedText = wordsOnlyForString(textBeforeSelectedText).filter(shouldKeepWordBeforeSelection)
-    
-  // Keep only the first 'numberOfAdjacentWordsToIncludeInSearch' words of 'textAfterSelectedText'
-  const shouldKeepWordAfterSelection = (e, i) => i < numberOfAdjacentWordsToIncludeInSearch
-  const reducedTextAfterSelectedText = wordsOnlyForString(textAfterSelectedText).filter(shouldKeepWordAfterSelection)
-  
-  return {
-    textBeforeSelectedText: reducedTextBeforeSelectedText.join(' '),
-    selectedText: wordsOnlyForString(selectedText).join(' '),
-    textAfterSelectedText: reducedTextAfterSelectedText.join(' ')
-  }
-}
-
 const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-    const reducedSelectedTextEditInfo = reduceSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
-
     const getWildCardsForNonWords = (s) => s.replace(/[\W]+/g, '[\\W]+')
 
-    const beforeString = getWildCardsForNonWords(reducedSelectedTextEditInfo.textBeforeSelectedText)
-    const selectionString = getWildCardsForNonWords(reducedSelectedTextEditInfo.selectedText)
-    const afterString = getWildCardsForNonWords(reducedSelectedTextEditInfo.textAfterSelectedText)
+    const selectionString = getWildCardsForNonWords(selectedText)
+    const beforeString = getWildCardsForNonWords(textBeforeSelectedText)
+    const afterString = getWildCardsForNonWords(textAfterSelectedText)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'

@@ -27,7 +27,7 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
   
-  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection)
+  const selectedAndAdjacentText = getSelectedAndAdjacentText(selection).reduced()
 
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,
@@ -41,6 +41,22 @@ class SelectedAndAdjacentText {
     this.selectedText = selectedText
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
+  }
+  // Reduce to words only and only keep a couple adjacent words.
+  reduced() {
+    const wordsOnlyForString = (s) => s.replace(/[\W]+/g, ' ').trim().split(' ')
+    // Adjacent words are used to disambiguate search result.
+    const maxAdjacentWordsToKeep = 2
+    // Keep only the last 'maxAdjacentWordsToKeep' words of 'textBeforeSelectedText'
+    const shouldKeepWordBeforeSelection = (e, i, a) => (a.length - i - 1) < maxAdjacentWordsToKeep
+    // Keep only the first 'maxAdjacentWordsToKeep' words of 'textAfterSelectedText'
+    const shouldKeepWordAfterSelection = (e, i) => i < maxAdjacentWordsToKeep
+
+    return new SelectedAndAdjacentText(
+      wordsOnlyForString(this.selectedText).join(' '),
+      wordsOnlyForString(this.textBeforeSelectedText).filter(shouldKeepWordBeforeSelection).join(' '),
+      wordsOnlyForString(this.textAfterSelectedText).filter(shouldKeepWordAfterSelection).join(' ')
+    )
   }
 }
 
