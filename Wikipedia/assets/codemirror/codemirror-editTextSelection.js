@@ -1,19 +1,18 @@
 
+// Reminder: after we start using broswerify for code mirror bits DRY this up with the `SelectedAndAdjacentText` class in `editTextSelection.js`
 class SelectedAndAdjacentText {
   constructor(selectedText, textBeforeSelectedText, textAfterSelectedText) {
     this.selectedText = selectedText
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-}
-
-const wikitextRegexForSelectedTextEditInfo = (selectedAndAdjacentText) => {
+  wikitextRegex() {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
     const atLeastOneNonWordPattern = '\\W+'
-    const selectionString = replaceSpaceWith(selectedAndAdjacentText.selectedText, atLeastOneNonWordPattern)
-    const beforeString = replaceSpaceWith(selectedAndAdjacentText.textBeforeSelectedText, atLeastOneNonWordPattern)
-    const afterString = replaceSpaceWith(selectedAndAdjacentText.textAfterSelectedText, atLeastOneNonWordPattern)
+    const selectionString = replaceSpaceWith(this.selectedText, atLeastOneNonWordPattern)
+    const beforeString = replaceSpaceWith(this.textBeforeSelectedText, atLeastOneNonWordPattern)
+    const afterString = replaceSpaceWith(this.textAfterSelectedText, atLeastOneNonWordPattern)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'
@@ -21,10 +20,11 @@ const wikitextRegexForSelectedTextEditInfo = (selectedAndAdjacentText) => {
     const regex = new RegExp(pattern, 's')
 
     return regex
+  }
 }
 
 const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
-    const regex = wikitextRegexForSelectedTextEditInfo(selectedAndAdjacentText)
+    const regex = selectedAndAdjacentText.wikitextRegex()
     const match = wikitext.match(regex)
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
