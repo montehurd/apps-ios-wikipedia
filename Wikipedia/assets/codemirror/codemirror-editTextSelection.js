@@ -6,17 +6,33 @@ class SelectedAndAdjacentText {
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-  regexForLocatingSelectedTextInWikitext() {
+  
+  regexForLocatingSelectedTextInWikitext(wikitext) {
+    const atLeastOneNonWordPattern = '\\W+'
+    const restrictiveRegex = this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneNonWordPattern)
+    if (restrictiveRegex.test(wikitext)) {
+        return restrictiveRegex
+    }
+
+    const atLeastOneCharPattern = '.+'
+    const permissiveRegex = this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern)
+    if (permissiveRegex.test(wikitext)) {
+        return permissiveRegex
+    }
+    return null
+  }
+  
+  // Reminder: This object's parameters are always space separated words here.
+  regexForLocatingSelectedTextWithPatternForSpace(patternForSpace) {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
-    const atLeastOneNonWordPattern = '\\W+'
-    const selectionString = replaceSpaceWith(this.selectedText, atLeastOneNonWordPattern)
-    const beforeString = replaceSpaceWith(this.textBeforeSelectedText, atLeastOneNonWordPattern)
-    const afterString = replaceSpaceWith(this.textAfterSelectedText, atLeastOneNonWordPattern)
+    const selectedTextPattern = replaceSpaceWith(this.selectedText, patternForSpace)
+    const textBeforeSelectedTextPattern = replaceSpaceWith(this.textBeforeSelectedText, patternForSpace)
+    const textAfterSelectedTextPattern = replaceSpaceWith(this.textAfterSelectedText, patternForSpace)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
-    const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'
-    const pattern = `(${beforeStringPattern})(${selectionString}).*${afterString}`
+    const beforePattern = textBeforeSelectedTextPattern.length > 0 ? `.*?${textBeforeSelectedTextPattern}.*` : '.*'
+    const pattern = `(${beforePattern})(${selectedTextPattern}).*${textAfterSelectedTextPattern}`
     const regex = new RegExp(pattern, 's')
 
     return regex
@@ -24,7 +40,10 @@ class SelectedAndAdjacentText {
 }
 
 const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
-    const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext()
+    const regex = selectedAndAdjacentText.regexForLocatingSelectedTextInWikitext(wikitext)
+    if (regex === null) {
+      return null
+    }
     const match = wikitext.match(regex)
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
@@ -75,5 +94,8 @@ const highlightAndScrollToWikitextForSelectedTextEditInfo = (selectedText, textB
   const wikitext = editor.getValue()
   const selectedAndAdjacentText = new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
   const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedAndAdjacentText, wikitext)
+  if (rangeToHighlight === null) {
+    return null
+  }
   scrollToAndHighlightRange(rangeToHighlight, editor)
 }
