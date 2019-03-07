@@ -1,10 +1,11 @@
 
 const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-    const getWildCardsForNonWords = (s) => s.replace(/[\W]+/g, '[\\W]+')
+    const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
-    const selectionString = getWildCardsForNonWords(selectedText)
-    const beforeString = getWildCardsForNonWords(textBeforeSelectedText)
-    const afterString = getWildCardsForNonWords(textAfterSelectedText)
+    const atLeastOneNonWordPattern = '\\W+'
+    const selectionString = replaceSpaceWith(selectedText, atLeastOneNonWordPattern)
+    const beforeString = replaceSpaceWith(textBeforeSelectedText, atLeastOneNonWordPattern)
+    const afterString = replaceSpaceWith(textAfterSelectedText, atLeastOneNonWordPattern)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'

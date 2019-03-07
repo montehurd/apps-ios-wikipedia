@@ -248,9 +248,10 @@ class SelectedAndAdjacentText {
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-  // Reduce to words only and only keep a couple adjacent words.
+  // Reduces to space separated words only and only keeps a couple adjacent words.
   reduced() {
-    const wordsOnlyForString = (s) => s.replace(/[\W]+/g, ' ').trim().split(' ')
+    const separator = ' '
+    const wordsOnlyForString = (s) => s.replace(/[\W]+/g, separator).trim().split(separator)
     // Adjacent words are used to disambiguate search result.
     const maxAdjacentWordsToKeep = 2
     // Keep only the last 'maxAdjacentWordsToKeep' words of 'textBeforeSelectedText'
@@ -259,9 +260,9 @@ class SelectedAndAdjacentText {
     const shouldKeepWordAfterSelection = (e, i) => i < maxAdjacentWordsToKeep
 
     return new SelectedAndAdjacentText(
-      wordsOnlyForString(this.selectedText).join(' '),
-      wordsOnlyForString(this.textBeforeSelectedText).filter(shouldKeepWordBeforeSelection).join(' '),
-      wordsOnlyForString(this.textAfterSelectedText).filter(shouldKeepWordAfterSelection).join(' ')
+      wordsOnlyForString(this.selectedText).join(separator),
+      wordsOnlyForString(this.textBeforeSelectedText).filter(shouldKeepWordBeforeSelection).join(separator),
+      wordsOnlyForString(this.textAfterSelectedText).filter(shouldKeepWordAfterSelection).join(separator)
     )
   }
 }
