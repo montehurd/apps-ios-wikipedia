@@ -6,22 +6,31 @@ class SelectedAndAdjacentText {
     this.textBeforeSelectedText = textBeforeSelectedText
     this.textAfterSelectedText = textAfterSelectedText
   }
-  
+
   regexForLocatingSelectedTextInWikitext(wikitext) {
-    const atLeastOneNonWordPattern = '\\W+'
-    const restrictiveRegex = this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneNonWordPattern)
+    const restrictiveRegex = this.getRestrictiveRegex()
     if (restrictiveRegex.test(wikitext)) {
         return restrictiveRegex
     }
-
-    const atLeastOneCharPattern = '.+'
-    const permissiveRegex = this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern)
+    const permissiveRegex = this.getPermissiveRegex()
     if (permissiveRegex.test(wikitext)) {
         return permissiveRegex
     }
     return null
   }
+
+  // Faster, less error prone - but has more trouble with skipping past some unexpectedly complicated wiki markup, so more prone to not finding any match.
+  getRestrictiveRegex() {
+    const atLeastOneNonWordPattern = '\\W+'
+    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneNonWordPattern)
+  }
   
+  // Slower, more error prone - but has less trouble with skipping past some unexpectedly complicated wiki markup, so less prone to not finding any match.
+  getPermissiveRegex() {
+    const atLeastOneCharPattern = '.+'
+    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern)
+  }
+    
   // Reminder: This object's parameters are always space separated words here.
   regexForLocatingSelectedTextWithPatternForSpace(patternForSpace) {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
