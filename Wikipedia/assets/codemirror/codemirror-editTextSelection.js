@@ -1,11 +1,19 @@
 
-const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
+class SelectedAndAdjacentText {
+  constructor(selectedText, textBeforeSelectedText, textAfterSelectedText) {
+    this.selectedText = selectedText
+    this.textBeforeSelectedText = textBeforeSelectedText
+    this.textAfterSelectedText = textAfterSelectedText
+  }
+}
+
+const wikitextRegexForSelectedTextEditInfo = (selectedAndAdjacentText) => {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
     const atLeastOneNonWordPattern = '\\W+'
-    const selectionString = replaceSpaceWith(selectedText, atLeastOneNonWordPattern)
-    const beforeString = replaceSpaceWith(textBeforeSelectedText, atLeastOneNonWordPattern)
-    const afterString = replaceSpaceWith(textAfterSelectedText, atLeastOneNonWordPattern)
+    const selectionString = replaceSpaceWith(selectedAndAdjacentText.selectedText, atLeastOneNonWordPattern)
+    const beforeString = replaceSpaceWith(selectedAndAdjacentText.textBeforeSelectedText, atLeastOneNonWordPattern)
+    const afterString = replaceSpaceWith(selectedAndAdjacentText.textAfterSelectedText, atLeastOneNonWordPattern)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforeStringPattern = beforeString.length > 0 ? `.*?${beforeString}.*` : '.*'
@@ -15,8 +23,8 @@ const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedTe
     return regex
 }
 
-const wikitextRangeForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText, wikitext) => {
-    const regex = wikitextRegexForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText)
+const wikitextRangeForSelectedTextEditInfo = (selectedAndAdjacentText, wikitext) => {
+    const regex = wikitextRegexForSelectedTextEditInfo(selectedAndAdjacentText)
     const match = wikitext.match(regex)
     const matchedWikitextBeforeSelection = match[1]
     const matchedWikitextSelection = match[2]
@@ -65,6 +73,7 @@ const scrollToAndHighlightRange = (range, codemirror) => {
 
 const highlightAndScrollToWikitextForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
   const wikitext = editor.getValue()
-  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedText, textBeforeSelectedText, textAfterSelectedText, wikitext)
+  const selectedAndAdjacentText = new SelectedAndAdjacentText(selectedText, textBeforeSelectedText, textAfterSelectedText)
+  const rangeToHighlight = wikitextRangeForSelectedTextEditInfo(selectedAndAdjacentText, wikitext)
   scrollToAndHighlightRange(rangeToHighlight, editor)
 }
