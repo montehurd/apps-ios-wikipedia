@@ -242,6 +242,7 @@ const getSelectedTextEditInfo = () => {
   )
 }
 
+// Reminder: after we start using broswerify for code mirror bits DRY this up with the `SelectedAndAdjacentText` class in `codemirror-editTextSelection.js`
 class SelectedAndAdjacentText {
   constructor(selectedText, textBeforeSelectedText, textAfterSelectedText) {
     this.selectedText = selectedText
