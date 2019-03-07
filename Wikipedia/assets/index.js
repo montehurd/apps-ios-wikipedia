@@ -270,7 +270,6 @@ class SelectedAndAdjacentText {
 
 // Workaround for table collapsing html which doesn't exist in article wikitext.
 const nodeOrNullIfCollapsedTableWrapper = (node) => {
-  return node
   if (node && node.classList && node.classList.contains('pagelib_collapse_table_container')) {
     return null
   }
