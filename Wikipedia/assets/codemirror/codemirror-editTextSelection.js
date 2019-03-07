@@ -45,7 +45,6 @@ class SelectedAndAdjacentText {
     return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern, maxAdjacentWordsToUse)
   }
     
-  // Reminder: This object's parameters are always space separated words here.
   regexForLocatingSelectedTextWithPatternForSpace(patternForSpace, maxAdjacentWordsToUse) {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
@@ -60,10 +59,9 @@ class SelectedAndAdjacentText {
     const textBeforeSelectedTextPattern = replaceSpaceWith(wordsBefore, patternForSpace)
     const textAfterSelectedTextPattern = replaceSpaceWith(wordsAfter, patternForSpace)
 
-    const p = '(?:\\W+|.*)'
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
-    const beforePattern = textBeforeSelectedTextPattern.length > 0 ? `.*?${textBeforeSelectedTextPattern}${p}` : p
-    const pattern = `(${beforePattern})(${selectedTextPattern})${p}${textAfterSelectedTextPattern}`
+    const atLeastOneNonWordOrOptionalStringPattern = '(?:\\W+|.*)'
+    const pattern = `(${textBeforeSelectedTextPattern.length > 0 ? '.*?' : ''}${textBeforeSelectedTextPattern}${atLeastOneNonWordOrOptionalStringPattern})(${selectedTextPattern})${atLeastOneNonWordOrOptionalStringPattern}${textAfterSelectedTextPattern}`
     const regex = new RegExp(pattern, 's')
 
     return regex
