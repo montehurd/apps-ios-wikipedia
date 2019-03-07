@@ -1,7 +1,7 @@
 
 const wikitextRegexForSelectedTextEditInfo = (selectedText, textBeforeSelectedText, textAfterSelectedText) => {
-    const getWordsOnlyStringForString = (s) => s.replace(/[\W_]+/g, ' ').trim()
-    const getWildCardsForNonWords = (s) => s.replace(/[\W_]+/g, '.*?')
+    const getWordsOnlyStringForString = (s) => s.replace(/[\W]+/g, ' ').trim()
+    const getWildCardsForNonWords = (s) => s.replace(/[\W]+/g, '[\\W]+')
 
     // Adjacent words are used to disambiguate search result.
     const numberOfAdjacentWordsToIncludeInSearch = 2
