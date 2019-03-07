@@ -9,6 +9,7 @@ class SelectedTextEditInfo {
 }
 
 const isSelectedTextInTitleDescription = selection => utilities.findClosest(selection.anchorNode, 'p#pagelib_edit_section_title_description') != null
+const isSelectedTextInArticleTitle = selection => utilities.findClosest(selection.anchorNode, 'h1.pagelib_edit_section_title') != null
 
 const getSelectedTextSectionID = selection => {
   const sectionIDString = utilities.findClosest(selection.anchorNode, 'div[id^="section_heading_and_content_block_"]').id.slice('section_heading_and_content_block_'.length)
@@ -27,7 +28,7 @@ const getSelectedTextEditInfo = () => {
     sectionID = getSelectedTextSectionID(selection)
   }
 
-  const selectedAndAdjacentText = getSelectedAndAdjacentText().reducedToSpaceSeparatedWordsOnly()
+  let selectedAndAdjacentText = isSelectedTextInArticleTitle(selection) ? new SelectedAndAdjacentText('', '', '') : getSelectedAndAdjacentText().reducedToSpaceSeparatedWordsOnly()
 
   return new SelectedTextEditInfo(
     selectedAndAdjacentText,

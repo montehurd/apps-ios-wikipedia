@@ -10,7 +10,7 @@ class SelectedAndAdjacentText {
   regexForLocatingSelectedTextInWikitext(wikitext) {
     const maxAdjacentWordsToUse = 4
     const getWorkingRegexWithMostAdjacentWords = (regexGetter) => {
-      for (var i = maxAdjacentWordsToUse; i > 0; i--) {
+      for (let i = maxAdjacentWordsToUse; i > 0; i--) {
         const regex = regexGetter(i)
         if (regex.test(wikitext)) {
           return regex
