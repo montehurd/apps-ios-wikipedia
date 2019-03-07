@@ -8,36 +8,57 @@ class SelectedAndAdjacentText {
   }
 
   regexForLocatingSelectedTextInWikitext(wikitext) {
-    const restrictiveRegex = this.getRestrictiveRegex()
-    if (restrictiveRegex.test(wikitext)) {
-        return restrictiveRegex
+
+    const maxAdjacentWordsToUse = 4
+    const getWorkingRegexWithMostAdjacentWords = (regexGetter) => {
+      for (var i = maxAdjacentWordsToUse; i > 0; i--) {
+        const regex = regexGetter(i)
+        if (regex.test(wikitext)) {
+          return regex
+        }    
+      }
+      return null
     }
-    const permissiveRegex = this.getPermissiveRegex()
-    if (permissiveRegex.test(wikitext)) {
-        return permissiveRegex
+
+    const restrictiveRegex = getWorkingRegexWithMostAdjacentWords(this.getRestrictiveRegex.bind(this))
+    if (restrictiveRegex) {
+      return restrictiveRegex
     }
+
+    const permissiveRegex = getWorkingRegexWithMostAdjacentWords(this.getPermissiveRegex.bind(this))
+    if (permissiveRegex) {
+      return permissiveRegex
+    }
+
     return null
   }
 
   // Faster, less error prone - but has more trouble with skipping past some unexpectedly complicated wiki markup, so more prone to not finding any match.
-  getRestrictiveRegex() {
+  getRestrictiveRegex(maxAdjacentWordsToUse) {
     const atLeastOneNonWordPattern = '\\W+'
-    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneNonWordPattern)
+    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneNonWordPattern, maxAdjacentWordsToUse)
   }
   
   // Slower, more error prone - but has less trouble with skipping past some unexpectedly complicated wiki markup, so less prone to not finding any match.
-  getPermissiveRegex() {
+  getPermissiveRegex(maxAdjacentWordsToUse) {
     const atLeastOneCharPattern = '.+'
-    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern)
+    return this.regexForLocatingSelectedTextWithPatternForSpace(atLeastOneCharPattern, maxAdjacentWordsToUse)
   }
     
   // Reminder: This object's parameters are always space separated words here.
-  regexForLocatingSelectedTextWithPatternForSpace(patternForSpace) {
+  regexForLocatingSelectedTextWithPatternForSpace(patternForSpace, maxAdjacentWordsToUse) {
     const replaceSpaceWith = (s, replacement) => s.replace(/\s+/g, replacement)
 
+    // Keep only the last 'maxAdjacentWordsToUse' words of 'textBeforeSelectedText'
+    const shouldKeepWordBeforeSelection = (e, i, a) => (a.length - i - 1) < maxAdjacentWordsToUse
+    // Keep only the first 'maxAdjacentWordsToUse' words of 'textAfterSelectedText'
+    const shouldKeepWordAfterSelection = (e, i) => i < maxAdjacentWordsToUse
+    const wordsBefore = this.textBeforeSelectedText.split(' ').filter(shouldKeepWordBeforeSelection).join(' ')
+    const wordsAfter = this.textAfterSelectedText.split(' ').filter(shouldKeepWordAfterSelection).join(' ')
+
     const selectedTextPattern = replaceSpaceWith(this.selectedText, patternForSpace)
-    const textBeforeSelectedTextPattern = replaceSpaceWith(this.textBeforeSelectedText, patternForSpace)
-    const textAfterSelectedTextPattern = replaceSpaceWith(this.textAfterSelectedText, patternForSpace)
+    const textBeforeSelectedTextPattern = replaceSpaceWith(wordsBefore, patternForSpace)
+    const textAfterSelectedTextPattern = replaceSpaceWith(wordsAfter, patternForSpace)
 
     // Attempt to locate wikitext selection based on the non-wikitext context strings above.
     const beforePattern = textBeforeSelectedTextPattern.length > 0 ? `.*?${textBeforeSelectedTextPattern}.*` : '.*'

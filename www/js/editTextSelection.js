@@ -53,17 +53,10 @@ class SelectedAndAdjacentText {
         .trim()
         .split(separator)
     }
-    // Adjacent words are used to disambiguate search result.
-    const maxAdjacentWordsToKeep = 2
-    // Keep only the last 'maxAdjacentWordsToKeep' words of 'textBeforeSelectedText'
-    const shouldKeepWordBeforeSelection = (e, i, a) => (a.length - i - 1) < maxAdjacentWordsToKeep
-    // Keep only the first 'maxAdjacentWordsToKeep' words of 'textAfterSelectedText'
-    const shouldKeepWordAfterSelection = (e, i) => i < maxAdjacentWordsToKeep
-
     return new SelectedAndAdjacentText(
       wordsOnlyForString(this.selectedText).join(separator),
-      wordsOnlyForString(this.textBeforeSelectedText).filter(shouldKeepWordBeforeSelection).join(separator),
-      wordsOnlyForString(this.textAfterSelectedText).filter(shouldKeepWordAfterSelection).join(separator)
+      wordsOnlyForString(this.textBeforeSelectedText).join(separator),
+      wordsOnlyForString(this.textAfterSelectedText).join(separator)
     )
   }
 }
