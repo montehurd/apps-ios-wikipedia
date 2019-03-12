@@ -1,5 +1,5 @@
-const intersection = require('./codemirror-set-utilities').intersection
-const difference = require('./codemirror-set-utilities').difference
+const intersection = require('./codemirror-range-set-utilities').intersection
+const difference = require('./codemirror-range-set-utilities').difference
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
 const ItemLocation = require('./codemirror-range-objects').ItemLocation

@@ -110,8 +110,8 @@ const highlightTextForMarkupItemAtIndex = (index) => {
 exports.showRangeDebuggingButtonsForCursorLine = showRangeDebuggingButtonsForCursorLine
 
 },{"./codemirror-range-determination":4}],2:[function(require,module,exports){
-const intersection = require('./codemirror-set-utilities').intersection
-const difference = require('./codemirror-set-utilities').difference
+const intersection = require('./codemirror-range-set-utilities').intersection
+const difference = require('./codemirror-range-set-utilities').difference
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
 const ItemLocation = require('./codemirror-range-objects').ItemLocation
@@ -181,7 +181,7 @@ const nonTagMarkupItemsForLineTokens = (lineTokens, line) => {
 
 exports.nonTagMarkupItemsForLineTokens = nonTagMarkupItemsForLineTokens
 
-},{"./codemirror-range-objects":6,"./codemirror-set-utilities":8}],3:[function(require,module,exports){
+},{"./codemirror-range-objects":6,"./codemirror-range-set-utilities":7}],3:[function(require,module,exports){
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const MarkupItem = require('./codemirror-range-objects').MarkupItem
 const ItemLocation = require('./codemirror-range-objects').ItemLocation
@@ -396,6 +396,16 @@ exports.MarkupItem = MarkupItem
 exports.ItemLocation = ItemLocation
 
 },{}],7:[function(require,module,exports){
+
+const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
+const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
+const union = (a, b) => new Set([...a, ...b])
+
+exports.intersection = intersection
+exports.difference = difference
+exports.union = union
+
+},{}],8:[function(require,module,exports){
 // const ItemRange = require('./codemirror-range-objects').ItemRange
 // const ItemLocation = require('./codemirror-range-objects').ItemLocation
 
@@ -473,15 +483,5 @@ const tokensIntersectingSelection = (selectionRange, lineTokens) => {
 //     return this.line !== -1 && this.ch !== -1
 //   }
 // }
-
-},{}],8:[function(require,module,exports){
-
-const intersection = (a, b) => new Set([...a].filter(x => b.has(x)))
-const difference = (a, b) => new Set([...a].filter(x => !b.has(x)))
-const union = (a, b) => new Set([...a, ...b])
-
-exports.intersection = intersection
-exports.difference = difference
-exports.union = union
 
 },{}]},{},[1,2,3,4,5,6,7,8]);
