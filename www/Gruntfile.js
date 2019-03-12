@@ -12,8 +12,8 @@ module.exports = function (grunt) {
 
     browserify: {
       codeMirror: {
-        src: ['codemirror/**/*.js'],
-        dest: '../wikipedia/assets/codemirror/codemirror-bundle.js'
+        src: ['codemirror/**/codemirror-range-*.js'],
+        dest: '../wikipedia/assets/codemirror/codemirror-range-determination-bundle.js'
       },
       distMain: {
         src: [

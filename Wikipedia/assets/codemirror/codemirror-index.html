@@ -15,7 +15,7 @@
   <script src="resources/addon/search/searchcursor.js"></script>
   <script src="resources/addon/search/match-highlighter.js"></script>
 
-  <script src="codemirror-bundle.js"></script>
+  <script src="codemirror-range-determination-bundle.js"></script>
 
 </head>
 
@@ -26,47 +26,19 @@
 
 
 
+
+
+
+
+
+
 let showDebugButtons = () => {
   RangeHelper.rangeDebugging.showRangeDebuggingButtonsForCursorLine(editor)
 }
 setTimeout(showDebugButtons, 1000)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const ItemLocation = RangeHelper.rangeObjects.ItemLocation
-const ItemRange = RangeHelper.rangeObjects.ItemRange
-
-const getSelectionRange2 = (doc) => {
-  const fromCursor = doc.getCursor('from')
-  const toCursor = doc.getCursor('to')
-  const fromLocation = new ItemLocation(fromCursor.line, fromCursor.ch)
-  const toLocation = new ItemLocation(toCursor.line, toCursor.ch)
-  const selectionRange = new ItemRange(fromLocation, toLocation)
-  return selectionRange
-}
-
-
-
-
-
-const sendNativeMessages2 = (doc) => {
-  const selectionRange = getSelectionRange2(doc)
+const test = (doc) => {
+  const selectionRange = RangeHelper.rangeUtilities.getItemRangeFromSelection(doc)
   
   console.log(`
     selectionRange:
@@ -457,7 +429,8 @@ const sendNativeMessages2 = (doc) => {
       }
       editor.on('cursorActivity', (doc) => {
         sendNativeMessages(doc)
-sendNativeMessages2(doc)
+        
+test(doc)
 
         clearTimeout(cursorActivityScrollTimer)
         cursorActivityScrollTimer = setTimeout(() => {
