@@ -421,17 +421,27 @@ const getItemRangeFromSelection = (codeMirror) => {
   return selectionRange
 }
 
-const getButtonNamesIntersectingSelection = (codeMirror) => {
+const getMarkupItemsIntersectingSelection = (codeMirror) => {
   const selectionRange = getItemRangeFromSelection(codeMirror)
 
   const line = codeMirror.getCursor().line
   const lineTokens = codeMirror.getLineTokens(line, true)
   const markupItems = markupItemsForLineTokens(lineTokens, line)
   
-  const buttonNames = markupItems.filter(item => item.outerRange.intersectsRange(selectionRange)).map(item => item.buttonName)
+  const markupItemsIntersectingSelection = markupItems.filter(item => item.outerRange.intersectsRange(selectionRange))  
   
-  return buttonNames
+  return markupItemsIntersectingSelection
 }
+
+const getButtonNamesIntersectingSelection = (codeMirror) => getMarkupItemsIntersectingSelection(codeMirror).map(item => item.buttonName)
+
+/*
+TODO: add generic (non-regex or otherwise string aware) functional methods here for: 
+- unwrapping existing markup item (i.e. turning off something like bold)
+    would simply look at the item's inner and outer range and replace the code mirror string from the
+    outer range with the code mirror string from the inner range,
+- others t.b.d. - need to think a bit more about best way to implement wrapping related method(s)
+*/
 
 exports.getItemRangeFromSelection = getItemRangeFromSelection
 exports.getButtonNamesIntersectingSelection = getButtonNamesIntersectingSelection
