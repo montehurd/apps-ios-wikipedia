@@ -410,6 +410,7 @@ exports.union = union
 const ItemRange = require('./codemirror-range-objects').ItemRange
 const ItemLocation = require('./codemirror-range-objects').ItemLocation
 const SetUtilites = require('./codemirror-range-set-utilities')
+const markupItemsForLineTokens = require('./codemirror-range-determination').markupItemsForLineTokens
 
 const getItemRangeFromSelection = (codeMirror) => {
   const fromCursor = codeMirror.getCursor('from')
@@ -420,5 +421,18 @@ const getItemRangeFromSelection = (codeMirror) => {
   return selectionRange
 }
 
+const getButtonNamesIntersectingSelection = (codeMirror) => {
+  const selectionRange = getItemRangeFromSelection(codeMirror)
+
+  const line = codeMirror.getCursor().line
+  const lineTokens = codeMirror.getLineTokens(line, true)
+  const markupItems = markupItemsForLineTokens(lineTokens, line)
+  
+  const buttonNames = markupItems.filter(item => item.outerRange.intersectsRange(selectionRange)).map(item => item.buttonName)
+  
+  return buttonNames
+}
+
 exports.getItemRangeFromSelection = getItemRangeFromSelection
-},{"./codemirror-range-objects":6,"./codemirror-range-set-utilities":7}]},{},[1,2,3,4,5,6,7,8]);
+exports.getButtonNamesIntersectingSelection = getButtonNamesIntersectingSelection
+},{"./codemirror-range-determination":4,"./codemirror-range-objects":6,"./codemirror-range-set-utilities":7}]},{},[1,2,3,4,5,6,7,8]);

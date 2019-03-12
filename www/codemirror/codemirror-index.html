@@ -45,9 +45,12 @@ const test = (doc) => {
       from: ${selectionRange.startLocation.line}, ${selectionRange.startLocation.ch}
       to: ${selectionRange.endLocation.line}, ${selectionRange.endLocation.ch}
   `)
-  
-  //const tagRangesIntersectingSelectionRange = tagRanges.filter(tagRange => rangesIntersect(selectionRange, tagRange))
-  return selectionRange
+
+  const buttonNamesInSelectionRange = RangeHelper.rangeUtilities.getButtonNamesIntersectingSelection(doc)
+  console.log(`
+    buttonNamesInSelectionRange:
+      ${buttonNamesInSelectionRange}
+  `)
 }
 
 
