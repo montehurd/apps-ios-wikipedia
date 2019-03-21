@@ -45,9 +45,23 @@ class MarkupItem {
     )    
   }
 
-  innerRangeStartsOrEndsInRange(range) {
-    return this.innerRange.startsInsideRange(range, true) || this.innerRange.endsInsideRange(range, true)
+  innerRangeStartsOrEndsInRange(range, allowEdgeOverlap = false) {
+    return this.innerRange.startsInsideRange(range, allowEdgeOverlap) || this.innerRange.endsInsideRange(range, allowEdgeOverlap)
   }
+  
+
+//   openingMarkupRangeStartsOrEndsInRange(range, allowEdgeOverlap = false) {
+//     return item.openingMarkupRange().intersectsRange(selectionRange, allowEdgeOverlap)
+//   }
+// 
+//   closingMarkupRangeStartsOrEndsInRange(range, allowEdgeOverlap = false) {
+//     return item.closingMarkupRange().intersectsRange(selectionRange, allowEdgeOverlap)
+//   }
+// 
+// 
+// .find(item => item.openingMarkupRange().intersectsRange(selectionRange, false) || item.closingMarkupRange().intersectsRange(selectionRange, false))
+  
+  
 }
 
 class ItemRange {

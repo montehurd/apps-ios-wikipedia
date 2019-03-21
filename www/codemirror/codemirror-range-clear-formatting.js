@@ -7,9 +7,27 @@ const getButtonNamesFromMarkupItems = require('./codemirror-range-utilities').ge
 const markupItemsForItemRangeLines = require('./codemirror-range-determination').markupItemsForItemRangeLines
 
 const markupItemsStartingOrEndingInSelectionRange = (codeMirror, selectionRange) =>
-  markupItemsForItemRangeLines(codeMirror, selectionRange).filter(item => item.innerRangeStartsOrEndsInRange(selectionRange))
+  markupItemsForItemRangeLines(codeMirror, selectionRange).filter(item => item.innerRangeStartsOrEndsInRange(selectionRange, true))
+
+
+// const markupItemsNotStartingOrEndingInSelectionRange = (codeMirror, selectionRange) =>
+//   markupItemsForItemRangeLines(codeMirror, selectionRange).filter(item => !item.innerRangeStartsOrEndsInRange(selectionRange, false))
+
+
+// const markupItems123 = (codeMirror, selectionRange) =>
+//   markupItemsForItemRangeLines(codeMirror, selectionRange)
+//   .filter(item => item.innerRange.intersectsRange(selectionRange, true))
+//   .filter(item => !item.innerRangeStartsOrEndsInRange(selectionRange, false))
+//   .filter(item => !selectionRange.startsInsideRange(item.openingMarkupRange(), false))
+//   .filter(item => !selectionRange.startsInsideRange(item.closingMarkupRange(), false))
+//   .filter(item => !selectionRange.endsInsideRange(item.openingMarkupRange(), false))
+//   .filter(item => !selectionRange.endsInsideRange(item.closingMarkupRange(), false))
 
 const canClearFormatting = (codeMirror) => {
+  
+//FORCE for testing addMarkupAroundSelectionRange
+return true  
+  
   let selectionRange = getItemRangeFromSelection(codeMirror)
   if (selectionRange.isZeroLength()) {
     return false
@@ -23,11 +41,166 @@ const canClearFormatting = (codeMirror) => {
   }
   
   return canRelocateOrRemoveExistingMarkupForSelectionRange(codeMirror)
+
+// will need to account for canAddMarkupAroundSelectionRange here too!
+
 }
 
 const clearFormatting = (codeMirror) => {
-  relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, false)
+//  relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, false)
+
+addMarkupAroundSelectionRange(codeMirror, false)
+
 }
+
+
+
+
+
+
+
+
+
+
+//TODO: can we split out the 2 removal/relocate and addition logic to separate files?
+
+
+
+const canAddMarkupAroundSelectionRange = (codeMirror) => addMarkupAroundSelectionRange(codeMirror, true)
+
+const addMarkupAroundSelectionRange = (codeMirror, evaluateOnly = false) => {
+  const selectionRange = getItemRangeFromSelection(codeMirror)
+
+
+
+  /*
+    - use markupItemsInSelectionRange 
+  */
+
+  //bail if any markup items start or end in selection
+  // if (markupItemsStartingOrEndingInSelectionRange(codeMirror, selectionRange).length > 0) {
+  //   return
+  // }
+
+  // const markupItems = markupItemsNotStartingOrEndingInSelectionRange(codeMirror, selectionRange)
+  //   .filter((item => item.innerRange.intersectsRange(selectionRange, true)))
+
+
+
+
+
+
+
+let markupItems = markupItemsForItemRangeLines(codeMirror, selectionRange)
+
+const markupItemOpeningOrClosingMarkupIntersectsSelectionRange = (item) => item.openingMarkupRange().intersectsRange(selectionRange, false) || item.closingMarkupRange().intersectsRange(selectionRange, false)
+
+const selectionIncludesAnyOpeningOrClosingMarkup = markupItems.find(markupItemOpeningOrClosingMarkupIntersectsSelectionRange) !== undefined
+
+if (selectionIncludesAnyOpeningOrClosingMarkup) {
+  return
+}
+
+const selectionIntersectsItemInnerRange = (item) => item.innerRange.intersectsRange(selectionRange, true)
+markupItems = markupItems.filter(selectionIntersectsItemInnerRange)// === undefined
+// return if selection doesn't intersect with any markup items (selected word at end of line after last markup item etc)
+if (markupItems.length === 0) {
+  return
+}
+
+
+
+// AFTER the code below need to collapse EMPTY item ranges - ie <sup></sup> or ''''''
+// OR if CM doesn't tokenize these correctly insert an extra space if we detect and EMPTY range will be the result of change
+
+
+
+
+
+
+
+
+
+
+
+  // at selection end add opening tags for all markup items
+  // at selection start add closing tags for all markup items
+
+  let markupRangesToAddBeforeSelection = []
+  let markupRangesToAddAfterSelection = []
+
+  markupItems.forEach(item => {
+    markupRangesToAddBeforeSelection.unshift(item.closingMarkupRange())
+    markupRangesToAddAfterSelection.push(item.openingMarkupRange())
+  })
+
+  let accumulatedLeftMarkup = getTextFromRanges(codeMirror, markupRangesToAddBeforeSelection)
+  let accumulatedRightMarkup = getTextFromRanges(codeMirror, markupRangesToAddAfterSelection)
+
+
+
+const removalMarker = 'REMOVE_ME'
+// Work-around for Codemirror incorrectly tokenizing empty markup items (i.e. <sup></sup> or '''')
+// Simply adds `COLLAPSE_ME` where addition would result in empty item. makes it easy to strip these.
+// Otherwise they'd be incorrectly tokenized and things would get explodey.
+const selectionStartsAtOpeningMarkupEnd = markupItems.find(item => item.openingMarkupRange().endLocation.equals(selectionRange.startLocation)) !== undefined
+if (selectionStartsAtOpeningMarkupEnd) {
+  accumulatedLeftMarkup = `${removalMarker}${accumulatedLeftMarkup}`
+}
+const selectionEndsAtClosingMarkupStart = markupItems.find(item => item.closingMarkupRange().startLocation.equals(selectionRange.endLocation)) !== undefined
+if (selectionEndsAtClosingMarkupStart) {
+  accumulatedRightMarkup = `${accumulatedRightMarkup}${removalMarker}`
+}
+
+
+
+  codeMirror.replaceRange(accumulatedRightMarkup, selectionRange.endLocation, null, '+')
+  codeMirror.replaceRange(accumulatedLeftMarkup, selectionRange.startLocation, null, '+')
+
+
+
+// Strip out 'removalMarker' items.
+const markupItems2 = markupItemsForItemRangeLines(codeMirror, selectionRange)
+markupItems2.forEach(item => {
+  if (codeMirror.getRange(item.innerRange.startLocation, item.innerRange.endLocation) === removalMarker) {
+    codeMirror.replaceRange('', item.outerRange.startLocation, item.outerRange.endLocation, '+')
+  }
+})
+
+
+
+
+
+
+const origSelectionRangeLineExtent = selectionRange.endLocation.line - selectionRange.startLocation.line
+const origSelectionRangeChExtent = selectionRange.endLocation.ch - selectionRange.startLocation.ch
+
+const newSelectionRange = getItemRangeFromSelection(codeMirror)
+
+  codeMirror.setSelection(
+    newSelectionRange.startLocation, 
+    newSelectionRange.startLocation.withOffset(origSelectionRangeLineExtent, origSelectionRangeChExtent)
+  )
+
+
+
+return true
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const canRelocateOrRemoveExistingMarkupForSelectionRange = (codeMirror) => relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, true)
 
