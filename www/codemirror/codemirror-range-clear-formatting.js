@@ -26,7 +26,7 @@ const markupItemsStartingOrEndingInSelectionRange = (codeMirror, selectionRange)
 const canClearFormatting = (codeMirror) => {
   
 //FORCE for testing addMarkupAroundSelectionRange
-return true  
+//return true  
   
   let selectionRange = getItemRangeFromSelection(codeMirror)
   if (selectionRange.isZeroLength()) {
@@ -40,14 +40,20 @@ return true
     return false
   }
   
-  return canRelocateOrRemoveExistingMarkupForSelectionRange(codeMirror)
+  return canRelocateOrRemoveExistingMarkupForSelectionRange(codeMirror) || canAddMarkupAroundSelectionRange(codeMirror)
 
 // will need to account for canAddMarkupAroundSelectionRange here too!
 
 }
 
 const clearFormatting = (codeMirror) => {
-//  relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, false)
+/*
+if (relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, false)) {
+  // No need to try 'addMarkupAroundSelectionRange()' if markup was relocated or removed
+  return
+}
+*/
+relocateOrRemoveExistingMarkupForSelectionRange(codeMirror, false)
 
 addMarkupAroundSelectionRange(codeMirror, false)
 
@@ -98,14 +104,14 @@ const markupItemOpeningOrClosingMarkupIntersectsSelectionRange = (item) => item.
 const selectionIncludesAnyOpeningOrClosingMarkup = markupItems.find(markupItemOpeningOrClosingMarkupIntersectsSelectionRange) !== undefined
 
 if (selectionIncludesAnyOpeningOrClosingMarkup) {
-  return
+  return false
 }
 
 const selectionIntersectsItemInnerRange = (item) => item.innerRange.intersectsRange(selectionRange, true)
 markupItems = markupItems.filter(selectionIntersectsItemInnerRange)// === undefined
 // return if selection doesn't intersect with any markup items (selected word at end of line after last markup item etc)
 if (markupItems.length === 0) {
-  return
+  return false
 }
 
 
@@ -116,7 +122,9 @@ if (markupItems.length === 0) {
 
 
 
-
+if (evaluateOnly) {
+  return true
+}
 
 
 
@@ -244,7 +252,7 @@ const relocateOrRemoveExistingMarkupForSelectionRange = (codeMirror, evaluateOnl
       return allMarkupRanges.length > 0
     }
     removeTextFromRanges(codeMirror, allMarkupRanges)
-    return
+    return allMarkupRanges.length > 0
   }
   if (evaluateOnly) {
     return true
@@ -268,6 +276,7 @@ const relocateOrRemoveExistingMarkupForSelectionRange = (codeMirror, evaluateOnl
     selectionRange.startLocation.withOffset(0, accumulatedRightMarkup.length), 
     selectionRange.endLocation.withOffset(0, -getTextFromRanges(codeMirror, markupRangesToMoveAfterSelection.concat(markupRangesToRemove)).length)
   )
+  return true
 }
 
 // Need to remove in reverse order of appearance to avoid invalidating yet-to-be-removed ranges.
