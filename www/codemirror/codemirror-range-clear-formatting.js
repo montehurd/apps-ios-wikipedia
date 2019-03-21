@@ -174,7 +174,6 @@ markupItems2.forEach(item => {
 
 const origSelectionRangeLineExtent = selectionRange.endLocation.line - selectionRange.startLocation.line
 const origSelectionRangeChExtent = selectionRange.endLocation.ch - selectionRange.startLocation.ch
-
 const newSelectionRange = getItemRangeFromSelection(codeMirror)
 
   codeMirror.setSelection(
