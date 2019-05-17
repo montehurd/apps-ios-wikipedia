@@ -1227,6 +1227,7 @@
 		B09CE59C222F623900067D2A /* WKWebView+EditSelectionJavascript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09CE599222F623800067D2A /* WKWebView+EditSelectionJavascript.swift */; };
 		B09CE59D222F623900067D2A /* WKWebView+EditSelectionJavascript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09CE599222F623800067D2A /* WKWebView+EditSelectionJavascript.swift */; };
 		B09CE59E222F623900067D2A /* WKWebView+EditSelectionJavascript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09CE599222F623800067D2A /* WKWebView+EditSelectionJavascript.swift */; };
+		B0A4814C2289ECFD0088B265 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A4814B2289ECFD0088B265 /* Debug.swift */; };
 		B0ACB13321265B930078C136 /* WMFImageGalleryDescriptionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0ACB13221265B930078C136 /* WMFImageGalleryDescriptionTextView.swift */; };
 		B0ACB13421265B9C0078C136 /* WMFImageGalleryDescriptionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0ACB13221265B930078C136 /* WMFImageGalleryDescriptionTextView.swift */; };
 		B0ACB13521265B9D0078C136 /* WMFImageGalleryDescriptionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0ACB13221265B930078C136 /* WMFImageGalleryDescriptionTextView.swift */; };
@@ -3930,6 +3931,7 @@
 		B09BE6A01FB3DA45007F52E3 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		B09BE6A21FB4D697007F52E3 /* WMFArticleSectionLoadingJSPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WMFArticleSectionLoadingJSPerformanceTests.swift; sourceTree = "<group>"; };
 		B09CE599222F623800067D2A /* WKWebView+EditSelectionJavascript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WKWebView+EditSelectionJavascript.swift"; sourceTree = "<group>"; };
+		B0A4814B2289ECFD0088B265 /* Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 		B0ACB13221265B930078C136 /* WMFImageGalleryDescriptionTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WMFImageGalleryDescriptionTextView.swift; sourceTree = "<group>"; };
 		B0B0CAD71D2345CB009CE8ED /* WMFImageTagList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WMFImageTagList.h; path = Wikipedia/Code/WMFImageTagList.h; sourceTree = SOURCE_ROOT; };
 		B0B0CAD81D2345CB009CE8ED /* WMFImageTagList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WMFImageTagList.m; path = Wikipedia/Code/WMFImageTagList.m; sourceTree = SOURCE_ROOT; };
@@ -6865,6 +6867,7 @@
 			children = (
 				B0E802BF1C0CD27F0065EBC0 /* WMFAppViewController.h */,
 				B0E802C01C0CD27F0065EBC0 /* WMFAppViewController.m */,
+				B0A4814B2289ECFD0088B265 /* Debug.swift */,
 				B0421AA1206991F500C22630 /* SavedTabBarItemProgressBadgeManager.swift */,
 			);
 			name = "App View Controller";
@@ -10594,6 +10597,7 @@
 				B0267CF31E32A0CB006B6D8D /* WMFPasswordResetter.swift in Sources */,
 				BAA0D91C1F4F165A00091284 /* PageIssuesTableViewController.swift in Sources */,
 				B0E802B81C0CD2140065EBC0 /* UIBarButtonItem+WMFButtonConvenience.m in Sources */,
+				B0A4814C2289ECFD0088B265 /* Debug.swift in Sources */,
 				B08E7E9B1C1FA57A00EC3C99 /* UIViewController+WMFEmptyView.m in Sources */,
 				B0E8036B1C0CD97D0065EBC0 /* WMFArticleContainerViewController+TOC.swift in Sources */,
 				B0524B1F214854E900D8FD8D /* DescriptionWelcomeInitialViewController.swift in Sources */,

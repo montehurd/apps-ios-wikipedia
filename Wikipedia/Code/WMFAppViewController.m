@@ -223,6 +223,15 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
                                                object:nil];
     [self setupReadingListsHelpers];
     self.editHintController = [[WMFEditHintController alloc] init];
+    
+    
+    TestTextView *tv = [[TestTextView alloc] init];
+    tv.frame = CGRectMake(0, 50, self.view.frame.size.width, self.view.frame.size.height - 50);
+    [self.view addSubview:tv];
+    
+    
+    
+    
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {

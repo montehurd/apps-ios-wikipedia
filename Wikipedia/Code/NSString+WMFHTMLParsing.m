@@ -6,6 +6,17 @@
 #import <WMF/NSRegularExpression+HTML.h>
 #import <WMF/NSCharacterSet+WMFExtras.h>
 
+
+
+void IFPrint (NSString *format, ...) {
+    va_list args;
+    va_start(args, format);
+    fputs([[[NSString alloc] initWithFormat:format arguments:args] UTF8String], stdout);
+    va_end(args);
+}
+
+
+
 @implementation NSString (WMFHTMLParsing)
 
 - (NSArray *)wmf_htmlTextNodes {
@@ -408,6 +419,181 @@
         
     }];
 
+    
+    
+    
+    
+    
+    
+    
+
+    [ranges enumerateObjectsWithOptions: NSEnumerationReverse
+                             usingBlock: ^(id _Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+                                 NSRange range = [obj rangeValue];
+                                 NSSet *tagsForRange = [tags objectAtIndex:idx];
+
+NSSet *prevTagsForRange = (idx > 0) ? [tags objectAtIndex:idx - 1] : [[NSSet alloc] init];
+NSSet *listItemSet = [[NSSet alloc] initWithObjects:@"li", @"ul", @"ol", nil];
+BOOL tagsForRangeContainsNonListItem = ![tagsForRange isSubsetOfSet: listItemSet];
+BOOL prevTagsForRangeContainsNonListItem = ![prevTagsForRange isSubsetOfSet: listItemSet];
+                                 
+                                 BOOL isListItem = [tagsForRange containsObject:@"li"];
+                                 if (isListItem) {
+
+                                     NSString *s = [attributedString attributedSubstringFromRange:range].string;
+
+                                     NSString *nextS = @"";
+                                     if (idx + 1 < ranges.count - 1) {
+                                         id nextObj = ranges[idx + 1];
+                                         NSRange nextRange = [nextObj rangeValue];
+                                         nextS = [attributedString attributedSubstringFromRange:nextRange].string;
+                                     }
+
+                                     
+NSString *prevS = @"";
+if (idx > 0) {
+    id prevObj = ranges[idx - 1];
+    NSRange prevRange = [prevObj rangeValue];
+    prevS = [attributedString attributedSubstringFromRange:prevRange].string;
+}
+
+                                     
+                                     NSUInteger indexOfFirstULorOLtag = [[tagsForRange allObjects] indexOfObjectPassingTest:^BOOL(NSString *tag, NSUInteger idx, BOOL *stop) {
+                                         NSString *lowerCaseTag = [tag lowercaseString];
+                                         if ([lowerCaseTag isEqualToString:@"ul"] || [lowerCaseTag isEqualToString:@"ol"]) {
+                                             *stop = YES;
+                                             return YES;
+                                         } else {
+                                             return NO;
+                                         }
+                                     }];
+
+
+                                     
+                                     
+                                     NSUInteger listItemDepth = [[tagsForRange allObjects] indexesOfObjectsPassingTest:^BOOL(NSString *tag, NSUInteger idx, BOOL *stop) {
+                                         NSString *lowerCaseTag = [tag lowercaseString];
+                                         if ([lowerCaseTag isEqualToString:@"ul"] || [lowerCaseTag isEqualToString:@"ol"]) {
+                                             return YES;
+                                         } else {
+                                             return NO;
+                                         }
+                                     }].count;
+
+                                     
+/*
+                                     NSUInteger indexOfFirstListItemTag = [[tagsForRange allObjects] indexOfObjectPassingTest:^BOOL(NSString *tag, NSUInteger idx, BOOL *stop) {
+                                         NSString *lowerCaseTag = [tag lowercaseString];
+                                         if ([lowerCaseTag isEqualToString:@"li"]) {
+                                             *stop = YES;
+                                             return YES;
+                                         } else {
+                                             return NO;
+                                         }
+                                     }];
+*/
+                                     //if no indexOfFirstListTag, then
+                                     if([s wmf_trim].length > 0){
+                                         
+                                         //BOOL skip = tagsForRangeContainsNonListItem || prevTagsForRangeContainsNonListItem;
+                                         
+                                         if(
+                                            (indexOfFirstULorOLtag != NSNotFound)
+                                            &&
+                                            !tagsForRangeContainsNonListItem
+                                            &&
+                                            !prevTagsForRangeContainsNonListItem
+                                         ){
+//                                             NSLog(@"\n\n\nSTRING:\"\n%@\"", s);
+//                                             NSLog(@"\n\tTAGSFORRANGE:\"\n%@\"", tagsForRange);
+//                                             NSLog(@"\n\ttagsForRangeContainsNonListItem: %d", tagsForRangeContainsNonListItem);
+//                                             NSLog(@"\n\tPREVTAGSFORRANGE:\"\n%@\"", prevTagsForRange);
+//                                             NSLog(@"\n\tprevTagsForRangeContainsNonListItem: %d", prevTagsForRangeContainsNonListItem);
+//                                             NSLog(@"");
+                                             BOOL isOrdered = false;
+
+                                             NSString* firstListTag = [[tagsForRange allObjects] objectAtIndex:indexOfFirstULorOLtag];
+                                             NSString* lowerCaseFirstListTag = [firstListTag lowercaseString];
+                                             isOrdered = [lowerCaseFirstListTag isEqualToString:@"ol"];
+
+                                             NSString *bullet = isOrdered ? @"#" : @"*";
+                                             
+                                             
+//                                             NSMutableAttributedString *a = [[attributedString attributedSubstringFromRange:range] mutableCopy];
+//                                             [a insertAttributedString:[[NSAttributedString alloc] initWithString:bullet] atIndex:0];
+//                                             [attributedString replaceCharactersInRange:range withAttributedString:a];
+                                             
+                                             
+                                             NSString *a = [attributedString attributedSubstringFromRange:range].string;
+                                             NSString *b = [bullet stringByAppendingString:a];
+//                                             [attributedString replaceCharactersInRange:range withString:b];
+                                             
+                                             
+                                             
+                                             NSString *c = [b stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+                                             NSString *tabs = [@"" stringByPaddingToLength:listItemDepth withString:@"\t" startingAtIndex:0];
+                                             NSString *d = [NSString stringWithFormat:@"\n%@%@", tabs, c];
+                                             [attributedString replaceCharactersInRange:range withString:d];
+
+IFPrint(@"%@", d);
+
+                                             
+                                         }
+                                     }else{
+                                         // replace with "" of next line starts with \n
+                                         if ([nextS hasPrefix:@"\n"]) {
+//                                         if ([nextS wmf_trim].length == 0) {
+                                             [attributedString replaceCharactersInRange:range withString:@""];
+                                         }
+                                     }
+                                     
+                                     
+                                 }else{
+                                     NSString *s2 = [attributedString attributedSubstringFromRange:range].string;
+//                                     NSLog(@"NOT LIST ITEM: %@", s2);
+//                                     NSLog(@"");
+                                 }
+                             }];
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     return attributedString;
 }
 
