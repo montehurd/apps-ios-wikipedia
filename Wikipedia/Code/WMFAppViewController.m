@@ -52,6 +52,108 @@ typedef NS_ENUM(NSUInteger, WMFAppTabType) {
  *  @see WMFAppTabType
  */
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@interface UIView (WhiteViews)
+
+- (void)printWhiteViews;
+
+@end
+
+@implementation UIView (WhiteViews)
+
+- (void)printWhiteViews
+{
+
+    for (UIView *subView in self.subviews) {
+        if(
+           subView.isHidden
+           ||
+           subView.alpha == 0
+           ||
+           (subView.frame.origin.x == 0 && subView.frame.origin.y == 0 && subView.frame.size.width == 0 && subView.frame.size.height == 0)
+        ){
+            return;
+        }
+        
+        if([[subView.backgroundColor wmf_hexString] isEqualToString:@"FFFFFF"]){
+            NSLog(@"\n\nWHITEVIEW = %@\n\n", subView);
+        }
+        
+        [subView printWhiteViews];
+    }
+}
+
+@end
+
+
+
+@interface UIWindow (WhiteViews)
+
+- (void)assertNoWhiteSubviews;
+
+@end
+
+@implementation UIWindow (WhiteViews)
+
+- (void)assertNoWhiteSubviews {
+    for (UIView *view in self.subviews) {
+        [view printWhiteViews];
+    }
+}
+
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 static NSTimeInterval const WMFTimeBeforeShowingExploreScreenOnLaunch = 24 * 60 * 60;
 
 static CFTimeInterval const WMFRemoteAppConfigCheckInterval = 3 * 60 * 60;
@@ -1098,6 +1200,17 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
     [super didReceiveMemoryWarning];
     self.settingsViewController = nil;
     [self.dataStore clearMemoryCache];
+    
+
+    
+    
+    
+    for (UIWindow *window in [UIApplication sharedApplication].windows) {
+        [window assertNoWhiteSubviews];
+    }
+    
+    
+    
 }
 
 #pragma mark - Logging
