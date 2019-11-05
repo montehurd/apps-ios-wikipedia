@@ -190,10 +190,24 @@ class DiffContainerViewController: ViewController, HintPresenting {
             })
         })
     }
-
-    @objc func shareButtonTapped(_ : UIBarButtonItem) {
-        // TODO: wire this up!
-        print("share time!")
+    
+    private func fullRevisionDiffURL() -> URL? {
+        var components = URLComponents(url: siteURL, resolvingAgainstBaseURL: false)
+        components?.path = "/w/index.php"
+        components?.queryItems = [
+            URLQueryItem(name: "title", value: articleTitle),
+            URLQueryItem(name: "diff", value: String(toModel.revisionID)),
+            URLQueryItem(name: "oldid", value: String(toModel.parentID))
+        ]
+        return components?.url
+    }
+    
+    @objc func shareButtonTapped(_ sender: UIButton) {
+        guard let diffURL = fullRevisionDiffURL() else {
+            assertionFailure("Couldn't get full revision diff URL")
+            return
+        }
+        present(UIActivityViewController(activityItems: [diffURL], applicationActivities: [TUSafariActivity()]), animated: true)
     }
 
     override func viewDidAppear(_ animated: Bool) {
