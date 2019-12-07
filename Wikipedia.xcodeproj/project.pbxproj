@@ -9659,6 +9659,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D8B589A921CD05080027083A /* Build configuration list for PBXNativeTarget "codemirror-config" */;
 			buildPhases = (
+				B04C08DB239B93DB00C427CC /* ShellScript */,
 				D8B589A121CD05070027083A /* Sources */,
 				D8B589A221CD05070027083A /* Frameworks */,
 				D8B589A321CD05070027083A /* CopyFiles */,
@@ -10753,6 +10754,23 @@
 			shellPath = /bin/sh;
 			shellScript = "cp -f `readlink ${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}` \"${SRCROOT}/scripts/${PRODUCT_NAME}\"\n";
 		};
+		B04C08DB239B93DB00C427CC /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\nPROCESSID=\"TotallyUniquePID\"\n\n# kill any previous instance of our node process\nkill -9 $(ps ax | grep $PROCESSID| fgrep -v grep | awk '{ print $1 }')\n\n# start our node process in a non-blocking way. pass it our processs id so inside the script we can associate it with the process being started, so the kill command above can kill any previous processes before starting another one\n# https://stackoverflow.com/a/20019870\n/usr/local/bin/node \"${SRCROOT}/codemirror-config/index.js\" $PROCESSID > /dev/null 2>&1 &\n\n\n\n\n";
+		};
 		D80ED42B1EE57F4800CE8C50 /* Embed Frameworks from Carthage */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
@@ -10934,7 +10952,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
 		};
 		D8D987FD1E1C468F00789CA0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

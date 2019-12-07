@@ -35,6 +35,36 @@ func extractJSONString(from responseString: String) -> String? {
 }
 
 
+func validate(json: String, completion: @escaping (Bool) -> Void) {
+    var urlComponents = URLComponents()
+    urlComponents.scheme = "http"
+    urlComponents.host = "localhost"
+    urlComponents.port = 3000
+    urlComponents.queryItems = [
+       URLQueryItem(name: "jsonToValidate", value: json)
+    ]
+    guard let url = urlComponents.url else {
+        completion(false)
+        return
+    }
+    URLSession.shared.dataTask(with: url) { (data, response, error) in
+        guard let data = data else {
+            completion(false)
+            return
+        }
+        guard let responseString = String(data: data, encoding: .utf8) else {
+            completion(false)
+            return
+        }
+        guard responseString == "true" else {
+            completion(false)
+            return
+        }
+        completion(true)
+    }.resume()
+}
+
+
 func getCodeMirrorConfigJSON(for wikiLanguage: String, completion: @escaping (String?) -> Void) {
     guard let url = URL(string: "http://\(wikiLanguage).wikipedia.org/w/load.php?debug=false&lang=en&modules=ext.CodeMirror.data") else {
         completion(nil)
@@ -53,8 +83,27 @@ func getCodeMirrorConfigJSON(for wikiLanguage: String, completion: @escaping (St
             completion(nil)
             return
         }
-        completion(soughtSubstring.replacingOccurrences(of: "!0", with: "true"))
-        }.resume()
+        
+        let cleanedString = soughtSubstring.replacingOccurrences(of: "!0", with: "true")
+        
+        
+//        let jsonData = cleanedString.data(using: String.Encoding.utf8)
+//        if JSONSerialization.isValidJSONObject(jsonData) {
+//            print("Valid Json")
+//        } else {
+//            print("InValid Json")
+//        }
+        
+        validate(json: cleanedString) { isValid in
+            if isValid {
+                completion(cleanedString)
+            } else {
+                completion(nil)
+            }
+        }
+        
+//        completion(cleanedString)
+    }.resume()
 }
 
 let group = DispatchGroup()
@@ -71,6 +120,9 @@ for language in languages {
             }
             let outputComponents = pathComponents + ["Wikipedia", "assets", "codemirror", "config", "codemirror-config-\(language.code).json"]
             let outputPath = outputComponents.joined(separator: "/")
+            
+            // print("\n\n\n\(response)\n\n\n")
+            
             try! response.write(to: URL(fileURLWithPath: outputPath), atomically: true, encoding: .utf8)
         }
     }
