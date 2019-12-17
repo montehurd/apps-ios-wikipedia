@@ -7,6 +7,7 @@ let WMFMigrateToSharedContainerKey = "WMFMigrateToSharedContainerKey"
 let WMFMigrateSavedPageListKey = "WMFMigrateSavedPageListKey"
 let WMFMigrateBlackListKey = "WMFMigrateBlackListKey"
 let WMFMigrateToFixArticleCacheKey = "WMFMigrateToFixArticleCacheKey3"
+let WMFMigrateToMobileHTMLKey = "WMFMigrateToMobileHTMLKey"
 let WMFDidMigrateToGroupKey = "WMFDidMigrateToGroup"
 let WMFDidMigrateToCoreDataFeedKey = "WMFDidMigrateToCoreDataFeedKey"
 let WMFMostRecentInTheNewsNotificationDateKey = "WMFMostRecentInTheNewsNotificationDate"
@@ -363,7 +364,15 @@ let WMFSearchLanguageKey = "WMFSearchLanguageKey"
     @objc func wmf_didMigrateToFixArticleCache() -> Bool {
         return self.bool(forKey: WMFMigrateToFixArticleCacheKey)
     }
+
+    @objc func wmf_setDidMigrateToMobileHTML(_ didFinish: Bool) {
+        self.set(didFinish, forKey: WMFMigrateToMobileHTMLKey)
+    }
     
+    @objc func wmf_didMigrateToMobileHTML() -> Bool {
+        return self.bool(forKey: WMFMigrateToMobileHTMLKey)
+    }
+
     @objc func wmf_setDidMigrateToSharedContainer(_ didFinish: Bool) {
         self.set(didFinish, forKey: WMFMigrateToSharedContainerKey)
     }

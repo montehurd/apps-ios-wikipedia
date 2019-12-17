@@ -1,0 +1,19 @@
+{
+  "name": "pcs-html-converter",
+  "version": "1.0.0",
+  "repository": "github:wikimedia/pcs-html-converter",
+  "license": "Apache-2.0",
+  "description": "Browser based transformer for the Page Content Service. Convert Parsoid HTML and MobileView HTML to HTML compatible with PCS.",
+  "scripts": {
+    "build": "webpack -p"
+  },
+  "dependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/polyfill": "^7.7.0",
+    "@babel/preset-env": "^7.7.5",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "whatwg-fetch": "^3.0.0"
+  }
+}

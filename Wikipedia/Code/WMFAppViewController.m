@@ -682,6 +682,14 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
     if (self.housekeepingBackgroundTaskIdentifier == UIBackgroundTaskInvalid) {
         return;
     }
+    
+    NSLog(@"STOPPPPPPPPPPPPPPPPP!!!!!!!!=========");
+
+    [self.houseKeeper stopKickingItWithCompletionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        NSLog(@"Stopped kicking it");
+    }];
+
+    
     UIBackgroundTaskIdentifier backgroundTaskToStop = self.housekeepingBackgroundTaskIdentifier;
     self.housekeepingBackgroundTaskIdentifier = UIBackgroundTaskInvalid;
     [[UIApplication sharedApplication] endBackgroundTask:backgroundTaskToStop];
@@ -727,6 +735,12 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
 #pragma mark - Launch
 
 - (void)launchAppInWindow:(UIWindow *)window waitToResumeApp:(BOOL)waitToResumeApp {
+    
+    
+    self.houseKeeper = [WMFDatabaseHouseKeeper new];
+
+    
+    
     self.waitingToResumeApp = waitToResumeApp;
 
     WMFThemeableNavigationController *articleNavigationController = [[WMFThemeableNavigationController alloc] initWithRootViewController:self];
@@ -791,18 +805,35 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
                             bail();
                             return;
                         }
-                        [self.dataStore performLibraryUpdates:^{
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                self.migrationComplete = YES;
-                                self.migrationActive = NO;
-                                [self endMigrationBackgroundTask];
-                                [self checkRemoteAppConfigIfNecessary];
-                                [self setupControllers];
-                                if (!self.isWaitingToResumeApp) {
-                                    [self resumeApp:NULL];
-                                }
-                            });
+                        
+                        // THIS may not be the place for mobileHTML conversion - too slow,
+                        // but if kicked off from housekeeping it needs to only happen if isMigrationComplete
+                        [self migrateToMobileHTMLIfNecessaryWithCompletion:^{
+                            if (!migrationsAllowed) {
+                                bail();
+                                return;
+                            }
+
+                        
+                        
+                        
+                            [self.dataStore performLibraryUpdates:^{
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    self.migrationComplete = YES;
+                                    self.migrationActive = NO;
+                                    [self endMigrationBackgroundTask];
+                                    [self checkRemoteAppConfigIfNecessary];
+                                    [self setupControllers];
+                                    if (!self.isWaitingToResumeApp) {
+                                        [self resumeApp:NULL];
+                                    }
+                                });
+                            }];
+                        
+                        
+                        
                         }];
+
                     }];
                 }];
             }];
@@ -851,6 +882,33 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
     }];
 }
 
+
+- (void)migrateToMobileHTMLIfNecessaryWithCompletion:(nonnull dispatch_block_t)completion {
+    if ([[NSUserDefaults wmf] wmf_didMigrateToMobileHTML]) {
+        completion();
+    } else {
+        [self.houseKeeper kickItWithCompletionHandler:^(id _Nullable result, NSError * _Nullable error) {
+            if (error) {
+                DDLogError(@"Error during mobileHTML migration: %@", error);
+            } else {
+                [[NSUserDefaults wmf] wmf_setDidMigrateToMobileHTML:YES];
+            }
+            completion();
+        }];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 - (void)migrateToRemoveUnreferencedArticlesIfNecessaryWithCompletion:(nonnull dispatch_block_t)completion {
     if ([[NSUserDefaults wmf] wmf_didMigrateToFixArticleCache]) {
         completion();
@@ -873,6 +931,20 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
     self.waitingToResumeApp = NO;
     if (self.isMigrationComplete) {
         [self resumeApp:NULL];
+        
+        
+        
+//        [self.houseKeeper kickItWithCompletionHandler:^(id _Nullable result, NSError * _Nullable error) {
+//            if (error) {
+//                DDLogError(@"Error during mobileHTML migration: %@", error);
+//            } else {
+////                [[NSUserDefaults wmf] wmf_setDidMigrateToMobileHTML:YES];
+//            }
+////            completion();
+//        }];
+
+        
+        
     }
 }
 
@@ -1052,7 +1124,7 @@ static const NSString *kvo_SavedArticlesFetcher_progress = @"kvo_SavedArticlesFe
 
     [self.dataStore.feedContentController stopContentSources];
 
-    self.houseKeeper = [WMFDatabaseHouseKeeper new];
+//    self.houseKeeper = [WMFDatabaseHouseKeeper new];
     //TODO: these tasks should be converted to async so we can end the background task as soon as possible
     [self.dataStore clearMemoryCache];
 

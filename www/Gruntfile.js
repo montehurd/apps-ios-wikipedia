@@ -95,6 +95,12 @@ module.exports = function (grunt) {
           },
           {
             expand: true,
+            cwd: 'node_modules/pcs-html-converter/',
+            src: ['**'],
+            dest: `${distFolder}pcs-html-converter/`
+          },
+          {
+            expand: true,
             cwd: 'codemirror/',
             src: ['**', '!**/codemirror-range-*.js'],
             dest: `${distFolder}codemirror/`

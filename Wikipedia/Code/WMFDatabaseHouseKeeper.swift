@@ -1,6 +1,166 @@
 import Foundation
 
-@objc class WMFDatabaseHouseKeeper : NSObject {
+@objc class WMFDatabaseHouseKeeper : NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+/*
+    var count = 10
+    func test() {
+        self.webview.evaluateJavaScript("""
+    "boop"
+""") { (result, error) in
+            print("count = \(self.count)")
+            guard result != nil, error == nil else {
+                print("result = \(result ?? "") error = \(error.debugDescription)")
+                return
+            }
+            guard self.count > 0 else {
+                return
+            }
+            self.count = self.count - 1
+            self.test()
+        }
+    }
+    
+    lazy var webview: WKWebView = {
+        let wv = WKWebView()
+//        view.addSubview(wv)
+//        wv.frame = CGRect(x: 0, y: 0, width: 300, height: 800)
+        return wv
+    }()
+
+    @objc func test123() {
+        
+        
+        //loop(times: 10)
+        
+        test()
+        
+        
+        
+//        webview.test123()
+        
+        
+//        print("test123")
+
+    }
+     
+     
+     
+     let contentController = WKUserContentController()
+
+     contentController.add(self, name: "WebViewControllerMessageHandler")
+
+     let configuration = WKWebViewConfiguration()
+     configuration.userContentController = contentController
+
+     let webView = WKWebView(frame: .zero, configuration: configuration)
+
+*/    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+            lazy var webview: WKWebView = {
+                let contentController = WKUserContentController()
+
+                contentController.add(self, name: "WebViewControllerMessageHandler")
+
+                let configuration = WKWebViewConfiguration()
+                configuration.userContentController = contentController
+
+                let wv = WKWebView(frame: .zero, configuration: configuration)
+
+    //            let wv = WKWebView()
+                wv.navigationDelegate = self
+
+
+                return wv
+            }()
+
+            
+
+            func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+                print("\n ---------- \nMESSAGE RECEIVED: \(message.body) \n processed \(Date()) \n itemsToProcessCounter \(itemsToProcessCounter) time remaining \(UIApplication.shared.backgroundTimeRemaining)")
+
+                
+                itemsToProcessCounter = itemsToProcessCounter - 1
+                
+                if (itemsToProcessCounter == 0) {
+                    
+                    webview.evaluateJavaScript("stop123()") { (result, error) in
+                        print("result \(result) error \(error)")
+                    }
+
+                    
+                    completionHandler("TOTAL SUCCESS", nil)
+                }
+
+                
+            }
+
+
+        
+            func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    //            webview.evaluateJavaScript("test321()") { (result, error) in
+    //                print("result \(result) error \(error)")
+    //            }
+            }
+
+    
+    
+    /*
+     PER JOE:
+     - for ios integration just grab build products and directly check those in - have note about steps to regen these, but don't spend time on scripty bits
+     - figure out if when app backgrounded if the code native code which processes messages is still happening...
+     */
+    
+    var completionHandler: ((Any?, Error?) -> Void) = {(result, error) in }
+    var itemsToProcessCounter = 100
+
+    @objc func stopKickingIt(completionHandler:  ((Any?, Error?) -> Void)? = nil) {
+        webview.evaluateJavaScript("stop123()", completionHandler: completionHandler)
+    }
+    
+    @objc func kickIt(completionHandler: @escaping ((Any?, Error?) -> Void)) {
+//    @objc func kickIt() {
+//        let wv = webview
+        
+        //view.addSubview(webview)
+        
+        let htmlLocalFilePath =
+            ((WikipediaAppUtils.assetsPath() as NSString)
+                .appendingPathComponent("pcs-html-converter") as NSString)
+                .appendingPathComponent("mobileview_test.html")
+
+        let url2 = URL(fileURLWithPath: htmlLocalFilePath)
+        print(url2)
+self.completionHandler = completionHandler
+        webview.loadFileURL(URL(fileURLWithPath: htmlLocalFilePath), allowingReadAccessTo: url2.deletingLastPathComponent())
+
+    }
+    
+    
+    
+    
     
     // Returns deleted URLs
     @objc func performHouseKeepingOnManagedObjectContext(_ moc: NSManagedObjectContext, navigationStateController: NavigationStateController) throws -> [URL] {

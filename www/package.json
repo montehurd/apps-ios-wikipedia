@@ -4,7 +4,8 @@
   "repository": "https://gerrit.wikimedia.org/r/apps/ios/wikipedia",
   "version": "0.1.0",
   "dependencies": {
-    "wikimedia-page-library": "6.5.0"
+    "wikimedia-page-library": "6.5.0",
+    "pcs-html-converter": "file:///Users/montehurd/pcs-html-converter"
   },
   "devDependencies": {
     "grunt": "1.0.4",
