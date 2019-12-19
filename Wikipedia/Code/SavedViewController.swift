@@ -379,7 +379,7 @@ extension SavedViewController {
             
             guard
                 let url = article.url,
-                let jsonData = WMFArticleJSONCompilationHelper.reconstructMobileViewJSON(for: dataStore.article(with: url), imageSize: CGSize(width: article.imageWidth.intValue, height: article.imageHeight.intValue))
+                let jsonDict = dataStore.article(with: url).reconstructMobileViewJSON(imageSize: CGSize(width: article.imageWidth.intValue, height: article.imageHeight.intValue))
             else {
                 return
             }
@@ -387,11 +387,10 @@ extension SavedViewController {
             print("""
                 
                 RECONSTRUCTED JSON:
-                \(String(data: jsonData, encoding: .utf8)! as NSString /* https://stackoverflow.com/a/46740338 */ )
+                \(jsonDict)
                 
             """)
             
         }
     }
 }
-

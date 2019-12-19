@@ -84,18 +84,18 @@ fileprivate extension MWKArticle {
     }
 }
 
-extension WMFArticleJSONCompilationHelper {
-    @objc static func reconstructMobileViewJSON(for article: MWKArticle, imageSize: CGSize) -> Data? {
+extension MWKArticle {
+    @objc public func reconstructMobileViewJSON(imageSize: CGSize) -> [String: Any]? {
         /*
         print("""
         
             MWK ARTICLE:
-            \(article)
+            \(self)
             
         """)
         */
         guard
-            let sections = article.sections?.entries as? [MWKSection]
+            let sections = sections?.entries as? [MWKSection]
         else {
             assertionFailure("Couldn't get expected article sections")
             return nil
@@ -103,22 +103,22 @@ extension WMFArticleJSONCompilationHelper {
 
         var mvDict: [String: Any] = [:]
         
-        mvDict["ns"] = article.ns
-        mvDict["lastmodified"] = article.mobileViewLastModified()
-        mvDict["lastmodifiedby"] = article.mobileViewLastModifiedBy()
-        mvDict["revision"] = article.revisionId
-        mvDict["languagecount"] = article.languagecount
-        mvDict["displaytitle"] = article.displaytitle
-        mvDict["id"] = article.articleId
-        mvDict["pageprops"] = article.mobileViewPageProps()
-        mvDict["description"] = article.entityDescription
-        mvDict["descriptionsource"] = article.mobileViewDescriptionSource()
+        mvDict["ns"] = ns
+        mvDict["lastmodified"] = mobileViewLastModified()
+        mvDict["lastmodifiedby"] = mobileViewLastModifiedBy()
+        mvDict["revision"] = revisionId
+        mvDict["languagecount"] = languagecount
+        mvDict["displaytitle"] = displaytitle
+        mvDict["id"] = articleId
+        mvDict["pageprops"] = mobileViewPageProps()
+        mvDict["description"] = entityDescription
+        mvDict["descriptionsource"] = mobileViewDescriptionSource()
         mvDict["sections"] = sections.map { $0.mobileViewDict() }
-        mvDict["editable"] = article.editable
-        mvDict["image"] = article.mobileViewImage(size: imageSize)
-        mvDict["thumb"] = article.mobileViewThumbnail()
-        mvDict["protection"] = article.mobileViewProtection()
-        
-        return try? JSONSerialization.data(withJSONObject: ["mobileview": mvDict], options: [.prettyPrinted])
+        mvDict["editable"] = editable
+        mvDict["image"] = mobileViewImage(size: imageSize)
+        mvDict["thumb"] = mobileViewThumbnail()
+        mvDict["protection"] = mobileViewProtection()
+
+        return ["mobileview": mvDict]
     }
 }
