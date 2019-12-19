@@ -387,10 +387,9 @@ extension SavedViewController {
             print("""
                 
                 RECONSTRUCTED JSON:
-                \(jsonDict)
-                
             """)
-            
+            jsonDict.printAsFormattedJSON()
+
         }
     }
 }
