@@ -379,7 +379,7 @@ extension SavedViewController {
             
             guard
                 let url = article.url,
-                let jsonData = WMFArticleJSONCompilationHelper.reconstructMobileViewJSON(for: url, from: dataStore, imageSize: CGSize(width: article.imageWidth.intValue, height: article.imageHeight.intValue))
+                let jsonData = WMFArticleJSONCompilationHelper.reconstructMobileViewJSON(for: dataStore.article(with: url), imageSize: CGSize(width: article.imageWidth.intValue, height: article.imageHeight.intValue))
             else {
                 return
             }

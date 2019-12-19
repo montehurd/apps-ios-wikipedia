@@ -85,8 +85,7 @@ fileprivate extension MWKArticle {
 }
 
 extension WMFArticleJSONCompilationHelper {
-    @objc static func reconstructMobileViewJSON(for url: URL, from dataStore: MWKDataStore, imageSize: CGSize) -> Data? {
-        let article = dataStore.article(with: url)
+    @objc static func reconstructMobileViewJSON(for article: MWKArticle, imageSize: CGSize) -> Data? {
         /*
         print("""
         
