@@ -9,7 +9,7 @@ fileprivate extension MWKSection {
         dict["index"] = index
         dict["anchor"] = anchor
         dict["id"] = sectionId
-        dict["text"] = "text" // stringByReplacingImageURLsWithAppSchemeURLs(inHTMLString: text ?? "", withBaseURL: baseURL, targetImageWidth: imageWidth)
+        dict["text"] = text // stringByReplacingImageURLsWithAppSchemeURLs(inHTMLString: text ?? "", withBaseURL: baseURL, targetImageWidth: imageWidth)
         dict["fromtitle"] = fromURL?.wmf_titleWithUnderscores
         return dict
     }
@@ -17,27 +17,27 @@ fileprivate extension MWKSection {
 
 fileprivate extension MWKArticle {
     func mobileViewLastModified() -> String? {
-        if let lastModifiedDate = lastmodified {
-            return iso8601DateString(lastModifiedDate)
+        guard let lastModifiedDate = lastmodified else {
+            return nil
         }
-        return nil
+        return iso8601DateString(lastModifiedDate)
     }
     func mobileViewLastModifiedBy() -> [String: String]? {
-        if let lastmodifiedby = lastmodifiedby {
-            return [
-                "name": lastmodifiedby.name ?? "",
-                "gender": lastmodifiedby.gender ?? ""
-            ]
+        guard let lastmodifiedby = lastmodifiedby else {
+            return nil
         }
-        return nil
+        return [
+            "name": lastmodifiedby.name ?? "",
+            "gender": lastmodifiedby.gender ?? ""
+        ]
     }
     func mobileViewPageProps() -> [String: String]? {
-        if let wikidataId = wikidataId {
-            return [
-                "wikibase_item": wikidataId
-            ]
+        guard let wikidataId = wikidataId else {
+            return nil
         }
-        return nil
+        return [
+            "wikibase_item": wikidataId
+        ]
     }
     func mobileViewDescriptionSource() -> String? {
         switch descriptionSource {
@@ -51,38 +51,37 @@ fileprivate extension MWKArticle {
         }
     }
     func mobileViewImage(size: CGSize) -> [String: Any]? {
-        if let imgName = image?.canonicalFilename() {
-            return [
-                "file": imgName,
-                "width": size.width,
-                "height": size.height
-            ]
+        guard let imgName = image?.canonicalFilename() else {
+            return nil
         }
-        return nil
+        return [
+            "file": imgName,
+            "width": size.width,
+            "height": size.height
+        ]
     }
     func mobileViewThumbnail() -> [String: Any]? {
-        if let thumbnailSourceURL = imageURL /*article.thumbnail?.sourceURL.absoluteString*/ {
-            return [
-                "url": thumbnailSourceURL
-                // Can't seem to find the original thumb "width" and "height" to match that seen in the orig mobileview - did we not save/model these?
-            ]
+        guard let thumbnailSourceURL = imageURL /*article.thumbnail?.sourceURL.absoluteString*/ else {
+            return nil
         }
-        return nil
+        return [
+            "url": thumbnailSourceURL
+            // Can't seem to find the original thumb "width" and "height" to match that seen in the orig mobileview - did we not save/model these?
+        ]
     }
     func mobileViewProtection() -> [String: Any]? {
-        if let protection = protection {
-            var protectionDict:[String: Any] = [:]
-            for protectedAction in protection.protectedActions() {
-                guard let actionString = protectedAction as? String else {
-                    continue
-                }
-                protectionDict[actionString] = protection.allowedGroups(forAction: actionString)
-            }
-            return protectionDict
+        guard let protection = protection else {
+            return nil
         }
-        return nil
+        var protectionDict:[String: Any] = [:]
+        for protectedAction in protection.protectedActions() {
+            guard let actionString = protectedAction as? String else {
+                continue
+            }
+            protectionDict[actionString] = protection.allowedGroups(forAction: actionString)
+        }
+        return protectionDict
     }
-    // ^ switch these to use guard
 }
 
 extension WMFArticleJSONCompilationHelper {
