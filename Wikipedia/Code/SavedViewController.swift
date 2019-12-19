@@ -362,4 +362,36 @@ extension SavedViewController: UISearchBarDelegate {
     }
 }
 
+extension SavedViewController {
+    override func didReceiveMemoryWarning() {
+        guard let dataStore = dataStore else {
+            return
+        }
+
+        dataStore.savedPageList.enumerateItems { (article, stop) in
+            
+            print("""
+                
+                WMFARTICLE:
+                \(article)
+                
+            """)
+            
+            guard
+                let url = article.url,
+                let jsonData = WMFArticleJSONCompilationHelper.reconstructMobileViewJSON(for: url, from: dataStore, imageSize: CGSize(width: article.imageWidth.intValue, height: article.imageHeight.intValue))
+            else {
+                return
+            }
+            
+            print("""
+                
+                RECONSTRUCTED JSON:
+                \(String(data: jsonData, encoding: .utf8)! as NSString /* https://stackoverflow.com/a/46740338 */ )
+                
+            """)
+            
+        }
+    }
+}
 
