@@ -106,6 +106,19 @@ NSString *const WMFArticleFetcherErrorCachedFallbackArticleKey = @"WMFArticleFet
                                                            withQueryParameters:params
                                                              completionHandler:^(NSDictionary<NSString *, id> *_Nullable result, NSHTTPURLResponse *_Nullable response, NSError *_Nullable error) {
                                                                  articleResponse = result[@"mobileview"];
+
+// Test json reconstruction by grabbing some reconstructed json data for a saved article ('enwiki > Tamarack,_Minnesota') and using it instead of the fetched article json.
+// If the article looks ok that's a good sign...
+                                                                 /*
+id jsonData = [WMFArticleJSONCompilationHelper reconstructMobileViewJSONFor:[NSURL URLWithString: @"https://en.wikipedia.org/wiki/Tamarack,_Minnesota"]
+                                                                       from:[[SessionSingleton sharedInstance] dataStore]
+                                                                  imageSize: CGSizeMake(640, 640)];
+id jsonDict = [NSJSONSerialization JSONObjectWithData:jsonData
+                                              options:0
+                                                error:nil];
+articleResponse = jsonDict[@"mobileview"];
+*/
+
                                                                  articleError = error;
                                                                  [taskGroup leave];
                                                              }];
