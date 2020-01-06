@@ -8,10 +8,34 @@
     <body>
         <pre id="mobileHTML"></pre>
         <script>
-          function handleMobileHTML(mobileHTML) {
-            document.getElementById("mobileHTML").innerText = mobileHTML
+
+
+
+          function handleMobileHTML(mobileHTML, url) {
+            window.webkit.messageHandlers.MobileHTMLConverterMessageHandler.postMessage(
+              {
+                "url": url,
+                "mobileHTML": mobileHTML
+              }
+            )
           }
-          PCSHTMLConverter.testMobileView().then(handleMobileHTML)
+
+         function convertMobileHTML(url) {
+            let handler = mobileHTML => { return handleMobileHTML(mobileHTML, url) }
+             PCSHTMLConverter.testMobileView().then(handler)
+         }
+
+
+
+         function convertMobileHTML2(url, mobileViewHTML) {
+           let handler = mobileHTML => { return handleMobileHTML(mobileHTML, url) }
+           PCSHTMLConverter.convertMobileViewHTMLToMobileHTML(mobileViewHTML).then(handler)
+         }
+
+
+
+
+
         </script>
     </body>
 </html>

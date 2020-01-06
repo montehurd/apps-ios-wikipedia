@@ -1,0 +1,3 @@
+[submodule "mobileapps"]
+	path = mobileapps
+	url = https://gerrit.wikimedia.org/r/mediawiki/services/mobileapps

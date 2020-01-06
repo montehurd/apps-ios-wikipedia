@@ -1,5 +1,6 @@
 
 import Foundation
+import WebKit
 
 //Responsible for listening to new NewCacheItems added to the db, fetching those urls from the network and saving the response in FileManager.
 
@@ -10,7 +11,7 @@ import Foundation
 }
 
 @objc(WMFArticleCacheSyncer)
-final public class ArticleCacheSyncer: NSObject {
+final public class ArticleCacheSyncer: NSObject/*, WKScriptMessageHandler, WKNavigationDelegate*/ {
     
     private let moc: NSManagedObjectContext
     private let articleFetcher: ArticleFetcher
@@ -32,6 +33,10 @@ final public class ArticleCacheSyncer: NSObject {
     
     @objc public func setup() {
         NotificationCenter.default.addObserver(self, selector: #selector(managedObjectContextDidSave(_:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: moc)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didReceiveMemoryWarningNotification(note:)), name: UIApplication.didReceiveMemoryWarningNotification, object: nil)
+        
     }
     
     @objc private func managedObjectContextDidSave(_ note: Notification) {
@@ -67,7 +72,321 @@ final public class ArticleCacheSyncer: NSObject {
         let pathComponent = key.sha256 ?? key
         return cacheURL.appendingPathComponent(pathComponent, isDirectory: false)
     }
+    
+    
+    
+    
+    
+    
+    
+    lazy var converter: MobileviewToMobileHTMLConverter = {
+        MobileviewToMobileHTMLConverter.init()
+    }()
+    
+    
+//    lazy var bundledConverterFileURL: URL = {
+//        URL(fileURLWithPath: WikipediaAppUtils.assetsPath())
+//            .appendingPathComponent("pcs-html-converter", isDirectory: true)
+//            .appendingPathComponent("index.html", isDirectory: false)
+//    }()
+    
+    
+    
+    
+    
+    
+    
+    
+    @objc public func didReceiveMemoryWarningNotification(note: Notification) {
+        
+        
+        
+guard
+    let dataStore = SessionSingleton.sharedInstance()?.dataStore,
+    let articleURL = URL(string: "https://en.wikipedia.org/wiki/Kodak_Tower"),
+    let jsonDict = dataStore.article(with: articleURL).reconstructMobileViewJSON(imageSize: CGSize(width: 320, height: 320)),
+    let mobileview = jsonDict["mobileview"] as? Dictionary<String, Any>,
+    let mobileviewSections = mobileview["sections"] as? Array<Dictionary<String, Any>>
+else {
+    return
 }
+print(jsonDict)
+        
+        
+        
+        
+        let mobileviewHTMLArray = mobileviewSections.map({ (s) -> String in
+            return s["text"] as? String ?? ""
+        })
+
+        
+        let mobileviewHTML = mobileviewHTMLArray.joined(separator: "")
+
+        
+        
+        
+// next step - use the lines above to get actual mobileview json string and pass it to convert instead of 123 below
+// the stub convertMobileViewHTMLToMobileHTML js function i created is returning a test string - it's named wrong - is actually passed json
+// string - it will need to have settings in it's meta.mw adjusted too...
+//
+// call "npm run -s build" if i add/changes funcs in the PCSHTMLConverter.js
+// at very end will need to clear out these:
+//        .git
+//        .gitignore
+//        .gitmodules
+//        *.html (except index.html - keep that one)
+//        *.json
+//        node_modules
+//        mobileapps
+
+    
+    
+    
+    
+        
+        converter.load {
+            // get the reconstructMobileViewJSON from the saved MWKArticle -
+            // https://github.com/wikimedia/wikipedia-ios/compare/develop...montehurd:mobileview-extractor#diff-94222cb464a2ffde8018b72f88281cdcR381
+            self.converter.convert(url: "TEST", mobileViewHTML: "<html>123</html>") { (mobileHTML, error) in
+
+
+                // TODO:
+                // use the URL here to get the mobileview version of a saved article - then this will need to get passed to the JS with the url
+                // may need to send the url back in the completion block
+                
+                
+                print("mobileHTML = \(mobileHTML)")
+                
+            }
+
+        }
+        
+//        return
+            
+//        webview.loadFileURL(bundledConverterFileURL, allowingReadAccessTo: bundledConverterFileURL.deletingLastPathComponent())
+    }
+
+    
+    
+    
+    
+//    lazy var webview: WKWebView = {
+//        let contentController = WKUserContentController()
+//
+//        contentController.add(self, name: "MobileHTMLConverterMessageHandler")
+//
+//        let configuration = WKWebViewConfiguration()
+//        configuration.userContentController = contentController
+//
+//        let wv = WKWebView(frame: .zero, configuration: configuration)
+//
+//        wv.navigationDelegate = self
+//
+//        return wv
+//    }()
+//
+//    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+//        guard let body = message.body as? [String: Any] else {
+//            return
+//        }
+//        guard let urlString = body["url"] as? String else {
+//            return
+//        }
+//        guard let mobileHTMLString = body["mobileHTML"] as? String else {
+//            return
+//        }
+//
+//        print("wa")
+//    }
+//
+//    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+//        guard webView.url == bundledConverterFileURL else {
+//            return
+//        }
+//        print("YO")
+//
+//
+//
+//
+//        webview.evaluateJavaScript("convertMobileHTML('\("https://en.wikipedia.org/wiki/dog".wmf_stringBySanitizingForJavaScript())')") { (result, error) in
+//            print("result \(result ?? "") error \(error?.localizedDescription ?? "")")
+//        }
+//    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
+
+
+/*
+ 
+ 
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script src="build/Polyfill.js"></script>
+        <script src="build/PCSHTMLConverter.js"></script>
+    </head>
+    <body>
+        <pre id="mobileHTML"></pre>
+        <script>
+
+
+
+          function handleMobileHTML(mobileHTML, url) {
+            window.webkit.messageHandlers.MobileHTMLConverterMessageHandler.postMessage(
+              {
+                "url": url,
+                "mobileHTML": mobileHTML
+              }
+            )
+          }
+
+         function convertMobileHTML(url) {
+            let handler = mobileHTML => { return handleMobileHTML(mobileHTML, url) }
+             PCSHTMLConverter.testMobileView().then(handler)
+         }
+
+
+
+         function convertMobileHTML2(url, mobileViewHTML) {
+           let handler = mobileHTML => { return handleMobileHTML(mobileHTML, url) }
+           PCSHTMLConverter.convertMobileViewHTMLToMobileHTML(mobileViewHTML).then(handler)
+         }
+
+
+
+
+
+        </script>
+    </body>
+</html>
+ 
+ 
+ 
+ 
+ 
+async function convertMobileViewHTMLToMobileHTML(mobileViewHTML) {
+    const meta = {
+      domain: "en.wikipedia.org",
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
+      mw
+    }
+    const mobileViewJSON = JSON.parse(mobileViewHTML)
+    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    return mobileHTML
+}
+*/
+
+
+// WIP converter obj
+class MobileviewToMobileHTMLConverter : NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+    private var isConverterLoaded = false
+    lazy private var completionHandlers: [String: (Any?, Error?) -> Void] = [:]
+    
+    public func convert(url: String, mobileViewHTML: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+        guard isConverterLoaded else {
+            assertionFailure("Cannot do mobile-html conversion until 'load:completionHandler:' completes")
+            return
+        }
+        completionHandlers[url] = completionHandler
+        webView.evaluateJavaScript("""
+            const url = '\(url.wmf_stringBySanitizingForJavaScript())'
+            const mobileViewHTML = '\(mobileViewHTML.wmf_stringBySanitizingForJavaScript())'
+            convertMobileHTML2(url, mobileViewHTML)
+        """) { (result, error) in
+            guard error == nil else {
+                self.completionHandlers.removeValue(forKey: url)
+                assertionFailure("Unable to kick off mobile-html conversion \(error.debugDescription)")
+                return
+            }
+        }
+    }
+
+    private var loadCompletionHandler: (() -> Void) = {}
+    public func load(completionHandler: @escaping (() -> Void)) {
+        loadCompletionHandler = completionHandler
+        webView.loadFileURL(bundledConverterFileURL, allowingReadAccessTo: bundledConverterFileURL.deletingLastPathComponent())
+    }
+    
+    lazy private var webView: WKWebView = {
+        let contentController = WKUserContentController()
+        
+        contentController.add(self, name: "MobileHTMLConverterMessageHandler")
+        
+        let configuration = WKWebViewConfiguration()
+        configuration.userContentController = contentController
+        
+        let wv = WKWebView(frame: .zero, configuration: configuration)
+        
+        wv.navigationDelegate = self
+        
+        return wv
+    }()
+
+    lazy private var bundledConverterFileURL: URL = {
+        URL(fileURLWithPath: WikipediaAppUtils.assetsPath())
+            .appendingPathComponent("pcs-html-converter", isDirectory: true)
+            .appendingPathComponent("index.html", isDirectory: false)
+    }()
+
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let body = message.body as? [String: Any] else {
+            return
+        }
+        guard let url = body["url"] as? String else {
+            return
+        }
+        guard let mobileHTMLString = body["mobileHTML"] as? String else {
+            return
+        }
+        guard let queuedCompletionHandler = completionHandlers[url] else {
+//            self.completionHandlers.removeValue(forKey: url)
+            return
+        }
+        
+        
+        queuedCompletionHandler(mobileHTMLString, nil)
+        
+//        print(url)
+
+        
+/*
+TODO:
+here need to
+         extact the url string and mobilehtml from the message body
+         use the url string to get the correct completion handler - and invoke it with the mobilehtml
+         (should the completion handlers also get passed the url? probably)
+*/
+        
+    }
+    
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        isConverterLoaded = true
+        loadCompletionHandler()
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
 
 private extension ArticleCacheSyncer {
     func download(cacheItem: NewCacheItem) {

@@ -123,10 +123,31 @@ async function testMobileView() {
     return mobileHTML
 }
 
+
+
+
+async function convertMobileViewHTMLToMobileHTML(mobileViewHTML) {
+
+return "fartbox"
+
+    const meta = {
+      domain: "en.wikipedia.org",
+      baseURI: "http://localhost:6927/en.wikipedia.org/v1/",
+      mw
+    }
+    const mobileViewJSON = JSON.parse(mobileViewHTML)
+    const mobileHTML = await PCSHTMLConverter.convertMobileViewJSONToMobileHTML(mobileViewJSON, meta)
+    return mobileHTML
+}
+
+
+
+
 module.exports = {
     convertParsoidHTMLToMobileHTML,
     convertMobileSectionsJSONToMobileHTML,
     convertMobileViewJSONToMobileHTML,
+    convertMobileViewHTMLToMobileHTML,
     testParsoid,
     testMobileView,
     testMobileSections
